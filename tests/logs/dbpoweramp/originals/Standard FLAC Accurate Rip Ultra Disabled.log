@@ -1,0 +1,69 @@
+dBpoweramp Release 17.4 Digital Audio Extraction Log from Monday, March 15, 2021 10:22
+
+Drive & Settings
+----------------
+
+Ripping with drive 'E:   [ASUS     - BW-16D1HT       ]',  Drive offset: 6,  Overread Lead-in/out: No
+AccurateRip: Active,  Using C2: No,  Cache: 1024 KB,  FUA Cache Invalidate: No
+Pass 1 Drive Speed: Max,  Pass 2 Drive Speed: Max
+Bad Sector Re-rip::  Drive Speed: Max,  Maximum Re-reads: 34
+
+Encoder: FLAC -compression-level-8
+DSP Effects / Actions: -dspeffect1="CUE Sheet - Multiple Files="
+
+Extraction Log
+--------------
+
+Track 1:  Ripped LBA 0 to 18532 (4:07) in 0:48. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\01 - Speak to Me._
+  AccurateRip: Accurate (confidence 22)     [Pass 1]
+  CRC32: A1B2C3D4     AccurateRip CRC: B3C4D5E6 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-1]
+  AccurateRip Verified Confidence 22 [CRCv2 b3c4d5e6]
+
+Track 2:  Ripped LBA 18532 to 38471 (4:26) in 0:52. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\02 - Breathe._
+  AccurateRip: Accurate (confidence 22)     [Pass 1]
+  CRC32: C4D5E6F7     AccurateRip CRC: D5E6F7A8 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-2]
+  AccurateRip Verified Confidence 22 [CRCv2 d5e6f7a8]
+
+Track 3:  Ripped LBA 38471 to 56204 (3:56) in 0:44. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\03 - On the Run._
+  AccurateRip: Accurate (confidence 21)     [Pass 1]
+  CRC32: E6F7A8B9     AccurateRip CRC: F7A8B9C0 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-3]
+  AccurateRip Verified Confidence 21 [CRCv2 f7a8b9c0]
+
+Track 4:  Ripped LBA 56204 to 78341 (4:55) in 1:02. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\04 - Time._
+  AccurateRip: Accurate (confidence 23)     [Pass 1]
+  CRC32: F8A9B0C1     AccurateRip CRC: A9B0C1D2 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-4]
+  AccurateRip Verified Confidence 23 [CRCv2 a9b0c1d2]
+
+Track 5:  Ripped LBA 78341 to 96872 (4:07) in 0:49. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\05 - The Great Gig in the Sky._
+  AccurateRip: Accurate (confidence 22)     [Pass 1]
+  CRC32: B0C1D2E3     AccurateRip CRC: C1D2E3F4 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-5]
+  AccurateRip Verified Confidence 22 [CRCv2 c1d2e3f4]
+
+Track 6:  Ripped LBA 96872 to 114593 (3:56) in 0:47. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\06 - Money._
+  AccurateRip: Accurate (confidence 22)     [Pass 1]
+  CRC32: D2E3F4A5     AccurateRip CRC: E3F4A5B6 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-6]
+  AccurateRip Verified Confidence 22 [CRCv2 e3f4a5b6]
+
+Track 7:  Ripped LBA 114593 to 133264 (4:08) in 0:51. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\07 - Us and Them._
+  AccurateRip: Accurate (confidence 21)     [Pass 1]
+  CRC32: F4A5B6C7     AccurateRip CRC: A5B6C7D8 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-7]
+  AccurateRip Verified Confidence 21 [CRCv2 a5b6c7d8]
+
+Track 8:  Ripped LBA 133264 to 148903 (3:28) in 0:39. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\08 - Any Colour You Like._
+  AccurateRip: Accurate (confidence 22)     [Pass 1]
+  CRC32: B6C7D8E9     AccurateRip CRC: C7D8E9F0 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-8]
+  AccurateRip Verified Confidence 22 [CRCv2 c7d8e9f0]
+
+Track 9:  Ripped LBA 148903 to 168214 (4:17) in 0:53. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\09 - Brain Damage._
+  AccurateRip: Accurate (confidence 22)     [Pass 1]
+  CRC32: D8E9F0A1     AccurateRip CRC: E9F0A1B2 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-9]
+  AccurateRip Verified Confidence 22 [CRCv2 e9f0a1b2]
+
+Track 10:  Ripped LBA 168214 to 183611 (3:25) in 0:41. Filename: D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\10 - Eclipse._
+  AccurateRip: Accurate (confidence 22)     [Pass 1]
+  CRC32: F0A1B2C3     AccurateRip CRC: A1B2C3D4 (CRCv2)     [DiscID: 009-001a2b3c-00e4f5a6-6a07b809-10]
+  AccurateRip Verified Confidence 22 [CRCv2 a1b2c3d4]
+
+--------------
+
+10 Tracks Ripped Accurately

@@ -1,0 +1,69 @@
+<span class='good'>dBpoweramp Release <span class='log1'>17.4</span> Digital Audio Extraction Log from <span class='log1'>Monday, March 15, 2021 10:22</span></span>
+
+<span class='log4 log5'>Drive & Settings</span>
+<strong>----------------
+</strong>
+Ripping with drive '<span class='good'>E:   <span class='log4'>[ASUS     - BW-16D1HT       ]</span></span>',  Drive offset: <span class='good'>6</span>,  Overread Lead-in/out: <span class='log4'>No</span>
+AccurateRip: <span class='good'>Active</span>,  Using C2: <span class='good'>No</span>,  Cache: <span class='log4'>1024 KB</span>,  FUA Cache Invalidate: <span class='badish'>No</span>
+Pass 1 Drive Speed: <span class='log4'>Max</span>,  Pass 2 Drive Speed: <span class='log4'>Max</span>
+Bad Sector Re-rip:<span class='log4'>:  Drive Speed: Max</span>,  Maximum Re-reads: <span class='good'>34</span>
+
+Encoder: <span class='good'>FLAC -compression-level-8</span>
+DSP Effects / Actions: -dspeffect1="CUE Sheet - Multiple Files="
+
+<span class='log4 log5'>Extraction Log</span>
+<strong>--------------</strong>
+<span class='log5'>Track</span> <span class='log4 log1'>1</span>:  Ripped LBA <span class='log1'>0 to 18532</span> (<span class='log1'>4:07</span>) in <span class='log1'>0:48</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\01 - Speak to Me._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 22)     [Pass 1]</span>
+  CRC32: <span class='log3'>A1B2C3D4</span>     AccurateRip CRC: <span class='log3'>B3C4D5E6</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-1</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>22</span> [CRCv2 <span class='log3'>b3c4d5e6</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>2</span>:  Ripped LBA <span class='log1'>18532 to 38471</span> (<span class='log1'>4:26</span>) in <span class='log1'>0:52</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\02 - Breathe._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 22)     [Pass 1]</span>
+  CRC32: <span class='log3'>C4D5E6F7</span>     AccurateRip CRC: <span class='log3'>D5E6F7A8</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-2</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>22</span> [CRCv2 <span class='log3'>d5e6f7a8</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>3</span>:  Ripped LBA <span class='log1'>38471 to 56204</span> (<span class='log1'>3:56</span>) in <span class='log1'>0:44</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\03 - On the Run._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 21)     [Pass 1]</span>
+  CRC32: <span class='log3'>E6F7A8B9</span>     AccurateRip CRC: <span class='log3'>F7A8B9C0</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-3</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>21</span> [CRCv2 <span class='log3'>f7a8b9c0</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>4</span>:  Ripped LBA <span class='log1'>56204 to 78341</span> (<span class='log1'>4:55</span>) in <span class='log1'>1:02</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\04 - Time._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 23)     [Pass 1]</span>
+  CRC32: <span class='log3'>F8A9B0C1</span>     AccurateRip CRC: <span class='log3'>A9B0C1D2</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-4</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>23</span> [CRCv2 <span class='log3'>a9b0c1d2</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>5</span>:  Ripped LBA <span class='log1'>78341 to 96872</span> (<span class='log1'>4:07</span>) in <span class='log1'>0:49</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\05 - The Great Gig in the Sky._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 22)     [Pass 1]</span>
+  CRC32: <span class='log3'>B0C1D2E3</span>     AccurateRip CRC: <span class='log3'>C1D2E3F4</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-5</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>22</span> [CRCv2 <span class='log3'>c1d2e3f4</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>6</span>:  Ripped LBA <span class='log1'>96872 to 114593</span> (<span class='log1'>3:56</span>) in <span class='log1'>0:47</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\06 - Money._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 22)     [Pass 1]</span>
+  CRC32: <span class='log3'>D2E3F4A5</span>     AccurateRip CRC: <span class='log3'>E3F4A5B6</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-6</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>22</span> [CRCv2 <span class='log3'>e3f4a5b6</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>7</span>:  Ripped LBA <span class='log1'>114593 to 133264</span> (<span class='log1'>4:08</span>) in <span class='log1'>0:51</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\07 - Us and Them._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 21)     [Pass 1]</span>
+  CRC32: <span class='log3'>F4A5B6C7</span>     AccurateRip CRC: <span class='log3'>A5B6C7D8</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-7</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>21</span> [CRCv2 <span class='log3'>a5b6c7d8</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>8</span>:  Ripped LBA <span class='log1'>133264 to 148903</span> (<span class='log1'>3:28</span>) in <span class='log1'>0:39</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\08 - Any Colour You Like._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 22)     [Pass 1]</span>
+  CRC32: <span class='log3'>B6C7D8E9</span>     AccurateRip CRC: <span class='log3'>C7D8E9F0</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-8</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>22</span> [CRCv2 <span class='log3'>c7d8e9f0</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>9</span>:  Ripped LBA <span class='log1'>148903 to 168214</span> (<span class='log1'>4:17</span>) in <span class='log1'>0:53</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\09 - Brain Damage._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 22)     [Pass 1]</span>
+  CRC32: <span class='log3'>D8E9F0A1</span>     AccurateRip CRC: <span class='log3'>E9F0A1B2</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-9</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>22</span> [CRCv2 <span class='log3'>e9f0a1b2</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>10</span>:  Ripped LBA <span class='log1'>168214 to 183611</span> (<span class='log1'>3:25</span>) in <span class='log1'>0:41</span>. Filename: <span class='log3'>D:\Rips\Pink Floyd - The Dark Side of the Moon (1973) [FLAC]\10 - Eclipse._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 22)     [Pass 1]</span>
+  CRC32: <span class='log3'>F0A1B2C3</span>     AccurateRip CRC: <span class='log3'>A1B2C3D4</span> (CRCv2)     [DiscID: <span class='log3'>009-001a2b3c-00e4f5a6-6a07b809-10</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>22</span> [CRCv2 <span class='log3'>a1b2c3d4</span>]</span>
+
+
+<strong>--------------
+</strong>
+<span class='good'>10 Tracks Ripped Accurately</span>

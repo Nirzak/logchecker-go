@@ -1,0 +1,65 @@
+dBpoweramp Release 16.6 Digital Audio Extraction Log from Wednesday, April 14, 2021 15:33
+
+Drive & Settings
+----------------
+
+Ripping with drive 'F:   [LITE-ON  - iHAS124   B     ]',  Drive offset: 48,  Overread Lead-in/out: No
+AccurateRip: Active,  Using C2: No,  Cache: 1024 KB,  FUA Cache Invalidate: No
+Pass 1 Drive Speed: Max,  Pass 2 Drive Speed: Max
+Ultra::  Vary Drive Speed: Yes,  Min Passes: 1,  Max Passes: 3,  Finish After Clean Passes: 2
+Bad Sector Re-rip::  Drive Speed: Max,  Maximum Re-reads: 34
+
+Encoder: FLAC -compression-level-8
+DSP Effects / Actions: -dspeffect1="CUE Sheet - Multiple Files="
+
+Extraction Log
+--------------
+
+Track 1:  Ripped LBA 0 to 19832 (4:24) in 1:08. Filename: D:\Rips\Dire Straits - Brothers in Arms (1985) [FLAC]\01 - So Far Away._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: A1F2B3C4     AccurateRip CRC: B2C3D4E5 (CRCv2)     [DiscID: 009-001c3d4e-01f2a3b4-7c08d509-1]
+  AccurateRip Verified Confidence 14 [CRCv2 b2c3d4e5]
+
+Track 2:  Ripped LBA 19832 to 41274 (4:46) in 1:14. Filename: D:\Rips\Dire Straits - Brothers in Arms (1985) [FLAC]\02 - Money for Nothing._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: C3D4E5F6     AccurateRip CRC: D4E5F6A7 (CRCv2)     [DiscID: 009-001c3d4e-01f2a3b4-7c08d509-2]
+  AccurateRip Verified Confidence 14 [CRCv2 d4e5f6a7]
+
+Track 3:  Ripped LBA 41274 to 58903 (3:55) in 1:02. Filename: D:\Rips\Dire Straits - Brothers in Arms (1985) [FLAC]\03 - Walk of Life._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: E5F6A7B8     AccurateRip CRC: F6A7B8C9 (CRCv2)     [DiscID: 009-001c3d4e-01f2a3b4-7c08d509-3]
+  AccurateRip Verified Confidence 15 [CRCv2 f6a7b8c9]
+
+Track 4:  Ripped LBA 58903 to 77541 (4:08) in 1:05. Filename: D:\Rips\Dire Straits - Brothers in Arms (1985) [FLAC]\04 - Your Latest Trick._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: A7B8C9D0     AccurateRip CRC: B8C9D0E1 (CRCv2)     [DiscID: 009-001c3d4e-01f2a3b4-7c08d509-4]
+  AccurateRip Verified Confidence 14 [CRCv2 b8c9d0e1]
+
+Track 5:  Ripped LBA 77541 to 96184 (4:08) in 1:03. Filename: D:\Rips\Dire Straits - Brothers in Arms (1985) [FLAC]\05 - Why Worry._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: C9D0E1F2     AccurateRip CRC: D0E1F2A3 (CRCv2)     [DiscID: 009-001c3d4e-01f2a3b4-7c08d509-5]
+  AccurateRip Verified Confidence 14 [CRCv2 d0e1f2a3]
+
+Track 6:  Ripped LBA 96184 to 117392 (4:42) in 1:18. Filename: D:\Rips\Dire Straits - Brothers in Arms (1985) [FLAC]\06 - Ride Across the River._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: E1F2A3B4     AccurateRip CRC: F2A3B4C5 (CRCv2)     [DiscID: 009-001c3d4e-01f2a3b4-7c08d509-6]
+  AccurateRip Verified Confidence 15 [CRCv2 f2a3b4c5]
+
+Track 7:  Ripped LBA 117392 to 139871 (4:59) in 1:22. Filename: D:\Rips\Dire Straits - Brothers in Arms (1985) [FLAC]\07 - The Man's Too Strong._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: A3B4C5D6     AccurateRip CRC: B4C5D6E7 (CRCv2)     [DiscID: 009-001c3d4e-01f2a3b4-7c08d509-7]
+  AccurateRip Verified Confidence 14 [CRCv2 b4c5d6e7]
+
+Track 8:  Ripped LBA 139871 to 158293 (4:05) in 1:04. Filename: D:\Rips\Dire Straits - Brothers in Arms (1985) [FLAC]\08 - One World._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: C5D6E7F8     AccurateRip CRC: D6E7F8A9 (CRCv2)     [DiscID: 009-001c3d4e-01f2a3b4-7c08d509-8]
+  AccurateRip Verified Confidence 14 [CRCv2 d6e7f8a9]
+
+Track 9:  Ripped LBA 158293 to 186741 (6:19) in 1:57. Filename: D:\Rips\Dire Straits - Brothers in Arms (1985) [FLAC]\09 - Brothers in Arms._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: E7F8A9B0     AccurateRip CRC: F8A9B0C1 (CRCv2)     [DiscID: 009-001c3d4e-01f2a3b4-7c08d509-9]
+  AccurateRip Verified Confidence 15 [CRCv2 f8a9b0c1]
+
+--------------
+
+9 Tracks Ripped Accurately

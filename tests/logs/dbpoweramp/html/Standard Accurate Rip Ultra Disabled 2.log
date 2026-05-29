@@ -1,0 +1,73 @@
+<span class='good'>dBpoweramp Release <span class='log1'>16.3</span> Digital Audio Extraction Log from <span class='log1'>Tuesday, November 13, 2018 08:51</span></span>
+
+<span class='log4 log5'>Drive & Settings</span>
+<strong>----------------
+</strong>
+Ripping with drive '<span class='good'>D:   <span class='log4'>[HL-DT-ST - DVDRW  GX50N    ]</span></span>',  Drive offset: <span class='good'>6</span>,  Overread Lead-in/out: <span class='log4'>No</span>
+AccurateRip: <span class='good'>Active</span>,  Using C2: <span class='good'>No</span>,  Cache: <span class='log4'>1024 KB</span>,  FUA Cache Invalidate: <span class='badish'>No</span>
+Pass 1 Drive Speed: <span class='log4'>Max</span>,  Pass 2 Drive Speed: <span class='log4'>Max</span>
+Bad Sector Re-rip:<span class='log4'>:  Drive Speed: Max</span>,  Maximum Re-reads: <span class='good'>34</span>
+
+Encoder: <span class='badish'>Wave -compression="PCM"</span>
+DSP Effects / Actions: -dspeffect1="CUE Sheet - Multiple Files="
+
+<span class='log4 log5'>Extraction Log</span>
+<strong>--------------</strong>
+<span class='log5'>Track</span> <span class='log4 log1'>1</span>:  Ripped LBA <span class='log1'>0 to 21577</span> (<span class='log1'>4:47</span>) in <span class='log1'>0:33</span>. Filename: <span class='log3'>C:\RxS WAV Rip\Ajay Devgan - Once Upon A Time In Mumbaai (2010) [Wave]\01 - Pi Loon._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 8)     [Pass 1]</span>
+  CRC32: <span class='log3'>858317B4</span>     AccurateRip CRC: <span class='log3'>3C914443</span> (CRCv2)     [DiscID: <span class='log3'>009-000f105c-006e4f61-8a0a4209-1</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>8</span> [CRCv2 <span class='log3'>3c914443</span>]</span>
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>3</span> [CRCv1 <span class='log3'>cceea01d</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>2</span>:  Ripped LBA <span class='log1'>21577 to 43211</span> (<span class='log1'>4:48</span>) in <span class='log1'>0:32</span>. Filename: <span class='log3'>C:\RxS WAV Rip\Ajay Devgan - Once Upon A Time In Mumbaai (2010) [Wave]\02 - Tum Jo Aaye._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 8)     [Pass 1]</span>
+  CRC32: <span class='log3'>6F914E0A</span>     AccurateRip CRC: <span class='log3'>C15E5553</span> (CRCv2)     [DiscID: <span class='log3'>009-000f105c-006e4f61-8a0a4209-2</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>8</span> [CRCv2 <span class='log3'>c15e5553</span>]</span>
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>3</span> [CRCv1 <span class='log3'>444f7aa6</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>3</span>:  Ripped LBA <span class='log1'>43211 to 65844</span> (<span class='log1'>5:01</span>) in <span class='log1'>0:31</span>. Filename: <span class='log3'>C:\RxS WAV Rip\Ajay Devgan - Once Upon A Time In Mumbaai (2010) [Wave]\03 - I Am In Love._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 8)     [Pass 1]</span>
+  CRC32: <span class='log3'>3BA075EC</span>     AccurateRip CRC: <span class='log3'>953468DF</span> (CRCv2)     [DiscID: <span class='log3'>009-000f105c-006e4f61-8a0a4209-3</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>8</span> [CRCv2 <span class='log3'>953468df</span>]</span>
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>3</span> [CRCv1 <span class='log3'>14692a19</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>4</span>:  Ripped LBA <span class='log1'>65844 to 90092</span> (<span class='log1'>5:23</span>) in <span class='log1'>0:30</span>. Filename: <span class='log3'>C:\RxS WAV Rip\Ajay Devgan - Once Upon A Time In Mumbaai (2010) [Wave]\04 - Parda._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 8)     [Pass 1]</span>
+  CRC32: <span class='log3'>1EBFFE36</span>     AccurateRip CRC: <span class='log3'>3578F39A</span> (CRCv2)     [DiscID: <span class='log3'>009-000f105c-006e4f61-8a0a4209-4</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>8</span> [CRCv2 <span class='log3'>3578f39a</span>]</span>
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>3</span> [CRCv1 <span class='log3'>35456411</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>5</span>:  Ripped LBA <span class='log1'>90092 to 111777</span> (<span class='log1'>4:49</span>) in <span class='log1'>0:27</span>. Filename: <span class='log3'>C:\RxS WAV Rip\Ajay Devgan - Once Upon A Time In Mumbaai (2010) [Wave]\05 - Babu Rao._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 8)     [Pass 1]</span>
+  CRC32: <span class='log3'>3FD266C8</span>     AccurateRip CRC: <span class='log3'>5BC3B5EF</span> (CRCv2)     [DiscID: <span class='log3'>009-000f105c-006e4f61-8a0a4209-5</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>8</span> [CRCv2 <span class='log3'>5bc3b5ef</span>]</span>
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>3</span> [CRCv1 <span class='log3'>c9a42f80</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>6</span>:  Ripped LBA <span class='log1'>111777 to 131991</span> (<span class='log1'>4:29</span>) in <span class='log1'>0:25</span>. Filename: <span class='log3'>C:\RxS WAV Rip\Ajay Devgan - Once Upon A Time In Mumbaai (2010) [Wave]\06 - Tum Jo Aaye ~ Reprise._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 8)     [Pass 1]</span>
+  CRC32: <span class='log3'>30A29D82</span>     AccurateRip CRC: <span class='log3'>7B1E1BD7</span> (CRCv2)     [DiscID: <span class='log3'>009-000f105c-006e4f61-8a0a4209-6</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>8</span> [CRCv2 <span class='log3'>7b1e1bd7</span>]</span>
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>3</span> [CRCv1 <span class='log3'>a9bd7016</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>7</span>:  Ripped LBA <span class='log1'>131991 to 153525</span> (<span class='log1'>4:47</span>) in <span class='log1'>0:25</span>. Filename: <span class='log3'>C:\RxS WAV Rip\Ajay Devgan - Once Upon A Time In Mumbaai (2010) [Wave]\07 - I Am In Love ~ v2._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 8)     [Pass 1]</span>
+  CRC32: <span class='log3'>2819E993</span>     AccurateRip CRC: <span class='log3'>12DC1966</span> (CRCv2)     [DiscID: <span class='log3'>009-000f105c-006e4f61-8a0a4209-7</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>8</span> [CRCv2 <span class='log3'>12dc1966</span>]</span>
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>3</span> [CRCv1 <span class='log3'>eb6bbd49</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>8</span>:  Ripped LBA <span class='log1'>153525 to 172252</span> (<span class='log1'>4:09</span>) in <span class='log1'>0:22</span>. Filename: <span class='log3'>C:\RxS WAV Rip\Ajay Devgan - Once Upon A Time In Mumbaai (2010) [Wave]\08 - Pi Loon ~ ReMix._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 7)     [Pass 1]</span>
+  CRC32: <span class='log3'>FBABB1AC</span>     AccurateRip CRC: <span class='log3'>6E183ED0</span> (CRCv2)     [DiscID: <span class='log3'>009-000f105c-006e4f61-8a0a4209-8</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>7</span> [CRCv2 <span class='log3'>6e183ed0</span>]</span>
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>3</span> [CRCv1 <span class='log3'>a8159f16</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>9</span>:  Ripped LBA <span class='log1'>172252 to 196959</span> (<span class='log1'>5:29</span>) in <span class='log1'>0:26</span>. Filename: <span class='log3'>C:\RxS WAV Rip\Ajay Devgan - Once Upon A Time In Mumbaai (2010) [Wave]\09 - I Am In Love ~ Dance._</span>
+  <span class='good'>AccurateRip: Accurate (confidence 8)     [Pass 1]</span>
+  CRC32: <span class='log3'>FDA08DA9</span>     AccurateRip CRC: <span class='log3'>7AAF5A72</span> (CRCv2)     [DiscID: <span class='log3'>009-000f105c-006e4f61-8a0a4209-9</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>8</span> [CRCv2 <span class='log3'>7aaf5a72</span>]</span>
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>3</span> [CRCv1 <span class='log3'>6b3016a4</span>]</span>
+
+
+<strong>--------------
+</strong>
+<span class='good'>9 Tracks Ripped Accurately</span>

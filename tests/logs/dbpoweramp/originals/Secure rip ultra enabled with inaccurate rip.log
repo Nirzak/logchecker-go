@@ -1,0 +1,72 @@
+dBpoweramp Release 16.6 Digital Audio Extraction Log from Friday, August 13, 2021 18:45
+
+Drive & Settings
+----------------
+
+Ripping with drive 'F:   [LITE-ON  - iHAS124   B     ]',  Drive offset: 48,  Overread Lead-in/out: No
+AccurateRip: Active,  Using C2: No,  Cache: 1024 KB,  FUA Cache Invalidate: No
+Pass 1 Drive Speed: Max,  Pass 2 Drive Speed: Max
+Ultra::  Vary Drive Speed: Yes,  Min Passes: 1,  Max Passes: 4,  Finish After Clean Passes: 2
+Bad Sector Re-rip::  Drive Speed: Max,  Maximum Re-reads: 34
+
+Encoder: FLAC -compression-level-5
+
+Extraction Log
+--------------
+
+Track 1:  Ripped LBA 0 to 21403 (4:45) in 1:12. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\01 - Come Together._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: 1A2B3C4D     AccurateRip CRC: 2B3C4D5E (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-1]
+  AccurateRip Verified Confidence 18 [CRCv2 2b3c4d5e]
+
+Track 2:  Ripped LBA 21403 to 39872 (4:06) in 1:05. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\02 - Something._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: 3C4D5E6F     AccurateRip CRC: 4D5E6F7A (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-2]
+  AccurateRip Verified Confidence 18 [CRCv2 4d5e6f7a]
+
+Track 3:  Ripped LBA 39872 to 54219 (3:11) in 0:58. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\03 - Maxwell's Silver Hammer._
+  Secure (Warning)  [Pass 1 & 2, Ultra 1 to 3, Re-Rip 8 Frames]
+  CRC32: 5E6F7A8B     AccurateRip CRC: 6F7A8B9C (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-3]
+  AccurateRip Verified Confidence 17 [CRCv2 6f7a8b9c]
+
+Track 4:  Ripped LBA 54219 to 69381 (3:22) in 1:14. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\04 - Oh! Darling._
+  Secure  [Pass 1 & 2, Ultra 1 to 2]
+  CRC32: 7A8B9C0D     AccurateRip CRC: 8B9C0D1E (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-4]
+  AccurateRip Verified Confidence 18 [CRCv2 8b9c0d1e]
+
+Track 5:  Ripped LBA 69381 to 80543 (2:28) in 0:47. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\05 - Octopus's Garden._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: 9C0D1E2F     AccurateRip CRC: 0D1E2F3A (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-5]
+  AccurateRip Verified Confidence 18 [CRCv2 0d1e2f3a]
+
+Track 6:  Ripped LBA 80543 to 97162 (3:41) in 1:28. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\06 - I Want You._
+  Secure (Warning)  [Pass 1 & 2, Ultra 1 to 4, Re-Rip 24 Frames]
+  CRC32: 1E2F3A4B     AccurateRip CRC: 2F3A4B5C (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-6]
+  AccurateRip Verified Confidence 16 [CRCv2 2f3a4b5c]
+
+Track 7:  Ripped LBA 97162 to 115284 (4:01) in 0:59. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\07 - Here Comes the Sun._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: 3A4B5C6D     AccurateRip CRC: 4B5C6D7E (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-7]
+  AccurateRip Verified Confidence 18 [CRCv2 4b5c6d7e]
+
+Track 8:  Ripped LBA 115284 to 134593 in 0:54. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\08 - Because._
+  AccurateRip: Not in Database     [Pass 1]
+  CRC32: 5C6D7E8F     AccurateRip CRC: 6D7E8F9A (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-8]
+
+Track 9:  Ripped LBA 134593 to 148821 in 0:43. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\09 - You Never Give Me Your Money._
+  AccurateRip: Inaccurate     [Pass 1 & 2]
+  CRC32: 7E8F9A0B     AccurateRip CRC: 8F9A0B1C (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-9]
+
+Track 10:  Ripped LBA 148821 to 163044 in 0:39. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\10 - Sun King._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: 9A0B1C2D     AccurateRip CRC: 0B1C2D3E (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-10]
+  AccurateRip Verified Confidence 17 [CRCv2 0b1c2d3e]
+
+Track 11:  Ripped LBA 163044 to 175312 in 0:37. Filename: G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\11 - Mean Mr. Mustard._
+  Secure  [Pass 1 & 2, Ultra 1 to 1]
+  CRC32: 1C2D3E4F     AccurateRip CRC: 2D3E4F5A (CRCv2)     [DiscID: 011-001f3a4b-020e8c9d-7b0c940b-11]
+  AccurateRip Verified Confidence 18 [CRCv2 2d3e4f5a]
+
+--------------
+
+11 Tracks Ripped: 7 Secure, 2 Secure (Warning), 1 Not in Database, 1 Inaccurate

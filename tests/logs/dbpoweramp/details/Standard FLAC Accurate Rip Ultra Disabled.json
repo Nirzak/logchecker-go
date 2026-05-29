@@ -1,0 +1,11 @@
+{
+    "ripper": "dBpoweramp",
+    "version": "17.4",
+    "language": "en",
+    "combined": false,
+    "score": 100,
+    "checksum": "checksum_missing",
+    "details": [
+        "[Notice] FUA Cache Invalidate is disabled (audio cache may not be fully defeated)."
+    ]
+}

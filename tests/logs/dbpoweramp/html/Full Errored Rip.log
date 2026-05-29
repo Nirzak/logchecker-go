@@ -1,0 +1,24 @@
+<span class='good'>dBpoweramp Release <span class='log1'>14.2</span> Digital Audio Extraction Log from <span class='log1'>Monday, July 17, 2023 11:22 PM</span></span>
+
+<span class='log4 log5'>Drive & Settings</span>
+<strong>----------------
+</strong>
+Ripping with drive '<span class='good'>I:   <span class='log4'>[ASUS     - DRW-24D5MT      ]</span></span>',  Drive offset: <span class='good'>6</span>,  Overread Lead-in/out: <span class='log4'>No</span>
+AccurateRip: <span class='good'>Active</span>,  Using C2: <span class='good'>No</span>,  Cache: <span class='log4'>1024 KB</span>,  FUA Cache Invalidate: <span class='badish'>No</span>
+Pass 1 Drive Speed: <span class='log4'>Max</span>,  Pass 2 Drive Speed: <span class='log4'>Max</span>
+Bad Sector Re-rip:<span class='log4'>:  Drive Speed: Max</span>,  Maximum Re-reads: <span class='good'>34</span>
+
+Encoder: <span class='badish'>Wave -compression="PCM" -bits="16" -freq="44100" -channels="2"</span>
+
+<span class='log4 log5'>Extraction Log</span>
+<strong>--------------</strong>
+<span class='log5'>Track</span> <span class='log4 log1'>1</span>:<span class='bad'>  ERROR Ripping LBA 0 to 27167 (6:02) in 2:08. Filename: <span class='log3'>C:\Users\RYZEN\Music\ks\k\01 ks - Track 1.wav</span></span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>2</span>:<span class='bad'>  ERROR Ripping LBA 27167 to 47145 (4:26) in 1:41. Filename: <span class='log3'>C:\Users\RYZEN\Music\ks\k\02 ks - Track 2.wav</span></span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>3</span>:<span class='bad'>  ERROR Ripping LBA 47145 to 70463 (5:10) in 1:31. Filename: <span class='log3'>C:\Users\RYZEN\Music\ks\k\03 ks - Track 3.wav</span></span>
+
+
+<strong>--------------
+</strong>
+<span class='bad'>User Stopped Ripping</span>

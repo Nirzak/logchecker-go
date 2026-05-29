@@ -1,0 +1,14 @@
+{
+    "ripper": "dBpoweramp",
+    "version": "16.6",
+    "language": "en",
+    "combined": false,
+    "score": 87,
+    "checksum": "checksum_missing",
+    "details": [
+        "[Notice] FUA Cache Invalidate is disabled (audio cache may not be fully defeated).",
+        "Track 03: Secure (Warning) \u2014 re-rip occurred during extraction (-1 point)",
+        "Track 06: Secure (Warning) with high re-rip frame count (24 frames) (-2 points)",
+        "Track 09: AccurateRip: Inaccurate \u2014 data integrity cannot be confirmed (-10 points)"
+    ]
+}

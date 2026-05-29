@@ -1,0 +1,72 @@
+<span class='good'>dBpoweramp Release <span class='log1'>16.6</span> Digital Audio Extraction Log from <span class='log1'>Friday, August 13, 2021 18:45</span></span>
+
+<span class='log4 log5'>Drive & Settings</span>
+<strong>----------------
+</strong>
+Ripping with drive '<span class='badish'>F:   <span class='log4'>[LITE-ON  - iHAS124   B     ] (not found in database)</span></span>',  Drive offset: <span class='badish'>48</span>,  Overread Lead-in/out: <span class='log4'>No</span>
+AccurateRip: <span class='good'>Active</span>,  Using C2: <span class='good'>No</span>,  Cache: <span class='log4'>1024 KB</span>,  FUA Cache Invalidate: <span class='badish'>No</span>
+Pass 1 Drive Speed: <span class='log4'>Max</span>,  Pass 2 Drive Speed: <span class='log4'>Max</span>
+<span class='good'>Ultra:<span class='log4'>:</span></span>  Vary Drive Speed: <span class='log4'>Yes</span>,  Min Passes: <span class='log4'>1</span>,  Max Passes: <span class='log4'>4</span>,  Finish After Clean Passes: <span class='log4'>2</span>
+Bad Sector Re-rip:<span class='log4'>:  Drive Speed: Max</span>,  Maximum Re-reads: <span class='good'>34</span>
+
+Encoder: <span class='good'>FLAC -compression-level-5</span>
+
+<span class='log4 log5'>Extraction Log</span>
+<strong>--------------</strong>
+<span class='log5'>Track</span> <span class='log4 log1'>1</span>:  Ripped LBA <span class='log1'>0 to 21403</span> (<span class='log1'>4:45</span>) in <span class='log1'>1:12</span>. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\01 - Come Together._</span>
+  <span class='good'>Secure  [Pass 1 & 2, Ultra 1 to 1]</span>
+  CRC32: <span class='log3'>1A2B3C4D</span>     AccurateRip CRC: <span class='log3'>2B3C4D5E</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-1</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>18</span> [CRCv2 <span class='log3'>2b3c4d5e</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>2</span>:  Ripped LBA <span class='log1'>21403 to 39872</span> (<span class='log1'>4:06</span>) in <span class='log1'>1:05</span>. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\02 - Something._</span>
+  <span class='good'>Secure  [Pass 1 & 2, Ultra 1 to 1]</span>
+  CRC32: <span class='log3'>3C4D5E6F</span>     AccurateRip CRC: <span class='log3'>4D5E6F7A</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-2</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>18</span> [CRCv2 <span class='log3'>4d5e6f7a</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>3</span>:  Ripped LBA <span class='log1'>39872 to 54219</span> (<span class='log1'>3:11</span>) in <span class='log1'>0:58</span>. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\03 - Maxwell's Silver Hammer._</span>
+  <span class='badish'>Secure (Warning)</span><span class='log4'>  [Pass 1 & 2, Ultra 1 to 3, Re-Rip 8 Frames]</span>
+  CRC32: <span class='log3'>5E6F7A8B</span>     AccurateRip CRC: <span class='log3'>6F7A8B9C</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-3</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>17</span> [CRCv2 <span class='log3'>6f7a8b9c</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>4</span>:  Ripped LBA <span class='log1'>54219 to 69381</span> (<span class='log1'>3:22</span>) in <span class='log1'>1:14</span>. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\04 - Oh! Darling._</span>
+  <span class='good'>Secure  [Pass 1 & 2, Ultra 1 to 2]</span>
+  CRC32: <span class='log3'>7A8B9C0D</span>     AccurateRip CRC: <span class='log3'>8B9C0D1E</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-4</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>18</span> [CRCv2 <span class='log3'>8b9c0d1e</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>5</span>:  Ripped LBA <span class='log1'>69381 to 80543</span> (<span class='log1'>2:28</span>) in <span class='log1'>0:47</span>. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\05 - Octopus's Garden._</span>
+  <span class='good'>Secure  [Pass 1 & 2, Ultra 1 to 1]</span>
+  CRC32: <span class='log3'>9C0D1E2F</span>     AccurateRip CRC: <span class='log3'>0D1E2F3A</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-5</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>18</span> [CRCv2 <span class='log3'>0d1e2f3a</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>6</span>:  Ripped LBA <span class='log1'>80543 to 97162</span> (<span class='log1'>3:41</span>) in <span class='log1'>1:28</span>. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\06 - I Want You._</span>
+  <span class='badish'>Secure (Warning)</span><span class='log4'>  [Pass 1 & 2, Ultra 1 to 4, Re-Rip 24 Frames]</span>
+  CRC32: <span class='log3'>1E2F3A4B</span>     AccurateRip CRC: <span class='log3'>2F3A4B5C</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-6</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>16</span> [CRCv2 <span class='log3'>2f3a4b5c</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>7</span>:  Ripped LBA <span class='log1'>97162 to 115284</span> (<span class='log1'>4:01</span>) in <span class='log1'>0:59</span>. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\07 - Here Comes the Sun._</span>
+  <span class='good'>Secure  [Pass 1 & 2, Ultra 1 to 1]</span>
+  CRC32: <span class='log3'>3A4B5C6D</span>     AccurateRip CRC: <span class='log3'>4B5C6D7E</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-7</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>18</span> [CRCv2 <span class='log3'>4b5c6d7e</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>8</span>:  Ripped LBA 115284 to 134593 in 0:54. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\08 - Because._</span>
+  <span class='badish'>AccurateRip: Not in Database     [Pass 1]</span>
+  CRC32: <span class='log3'>5C6D7E8F</span>     AccurateRip CRC: <span class='log3'>6D7E8F9A</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-8</span>]
+
+<span class='log5'>Track</span> <span class='log4 log1'>9</span>:  Ripped LBA 134593 to 148821 in 0:43. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\09 - You Never Give Me Your Money._</span>
+  <span class='bad'>AccurateRip: Inaccurate     [Pass 1 & 2]</span>
+  CRC32: <span class='log3'>7E8F9A0B</span>     AccurateRip CRC: <span class='log3'>8F9A0B1C</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-9</span>]
+
+<span class='log5'>Track</span> <span class='log4 log1'>10</span>:  Ripped LBA 148821 to 163044 in 0:39. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\10 - Sun King._</span>
+  <span class='good'>Secure  [Pass 1 & 2, Ultra 1 to 1]</span>
+  CRC32: <span class='log3'>9A0B1C2D</span>     AccurateRip CRC: <span class='log3'>0B1C2D3E</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-10</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>17</span> [CRCv2 <span class='log3'>0b1c2d3e</span>]</span>
+
+<span class='log5'>Track</span> <span class='log4 log1'>11</span>:  Ripped LBA 163044 to 175312 in 0:37. Filename: <span class='log3'>G:\Rips\The Beatles - Abbey Road (1969) [FLAC]\11 - Mean Mr. Mustard._</span>
+  <span class='good'>Secure  [Pass 1 & 2, Ultra 1 to 1]</span>
+  CRC32: <span class='log3'>1C2D3E4F</span>     AccurateRip CRC: <span class='log3'>2D3E4F5A</span> (CRCv2)     [DiscID: <span class='log3'>011-001f3a4b-020e8c9d-7b0c940b-11</span>]
+  <span class='good'>AccurateRip Verified Confidence <span class='log4'>18</span> [CRCv2 <span class='log3'>2d3e4f5a</span>]</span>
+
+
+<strong>--------------
+</strong>
+<span class='log4'>11 Tracks Ripped:</span> <span class='good'>7 Secure</span>, <span class='badish'>2 Secure (Warning)</span>, 1 Not in Database, <span class='badish'>1 Inaccurate</span>

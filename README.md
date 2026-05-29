@@ -1,81 +1,53 @@
-# Logchecker
+# Logchecker (Go Edition)
 
 A CD rip logchecker, used for analyzing the generated logs for any problems that would potentially
 indicate a non-perfect rip was produced. Of course, just because a log doesn't score a perfect 100%
-does not mean that the produced rip isn't bit perfect, it's just less likely. This library should work
-on any OS where PHP and Python are supported.
+does not mean that the produced rip isn't bit perfect, it's just less likely. 
 
-While this library will analyze most parts of a log, unfortunately it cannot properly validate the checksums
-for all types of logs. This is due to creators of these programs making their logchecker closed source
-and involves some amount of custom mathematical work to produce it. Therefore, we have to fallback on
-external methods to validate the checksums of EAC and XLD. If the logchecker detects that we do not have
-the necessary programs, then we will just skip this external step and assume the checksum is valid. For
-setting up the necessary programs to validate the checksum, see below for the given program you care about.
+This project is a pure Go rewrite of the original PHP Logchecker.
+
+Unlike the original PHP version which required external Python scripts to validate EAC and XLD checksums, this Go version has all checksum verification built-in via native Go libraries (`github.com/Nirzak/eac-logchecker` and `github.com/Nirzak/xld-logchecker`).
 
 ## Requirements
 
-* PHP 8.1+
+* Go 1.25.0+
 
-## Optional Requirements
-
-* Python 3.5+
-* [cchardet](https://github.com/PyYoshi/cChardet) (or [chardet](https://github.com/chardet/chardet))
-* [eac_logchecker.py](https://github.com/OPSnet/eac_logchecker.py)
-* [xld_logchecker.py](https://github.com/OPSnet/xld_logchecker.py)
-
-```bash
-pip3 install cchardet eac-logchecker xld-logchecker
-```
-
-## Standalone
+## Standalone CLI
 
 ### Installation
 
-Install via composer:
+Install via `go install`:
 
 ```bash
-composer global require orpheusnet/logchecker
+go install github.com/Nirzak/logchecker-go/cmd/logchecker@latest
 ```
 
-Alternatively, go to our [releases](https://github.com/OPSnet/Logchecker/releases) and grab the `logchecker.phar`
-file. Download this file, and then it can executed via CLI by running `php logchecker.phar`. If you `chmod +x` the
-file, then it should be directly executable (i.e. `./logchecker.phar`). To then install it globally, run:
+Alternatively, you can build it from source:
 
 ```bash
-mv logchecker.phar /usr/local/bin/logchecker
-chmod +x /usr/local/bin/logchecker
+git clone https://github.com/Nirzak/logchecker-go.git
+cd logchecker-go
+go build -o logchecker cmd/logchecker/main.go
 ```
 
 ### Usage
 
 ```text
-$ logchecker list
-Logchecker 0.11.1
+$ logchecker version
+Logchecker 0.14.4
 
 Usage:
-  command [options] [arguments]
-
-Options:
-  -h, --help            Display this help message
-  -q, --quiet           Do not output any message
-  -V, --version         Display this application version
-      --ansi            Force ANSI output
-      --no-ansi         Disable ANSI output
-  -n, --no-interaction  Do not ask any interactive question
-  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
-
-Available commands:
-  analyze    [analyse] analyze log file
-  decode     Decodes log from whatever encoding into UTF-8
-  help       Displays help for a command
-  list       Lists commands
-  translate  Translates a log into english
+  logchecker analyze  [--html] [--no_text] <file> [out_file] [details_json]
+  logchecker analyse  (alias of analyze)
+  logchecker decode   <file>
+  logchecker translate [-l lang] <file>
+  logchecker version
 ```
 
 Main usage is through the `analyze` command, e.g.:
 
 ```text
-$ logchecker analyze --no_text path/to/file.log
+$ logchecker analyze path/to/file.log
 Ripper  : EAC
 Version : 1.0 beta 3
 Language: en
@@ -87,52 +59,50 @@ Details :
     Range rip detected (-30 points)
 ```
 
-### Code
-
-```php
-<?php
-
-$logchecker = new OrpheusNET\Logchecker\Logchecker();
-$logchecker->add_file('path/to/file.log');
-list($score, $details, $checksum_state, $log_text) = $logchecker->parse();
-```
-
 ## Library Usage
 
 ### Installation
 
 ```bash
-composer require orpheusnet/logchecker
+go get github.com/Nirzak/logchecker-go
 ```
 
 ### Usage
 
-```php
-<?php
+```go
+package main
 
-require __DIR__ . '/vendor/autoload.php';
+import (
+    "fmt"
+    "github.com/Nirzak/logchecker-go/logchecker"
+)
 
-use OrpheusNET\Logchecker\Logchecker;
-
-$logchecker = new Logchecker();
-$logchecker->newFile('/path/to/log/file');
-$logchecker->parse();
-print('Ripper   : ' . $logchecker->getRipper() . "\n");
-print('Version  : ' . $logchecker->getRipperVersion() . "\n");
-print('Score    : ' . $logchecker->getScore() . "\n");
-print('Checksum : ' . $logchecker->getChecksumState() . "\n");
-print("\nDetails:\n");
-foreach ($logchecker->getDetails() as $detail) {
-    print("  {$detail}\n");
+func main() {
+    lc := logchecker.New()
+    
+    // Load and parse the file
+    err := lc.NewFile("/path/to/log/file.log")
+    if err != nil {
+        panic(err)
+    }
+    lc.Parse()
+    
+    // Output results
+    fmt.Printf("Ripper   : %s\n", lc.GetRipper())
+    fmt.Printf("Version  : %s\n", lc.GetRipperVersion())
+    fmt.Printf("Score    : %d\n", lc.GetScore())
+    fmt.Printf("Checksum : %s\n", lc.GetChecksumState())
+    fmt.Printf("\nDetails:\n")
+    for _, detail := range lc.GetDetails() {
+        fmt.Printf("  %s\n", detail)
+    }
 }
-print("\nLog Text:\n\n{$logchecker->getLog()}");
 ```
 
-## Building
+## Testing
 
-To build your own phar, see the `release.yml` workflow, but the gist is:
+To run the test suite (which validates against the same fixtures as the PHP version):
 
-1. Clone this repo and enter repo
-1. Install [box](https://github.com/box-project/box)
-1. Run `box compile`
-1. Get `logchecker.phar` in root of repo
+```bash
+go test -v ./...
+```

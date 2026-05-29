@@ -1,19 +1,19 @@
 # Logchecker — Agent Reference
 
-> **Purpose**: This file gives AI agents a fast, accurate orientation to the `orpheusnet/logchecker` codebase so that they can reason, modify, and extend it without having to re-read the whole source tree.
+> **Purpose**: This file gives AI agents a fast, accurate orientation to the `Nirzak/logchecker-go` codebase so that they can reason, modify, and extend it without having to re-read the whole source tree.
 
 ---
 
 ## 1. What the project is
 
-**Logchecker** is a PHP library (and CLI tool) that parses and scores CD-rip log files produced by three rippers:
+**Logchecker** is a Go library (and CLI tool) that parses and scores CD-rip log files produced by four rippers:
 
 | Ripper | Constant | Log signature |
 |---|---|---|
-| Exact Audio Copy (EAC) | `Ripper::EAC` | Contains `"Exact Audio Copy"` |
-| X Lossless Decoder (XLD) | `Ripper::XLD` | Contains `"X Lossless Decoder version"` |
-| whipper | `Ripper::WHIPPER` | Contains `"Log created by: whipper"` |
-| dBpoweramp | `Ripper::DBPOWERAMP` | First line matches `^dBpoweramp Release` |
+| Exact Audio Copy (EAC) | `check.EAC` | Contains `"Exact Audio Copy"` |
+| X Lossless Decoder (XLD) | `check.XLD` | Contains `"X Lossless Decoder version"` |
+| whipper | `check.WHIPPER` | Contains `"Log created by: whipper"` |
+| dBpoweramp | `check.DBPOWERAMP` | First line matches `^dBpoweramp Release` |
 
 A score starts at **100** and decreases based on problems found (bad settings, checksum failures, CRC mismatches, etc.). The final score and an array of human-readable detail messages are the primary output.
 
@@ -22,139 +22,105 @@ A score starts at **100** and decreases based on problems found (bad settings, c
 ## 2. Repository layout
 
 ```
-logchecker-fork/
-├── bin/
-│   ├── logchecker          # Shell wrapper that boots the Symfony Console app
-│   └── compile             # Script to build logchecker.phar
-├── scripts/
-│   └── update_offsets.php  # Downloads fresh drive-offset data from AccurateRip and writes src/resources/drives.json
-├── src/
-│   ├── Logchecker.php          # Core class — all parsing logic lives here (2193 lines)
-│   ├── LogcheckerConsole.php   # Symfony Console Application; registers commands
-│   ├── Chardet.php             # Thin wrapper around cchardetect / chardetect / chardet CLI tools
-│   ├── Util.php                # Static helpers: commandExists(), decodeEncoding()
-│   ├── Check/
-│   │   ├── Checksum.php        # CHECKSUM_OK / CHECKSUM_INVALID / CHECKSUM_MISSING + validate()
-│   │   └── Ripper.php          # Detects ripper from raw log text; defines EAC / XLD / WHIPPER constants
-│   ├── Command/
-│   │   ├── AnalyzeCommand.php  # CLI: analyze <file> — primary command
-│   │   ├── DecodeCommand.php   # CLI: decode <file> — UTF-8 conversion only
-│   │   └── TranslateCommand.php# CLI: translate <file> — EAC non-English → English
-│   ├── Exception/
-│   │   ├── FileNotFoundException.php
-│   │   ├── InvalidFileException.php
-│   │   ├── UnknownLanguageException.php
-│   │   └── UnknownRipperException.php
-│   ├── Parser/
-│   │   └── EAC/
-│   │       ├── Translator.php      # EAC-only: detects log language, translates to English
-│   │       └── languages/
-│   │           ├── master.json     # Keyed by language code; contains eac_strings[] used for detection
-│   │           ├── en.json         # English "canonical" key→phrase mapping (keys are integers)
-│   │           ├── de.json         # German translations (same key schema)
-│   │           ├── fr.json / ru.json / jp.json / … (16 other language files)
-│   │           └── README.md       # Explains translation file format
+logchecker-go/
+├── cmd/
+│   └── logchecker/
+│       └── main.go             # CLI wrapper for the logchecker tool
+├── internal/
+│   ├── check/
+│   │   ├── checksum.go         # Checksum state constants + validation logic
+│   │   └── ripper.go           # Detects ripper from raw log text
+│   ├── parser/
+│   │   └── eac/
+│   │       ├── translator.go   # EAC-only: detects log language, translates to English
+│   │       └── languages/      # JSON mappings for non-English to English translations
+│   └── util/
+│       └── encoding.go         # Encoding detection and conversion to UTF-8
+├── logchecker/
+│   ├── logchecker.go           # Core package — all parsing and scoring logic
 │   └── resources/
-│       └── drives.json         # ~6 000 drive entries: [[drive_name_lowercase, offset_int], …]
+│       └── drives.json         # ~6 000 drive entries mapped by Exact Audio Copy
+├── logchecker_test.go          # Data-provider test against real log fixtures
 ├── tests/
-│   ├── LogcheckerTest.php          # Data-provider test against real log fixtures
-│   ├── UtilTest.php
-│   ├── Check/
-│   │   ├── ChecksumTest.php
-│   │   └── RipperTest.php
-│   ├── Parser/EAC/
-│   │   └── TranslatorTest.php
 │   └── logs/
 │       ├── eac/                # originals/ details/ html/ utf8/
 │       ├── xld/                # originals/ details/ html/
 │       ├── whipper/            # originals/ details/ html/
 │       └── dbpoweramp/         # (reserved / extra fixtures)
-├── composer.json               # Package: orpheusnet/logchecker v0.14.4
-├── phpunit.xml
-├── phpcs.xml
-├── phpstan.neon / phpstan-baseline.neon
-└── box.json                    # box-project/box config for phar compilation
+├── go.mod                      # Go module definition and dependencies
+└── README.md
 ```
 
 ---
 
-## 3. Namespace & autoloading
+## 3. Packages & Imports
 
-| Namespace | Maps to |
+| Package | Purpose |
 |---|---|
-| `OrpheusNET\Logchecker` | `src/` |
-| `OrpheusNET\Logchecker\Check` | `src/Check/` |
-| `OrpheusNET\Logchecker\Command` | `src/Command/` |
-| `OrpheusNET\Logchecker\Exception` | `src/Exception/` |
-| `OrpheusNET\Logchecker\Parser\EAC` | `src/Parser/EAC/` |
-
-PSR-4, configured in `composer.json`.
+| `github.com/Nirzak/logchecker-go/logchecker` | Core API to be imported by users |
+| `github.com/Nirzak/logchecker-go/internal/check` | Internal checks (ripper detection, checksums) |
+| `github.com/Nirzak/logchecker-go/internal/util` | Internal encoding and utility functions |
+| `github.com/Nirzak/logchecker-go/internal/parser/eac` | EAC specific language parsing |
 
 ---
 
-## 4. Core class: `Logchecker`
+## 4. Core Struct: `Logchecker`
 
-**File**: [`src/Logchecker.php`](src/Logchecker.php)
+**File**: [`logchecker/logchecker.go`](logchecker/logchecker.go)
 
 ### Public API
 
-```php
-$lc = new Logchecker();
+```go
+lc := logchecker.New()
 
 // Load a file (resets all internal state)
-$lc->newFile('/path/to/file.log');
+err := lc.NewFile("/path/to/file.log")
 
 // Run analysis
-$lc->parse();
+lc.Parse()
 
 // Results
-$lc->getRipper();          // string: 'EAC' | 'XLD' | 'whipper' | 'unknown'
-$lc->getRipperVersion();   // string|null
-$lc->getScore();           // int 0–100
-$lc->getChecksumState();   // 'checksum_ok' | 'checksum_invalid' | 'checksum_missing'
-$lc->getDetails();         // string[] — human-readable list of deductions / notices
-$lc->getLanguage();        // string language code, e.g. 'en', 'ru'
-$lc->getLog();             // string — HTML-annotated log text (span-tagged)
-$lc->isCombinedLog();      // bool — true when the file holds multiple rip sessions
+lc.GetRipper()          // string: "EAC" | "XLD" | "whipper" | "unknown"
+lc.GetRipperVersion()   // string
+lc.GetScore()           // int 0–100
+lc.GetChecksumState()   // "checksum_ok" | "checksum_invalid" | "checksum_missing"
+lc.GetDetails()         // []string — human-readable list of deductions / notices
+lc.GetLanguage()        // string language code, e.g. "en", "ru"
+lc.GetLog()             // string — HTML-annotated log text (span-tagged)
+lc.IsCombinedLog()      // bool — true when the file holds multiple rip sessions
 
 // Control
-$lc->validateChecksum(false); // Disable external checksum validation
-
-// Static
-Logchecker::getAcceptValues();        // ".txt,.TXT,.log,.LOG"
-Logchecker::getLogcheckerVersion();   // reads version from composer.json
+lc.ValidateChecksum(false) // Disable external checksum validation
 ```
 
-### Parse flow (`parse()`)
+### Parse flow (`Parse()`)
 
 ```
-parse()
- ├── Util::decodeEncoding()          Converts log to UTF-8 (BOM detection + chardet)
- ├── Ripper::getRipper()             Determines ripper type
+Parse()
+ ├── util.DecodeEncoding()           Converts log to UTF-8 (BOM detection + charmap fallback)
+ ├── check.GetRipper()               Determines ripper type
  ├── if DBPOWERAMP → dbpowerampParse()  Settings + per-track regex parsing
  ├── if WHIPPER → whipperParse()     YAML-based parsing
  └── else → legacyParse()
-          ├── if EAC → Translator    Auto-detect + translate non-English to English
+          ├── if EAC → eac.Translate Auto-detect + translate non-English to English
           ├── Split log into sections by checksum delimiter or "End of status report"
-          ├── Per-section: ~60 preg_replace_callback() calls for each log field
-          │    Each callback both annotates the log text with HTML spans
+          ├── Per-section: regexp loops over line items
+          │    Each callback annotates the log text with HTML spans
           │    AND calls account() or accountTrack() if a problem is detected
           └── checkTracks() — fails score to 0 if no tracks found
 ```
 
 ### Scoring mechanics
 
-- `account($msg, $decrease, $score, $inclCombined, $notice)` — **global** deduction.  
-  - `$decrease` → `$this->Score -= $decrease`  
-  - `$score` → `$this->Score = $score` (absolute override)  
+- `account(msg, decrease, setScore, inclCombined, notice)` — **global** deduction.  
+  - `decrease` → `lc.score -= decrease`  
+  - `setScore` → `lc.score = setScore` (absolute override)  
   - Deduplication: same message string is never added twice.
-- `accountTrack($msg, $decrease)` — **per-track** deduction.  
-  - Accumulated into `$this->DecreaseScoreTrack` (applied at end of loop).  
+- `accountTrack(msg, decrease)` — **per-track** deduction.  
+  - Accumulated per track (applied at end of loop).  
   - Track-level messages carry `"Track NN: …"` prefix.
 
 ### HTML annotation classes
-
-The log text returned by `getLog()` contains `<span>` tags used for colorization in web UIs:
 
 | Class | Meaning |
 |---|---|
@@ -171,70 +137,61 @@ The log text returned by `getLog()` contains `<span>` tags used for colorization
 
 ## 5. Checksum validation
 
-**File**: [`src/Check/Checksum.php`](src/Check/Checksum.php)
+**File**: [`internal/check/checksum.go`](internal/check/checksum.go)
 
-| Ripper | Method | External dependency |
+Unlike the original PHP version which required Python tools, the Go version incorporates checksum verification directly using native Go ports.
+
+| Ripper | Method | Dependency |
 |---|---|---|
-| whipper | SHA-256 hash computed in PHP, compared to last line of log | none |
+| whipper | SHA-256 hash computed in Go, compared to last line of log | none |
 | dBpoweramp | Always `CHECKSUM_MISSING` — no embedded checksum | none |
-| EAC | Shells out to `eac_logchecker` (Python) | `pip install eac-logchecker` |
-| XLD | Shells out to `xld_logchecker` (Python) | `pip install xld-logchecker` |
-
-`Checksum::logcheckerExists($ripper)` uses `Util::commandExists()` to check whether the external tool is installed. If absent, validation is skipped and the state remains `CHECKSUM_OK` (generous assumption).
+| EAC | Uses native Go package | `github.com/Nirzak/eac-logchecker` |
+| XLD | Uses native Go package | `github.com/Nirzak/xld-logchecker` |
 
 ---
 
 ## 6. Drive offset matching
 
-- `src/resources/drives.json` — JSON array of `[drive_name_lowercase, offset_int]` pairs (~6 000 entries).
-- Loaded once in `Logchecker::__construct()`.
-- Matching in `getDrives()` uses **Levenshtein distance** (`levenshtein()`) controlled by the constant `LOGCHECKER_LEVENSTEIN_DISTANCE` (default `0` = exact match only; can be set to allow fuzzy matching).
-- Drive names are normalised before matching: vendor alias substitutions (e.g. `HL-DT-ST` → `LG Electronics`), whitespace collapse, revision suffix stripping.
-- `scripts/update_offsets.php` scrapes `accuraterip.com/driveoffsets.htm` to regenerate `drives.json`.
+- `logchecker/resources/drives.json` — JSON array of `[drive_name_lowercase, offset_int]` pairs.
+- Loaded via `go:embed` when the package is initialized.
+- Matching uses `normalizeDriveName()` to strip alias substitutions (e.g. `HL-DT-ST` → `LG Electronics`), whitespace collapse, and revision suffixes before exact matching.
 
 ---
 
 ## 7. EAC multi-language support
 
-- **Detection**: `Translator::getLanguage()` scans `master.json` for EAC-specific marker strings unique to each language.
-- **Translation**: `Translator::translate()` does regex-replacement of foreign phrases (from `<lang>.json`) with English canonical phrases (from `en.json`). Keys are integers; case-sensitivity differs by key range (`> 16` uses `ui` flags).
+- **Detection**: `eac.GetLanguage()` scans `master.json` for EAC-specific marker strings.
+- **Translation**: `eac.Translate()` does regex-replacement of foreign phrases. Keys are integers; case-sensitivity differs by key range (`> 16` uses case-insensitive matching). Translation phrases are sorted by descending length to prevent shorter phrases corrupting longer translations.
 - **Supported languages (16)**: bg, cs, de, en, es, fr, it, jp, ko, nl, pl, ru, se, sk, sr, zh.
-- A translation notice (`[Notice]`) is added to `Details` but costs no points.
 
 ---
 
 ## 8. whipper parsing specifics
 
-- Log format is YAML — parsed via `symfony/yaml`.
+- Log format is YAML — parsed via `gopkg.in/yaml.v3`.
 - Pre-parse fixups handle two known whipper bugs:
   1. Un-escaped YAML strings in `Release`/`Album` fields.
-  2. CRCs starting with `0` that `symfony/yaml` would interpret as octal.
+  2. CRCs starting with `0` that `yaml.v3` would interpret as octal.
 - Minimum supported whipper version: **0.7.3** (earlier versions have octal track number bugs).
-- Checksum is a SHA-256 of all lines except the last hash line itself.
 
 ---
 
 ## 9. CLI interface
 
-Bootstrapped by `bin/logchecker` → `LogcheckerConsole` (extends `Symfony\Component\Console\Application`).
+The CLI is located in `cmd/logchecker/main.go`.
 
-| Command | Class | Key options |
-|---|---|---|
-| `analyze` (alias: `analyse`) | `AnalyzeCommand` | `--html`, `--no_text`, optional `out_file`, optional `details` (JSON) |
-| `decode` | `DecodeCommand` | Converts log encoding to UTF-8; prints to stdout or file |
-| `translate` | `TranslateCommand` | `--language (-l)` to force language code |
-
-The `analyze` command outputs JSON details to a file (`$lc->getDetails()` etc.) when a `details` argument is given — this is exactly the format expected by test fixtures in `tests/logs/*/details/*.json`.
+| Command | Key options |
+|---|---|
+| `analyze` / `analyse` | `--html`, `--no_text`, optional `out_file`, optional `details` (JSON) |
+| `decode` | Converts log encoding to UTF-8; prints to stdout or file |
+| `translate` | `--language (-l)` to force language code |
 
 ---
 
 ## 10. Testing
 
 ```bash
-composer test              # runs phpunit
-composer lint              # phpcs
-composer lint:fix          # phpcbf
-composer static-analysis   # phpstan
+go test -v ./...       # runs the standard Go test framework
 ```
 
 ### Test fixture layout (`tests/logs/<ripper>/`)
@@ -246,44 +203,21 @@ html/        ← expected getLog() HTML output
 utf8/        ← UTF-8 re-encoded versions (for decode command tests)
 ```
 
-`LogcheckerTest::testLogchecker()` is a data-provider test that iterates all files in `originals/`, parses them, and asserts equality with the corresponding `details/*.json` and `html/*.log` fixtures.
-
-> **When adding a new test log**: place it in `originals/`, generate the `details/` JSON via  
-> `logchecker analyze file.log /dev/null details.json`, and capture `html/` output with  
-> `logchecker analyze --html file.log html_file.log`.
+`logchecker_test.go` iterates all files in `tests/logs/*/originals/`, parses them, and asserts equality with the corresponding `details/*.json` and `html/*.log` fixtures.
 
 ---
 
 ## 11. Dependencies
 
-### Runtime (`require`)
+### `go.mod` Requirements
 
 | Package | Used for |
 |---|---|
-| `php ^8.1` | Language runtime |
-| `ext-iconv` | Encoding conversion in `Util::decodeEncoding()` |
-| `ext-mbstring` | UTF-16 BOM detection and conversion |
-| `symfony/console ^6\|^7` | CLI framework |
-| `symfony/process ^6\|^7` | Running external checkers (eac/xld_logchecker) and chardet |
-| `symfony/yaml ^6\|^7` | Parsing whipper YAML logs |
-
-### Dev only
-
-| Package | Purpose |
-|---|---|
-| `phpunit/phpunit ^10.5` | Testing |
-| `phpstan/phpstan ^1.12` | Static analysis |
-| `squizlabs/php_codesniffer ^3.8` | Coding standards |
-
-### Optional external tools (Python)
-
-```bash
-pip3 install cchardet eac-logchecker xld-logchecker
-```
-
-- `cchardetect` / `chardetect` / `chardet` — character encoding detection for EAC logs.
-- `eac_logchecker` — validates EAC log checksum cryptographically.
-- `xld_logchecker` — validates XLD signature block.
+| `go 1.25.0` | Language runtime |
+| `golang.org/x/text` | Encoding detection and codepage fallbacks |
+| `gopkg.in/yaml.v3` | Parsing whipper YAML logs |
+| `github.com/Nirzak/eac-logchecker` | Native Go port of EAC logchecker |
+| `github.com/Nirzak/xld-logchecker` | Native Go port of XLD logchecker |
 
 ---
 
@@ -291,11 +225,10 @@ pip3 install cchardet eac-logchecker xld-logchecker
 
 | Constant / key | Default | Location | Effect |
 |---|---|---|---|
-| `LOGCHECKER_LEVENSTEIN_DISTANCE` | `0` | global (top of `Logchecker.php`) | Max edit distance for drive name fuzzy match |
-| `Logchecker::$ValidateChecksum` | `true` | instance | Set via `validateChecksum(false)` to skip external tool |
-| `Checksum::CHECKSUM_OK` | `'checksum_ok'` | `Check/Checksum.php` | Returned when checksum passes or tool absent |
-| `Checksum::CHECKSUM_INVALID` | `'checksum_invalid'` | `Check/Checksum.php` | Returned when tool reports tampered log |
-| `Checksum::CHECKSUM_MISSING` | `'checksum_missing'` | `Check/Checksum.php` | No checksum present in log |
+| `validateChecksum` | `true` | instance | Set via `lc.ValidateChecksum(false)` |
+| `check.ChecksumOk` | `"checksum_ok"` | `internal/check/checksum.go` | Passed checksum or tool missing |
+| `check.ChecksumInvalid` | `"checksum_invalid"` | `internal/check/checksum.go` | Failed/Tampered log |
+| `check.ChecksumMissing` | `"checksum_missing"` | `internal/check/checksum.go` | No checksum present |
 
 ---
 
@@ -324,14 +257,6 @@ pip3 install cchardet eac-logchecker xld-logchecker
 
 ## 14. Patterns to follow when modifying
 
-1. **Adding a new check**: Add a `preg_replace_callback()` call in `legacyParse()` or `whipperParse()`. The callback should both return an HTML-annotated string AND call `$this->account()` / `$this->accountTrack()` if a problem is detected.
-
-2. **Adding a new language**: Create `src/Parser/EAC/languages/<code>.json` using the same integer-keyed schema as `en.json`, and register a detection string in `master.json`.
-
-3. **Adding a new drive**: Run `scripts/update_offsets.php` to regenerate `src/resources/drives.json` from AccurateRip — do not hand-edit the large JSON file.
-
-4. **Adding a CLI command**: Create a class in `src/Command/`, extend `Symfony\Component\Console\Command\Command`, and register it in `LogcheckerConsole::__construct()`.
-
-5. **Updating test fixtures**: After any scoring logic change, regenerate the `details/` and `html/` fixture files using the `analyze` command, then commit them alongside the code change.
-
-6. **Pre-commit hooks** (configured via `composer.json` `extra.hooks`): `phpcbf` (lint fix) and `phpstan` run automatically on commit.
+1. **Adding a new check**: Add or modify the matching regex in `logchecker.go`. Extract substrings and call `lc.account()` or `lc.accountTrack()` when issues are detected.
+2. **Adding a new language**: Update `internal/parser/eac/languages/<code>.json` using the integer-keyed schema, and add the detection string to `master.json`.
+3. **Updating test fixtures**: When scoring logic changes, the `details` arrays in `logchecker_test.go` will complain. Adjust them to properly reflect the new scores.

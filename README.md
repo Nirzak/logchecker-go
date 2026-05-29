@@ -34,7 +34,7 @@ go build -o logchecker cmd/logchecker/main.go
 
 ```text
 $ logchecker version
-Logchecker 0.14.4
+Logchecker 1.14.4
 
 Usage:
   logchecker analyze  [--html] [--no_text] <file> [out_file] [details_json]
@@ -101,7 +101,7 @@ func main() {
 
 ## Testing
 
-To run the test suite (which validates against the same fixtures as the PHP version):
+To run the test suite:
 
 ```bash
 go test -v ./...

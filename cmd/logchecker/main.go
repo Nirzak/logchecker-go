@@ -84,14 +84,22 @@ func cmdAnalyze(args []string) {
 
 	// Write details JSON if requested.
 	if detailsFile != "" {
-		details := map[string]interface{}{
-			"ripper":   lc.GetRipper(),
-			"version":  nilIfEmpty(lc.GetRipperVersion()),
-			"language": nilIfEmptyStr(lc.GetLanguage()),
-			"combined": lc.IsCombinedLog(),
-			"score":    lc.GetScore(),
-			"checksum": lc.GetChecksumState(),
-			"details":  lc.GetDetails(),
+		details := struct {
+			Ripper   string      `json:"ripper"`
+			Version  interface{} `json:"version"`
+			Language interface{} `json:"language"`
+			Combined bool        `json:"combined"`
+			Score    int         `json:"score"`
+			Checksum string      `json:"checksum"`
+			Details  []string    `json:"details"`
+		}{
+			Ripper:   lc.GetRipper(),
+			Version:  nilIfEmpty(lc.GetRipperVersion()),
+			Language: nilIfEmptyStr(lc.GetLanguage()),
+			Combined: lc.IsCombinedLog(),
+			Score:    lc.GetScore(),
+			Checksum: lc.GetChecksumState(),
+			Details:  lc.GetDetails(),
 		}
 		data, _ := json.MarshalIndent(details, "", "    ")
 		if err := os.WriteFile(detailsFile, data, 0644); err != nil {

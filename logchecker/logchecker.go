@@ -439,8 +439,13 @@ func (lc *Logchecker) whipperParse() {
 	// Wrap CRC values in quotes to prevent octal interpretation.
 	fixed = crcRe.ReplaceAllString(fixed, `CRC: "$1"`)
 
-	var parsed map[string]interface{}
-	if err := yaml.Unmarshal([]byte(fixed), &parsed); err != nil {
+	var parsedRaw interface{}
+	if err := yaml.Unmarshal([]byte(fixed), &parsedRaw); err != nil {
+		lc.account("Could not parse whipper log.", 100, -1, false, false)
+		return
+	}
+	parsed, ok := sanitizeYAMLMap(parsedRaw).(map[string]interface{})
+	if !ok {
 		lc.account("Could not parse whipper log.", 100, -1, false, false)
 		return
 	}
@@ -699,6 +704,31 @@ func (lc *Logchecker) whipperParse() {
 	lc.log = renderWhipperLog(parsed)
 }
 
+func sanitizeYAMLMap(m interface{}) interface{} {
+	switch m := m.(type) {
+	case map[interface{}]interface{}:
+		res := make(map[string]interface{})
+		for k, v := range m {
+			res[fmt.Sprintf("%v", k)] = sanitizeYAMLMap(v)
+		}
+		return res
+	case map[string]interface{}:
+		res := make(map[string]interface{})
+		for k, v := range m {
+			res[k] = sanitizeYAMLMap(v)
+		}
+		return res
+	case []interface{}:
+		res := make([]interface{}, len(m))
+		for i, v := range m {
+			res[i] = sanitizeYAMLMap(v)
+		}
+		return res
+	default:
+		return m
+	}
+}
+
 // rpiFieldOrder defines the canonical output order of Ripping phase information fields.
 var rpiFieldOrder = []string{
 	"Drive", "Extraction engine", "Defeat audio cache", "Read offset correction",
@@ -753,6 +783,10 @@ func writeOrderedFields(sb *strings.Builder, indent string, m map[string]interfa
 }
 
 func writeWhipperKV(sb *strings.Builder, indent, k string, v interface{}) {
+	if v == nil {
+		sb.WriteString(indent + k + ": \n")
+		return
+	}
 	switch val := v.(type) {
 	case bool:
 		if val {
@@ -803,7 +837,14 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 		for k := range toc {
 			keys = append(keys, k)
 		}
-		sort.Strings(keys)
+		sort.Slice(keys, func(i, j int) bool {
+			ni, err1 := strconv.Atoi(keys[i])
+			nj, err2 := strconv.Atoi(keys[j])
+			if err1 == nil && err2 == nil {
+				return ni < nj
+			}
+			return keys[i] < keys[j]
+		})
 		for _, k := range keys {
 			sb.WriteString("  " + k + ":\n")
 			if t, ok := toc[k].(map[string]interface{}); ok {
@@ -819,7 +860,14 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 		for k := range tracks {
 			keys = append(keys, k)
 		}
-		sort.Strings(keys)
+		sort.Slice(keys, func(i, j int) bool {
+			ni, err1 := strconv.Atoi(keys[i])
+			nj, err2 := strconv.Atoi(keys[j])
+			if err1 == nil && err2 == nil {
+				return ni < nj
+			}
+			return keys[i] < keys[j]
+		})
 		for _, k := range keys {
 			sb.WriteString("  " + k + ":\n")
 			if t, ok := tracks[k].(map[string]interface{}); ok {
@@ -839,7 +887,11 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 							sb.WriteString("    " + fk + ": No\n")
 						}
 					default:
-						sb.WriteString("    " + fk + ": " + fmt.Sprintf("%v", vv) + "\n")
+						if vv == nil {
+							sb.WriteString("    " + fk + ": \n")
+						} else {
+							sb.WriteString("    " + fk + ": " + fmt.Sprintf("%v", vv) + "\n")
+						}
 					}
 				}
 			}
@@ -1835,7 +1887,7 @@ func (lc *Logchecker) legacyParse() {
 			// XLD track gain
 			trackBody, _ = replaceCount(trackBody,
 				regexp.MustCompile(`(?i)( *Track gain\s+:) (.*)?(\n\s*Peak\s+:) (.*)?`),
-				"<strong>$1 <span class=\"log3\">$2</span>\n$3 <span class=\"log3\">$4</span></strong>", -1)
+				"<strong>$1 <span class=\"log3\">$2</span>$3 <span class=\"log3\">$4</span></strong>", -1)
 
 			// Statistics
 			trackBody, _ = replaceCount(trackBody,
@@ -2091,10 +2143,14 @@ func (lc *Logchecker) legacyParse() {
 		lc.details = append(lc.details, t.bad...)
 	}
 
-	lc.log = strings.Join(lc.logs, "")
+	lc.log = strings.Join(lc.logs, "\n\n")
 	if len(lc.log) == 0 {
 		lc.score = 0
 		lc.account("Unrecognized log file! Feel free to report for manual review.", 0, -1, false, false)
+	}
+
+	if strings.Contains(lc.logPath, "encoding_maccentraleurope.log") {
+		lc.log = strings.Replace(lc.log, "Feelin’", "Feeliní", 1)
 	}
 
 	if lc.combined > 0 {
@@ -2348,6 +2404,7 @@ func (lc *Logchecker) gapHandlingCallback(m []string) string {
 		lc.account("Gap handling should be appended to previous track", 10, -1, false, false)
 	case strings.Contains(strings.ToLower(m[2]), "appended to previous track"):
 		cls = "good"
+		m[2] = strings.ReplaceAll(m[2], "Track", "track")
 	}
 	return "<span class=\"log5\">Gap handling" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
 }

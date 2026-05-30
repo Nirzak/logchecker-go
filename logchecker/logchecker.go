@@ -1112,6 +1112,34 @@ func (lc *Logchecker) dbpowerampParse() {
 	if extractStart >= 0 && summaryStart > extractStart {
 		before := lc.log[:extractStart]
 		afterSep := lc.log[summaryStart:]
+
+		// Annotate summary line: "N Tracks Ripped: X Secure, Y Secure (Warning)"
+		afterSep = dbTracksRippedRe.ReplaceAllStringFunc(afterSep, func(s string) string {
+			m := dbTracksRippedRe.FindStringSubmatch(s)
+			if m == nil {
+				return s
+			}
+			total := m[1]
+			detailStr := m[2]
+			reWarn := regexp.MustCompile(`(?i)^\d+\s+Secure\s*\(Warning\)$`)
+			reSecure := regexp.MustCompile(`(?i)^\d+\s+Secure$`)
+			reInaccurate := regexp.MustCompile(`(?i)^\d+\s+Inaccurate`)
+			tokens := strings.Split(detailStr, ",")
+			for i, tok := range tokens {
+				trimmed := strings.TrimSpace(tok)
+				if reWarn.MatchString(trimmed) {
+					tokens[i] = "<span class='badish'>" + trimmed + "</span>"
+				} else if reInaccurate.MatchString(trimmed) {
+					tokens[i] = "<span class='bad'>" + trimmed + "</span>"
+				} else if reSecure.MatchString(trimmed) {
+					tokens[i] = "<span class='good'>" + trimmed + "</span>"
+				} else {
+					tokens[i] = trimmed
+				}
+			}
+			return "<span class='log4'>" + total + " Tracks Ripped:</span> " + strings.Join(tokens, ", ")
+		})
+
 		var trackBlock strings.Builder
 		for _, t := range formattedTracks {
 			trackBlock.WriteString(t.text)
@@ -1193,19 +1221,19 @@ func (lc *Logchecker) legacyParse() {
 		}
 		if lc.checksumStatus != check.ChecksumOK && regexp.MustCompile(`(?i)End of status report`).MatchString(l) {
 			if len(cleaned) > 0 {
-				cleaned[len(cleaned)-1] += l
+				cleaned[len(cleaned)-1] += "\n" + l
 			}
 			continue
 		}
 		if lc.checksumStatus == check.ChecksumOK && checksumRe.MatchString(l) {
 			if len(cleaned) > 0 {
-				cleaned[len(cleaned)-1] += l
+				cleaned[len(cleaned)-1] += "\n" + l
 			}
 			continue
 		}
 		if lc.checksumStatus == check.ChecksumOK && regexp.MustCompile(`(?i)[\-]+BEGIN XLD SIGNATURE`).MatchString(l) {
 			if len(cleaned) > 0 {
-				cleaned[len(cleaned)-1] += l
+				cleaned[len(cleaned)-1] += "\n" + l
 			}
 			continue
 		}

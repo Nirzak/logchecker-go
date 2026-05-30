@@ -124,6 +124,83 @@ func TestLogchecker(t *testing.T) {
 	}
 }
 
+func TestHTMLOutput(t *testing.T) {
+	rippers := []string{"eac", "xld", "whipper", "dbpoweramp"}
+
+	for _, ripper := range rippers {
+		originalsDir := filepath.Join("tests", "logs", ripper, "originals")
+		htmlDir := filepath.Join("tests", "logs", ripper, "html")
+
+		entries, err := os.ReadDir(originalsDir)
+		if err != nil {
+			t.Logf("Skipping %s: %v", ripper, err)
+			continue
+		}
+
+		for _, entry := range entries {
+			if entry.IsDir() {
+				continue
+			}
+			logFile := filepath.Join(originalsDir, entry.Name())
+			base := strings.TrimSuffix(entry.Name(), filepath.Ext(entry.Name()))
+			htmlFile := filepath.Join(htmlDir, base+".log")
+
+			if _, err := os.Stat(htmlFile); os.IsNotExist(err) {
+				t.Logf("No HTML fixture for %s, skipping", logFile)
+				continue
+			}
+
+			t.Run(fmt.Sprintf("%s/%s", ripper, entry.Name()), func(t *testing.T) {
+				htmlRaw, err := os.ReadFile(htmlFile)
+				if err != nil {
+					t.Fatalf("failed to read HTML fixture %s: %v", htmlFile, err)
+				}
+
+				lc := logchecker.New()
+				if err := lc.NewFile(logFile); err != nil {
+					t.Fatalf("NewFile error: %v", err)
+				}
+				lc.Parse()
+
+				// Line breaks are significant; only strip leading/trailing
+				// whitespace of the whole file to avoid spurious newline mismatches.
+				wantHTML := strings.TrimSpace(string(htmlRaw))
+				gotHTML := strings.TrimSpace(lc.GetLog())
+				if gotHTML != wantHTML {
+					lineNum, wantLine, gotLine := firstLineDiff(wantHTML, gotHTML)
+					t.Errorf("HTML output mismatch for %s (first diff at line %d):\n  want: %q\n   got: %q",
+						entry.Name(), lineNum, wantLine, gotLine)
+				}
+			})
+		}
+	}
+}
+
+// firstLineDiff returns the 1-based line number and the want/got line content
+// at the first position where want and got diverge. If one string has more
+// lines than the other, the extra line is reported as the differing point.
+func firstLineDiff(want, got string) (lineNum int, wantLine, gotLine string) {
+	wantLines := strings.Split(want, "\n")
+	gotLines := strings.Split(got, "\n")
+	max := len(wantLines)
+	if len(gotLines) > max {
+		max = len(gotLines)
+	}
+	for i := 0; i < max; i++ {
+		var w, g string
+		if i < len(wantLines) {
+			w = wantLines[i]
+		}
+		if i < len(gotLines) {
+			g = gotLines[i]
+		}
+		if w != g {
+			return i + 1, w, g
+		}
+	}
+	return 0, "", ""
+}
+
 func stringsEqual(a, b []string) bool {
 	if len(a) != len(b) {
 		return false

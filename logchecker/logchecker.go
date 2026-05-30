@@ -816,17 +816,21 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 var (
 	dbVersionRe      = regexp.MustCompile(`(?im)^dBpoweramp Release ([^\s]+)( Digital Audio Extraction Log from )(.+)`)
 	dbDriveRe        = regexp.MustCompile(`(?i)Ripping with drive '([^']+)',\s*Drive offset:\s*([+-]?\d+)`)
-	dbDriveModelRe   = regexp.MustCompile(`^[A-Z]:\s+\[(.+)\]\s*$`)
+	dbDriveModelRe   = regexp.MustCompile(`^([A-Z]:\s+)(\[.+\])\s*$`)
 	dbC2Re           = regexp.MustCompile(`(?i)Using C2:\s*(Yes|No)`)
 	dbFUARe          = regexp.MustCompile(`(?i)FUA Cache Invalidate:\s*(Yes|No)`)
+	dbCacheRe        = regexp.MustCompile(`(?i)(Cache:\s*)(\d+\s*KB)`)
+	dbPassSpeedRe    = regexp.MustCompile(`(?i)(Pass 1 Drive Speed:\s*)(\S+)(,\s*Pass 2 Drive Speed:\s*)(\S+)`)
 	dbMaxReReadsRe   = regexp.MustCompile(`(?i)Maximum Re-reads:\s*(\d+)`)
-	dbUltraRe        = regexp.MustCompile(`(?im)^Ultra::`)
+	dbUltraRe        = regexp.MustCompile(`(?im)^Ultra::(\s*Vary Drive Speed:\s*)(\S+)(,\s*Min Passes:\s*)(\d+)(,\s*Max Passes:\s*)(\d+)(,\s*Finish After Clean Passes:\s*)(\d+)`)
+	dbBadSectorRe    = regexp.MustCompile(`(?i)(Bad Sector Re-rip:)(:\s*Drive Speed:\s*[^,\s]+)`)
+	dbOverreadRe     = regexp.MustCompile(`(?i)(Overread Lead-in/out:\s*)(\S+)`)
 	dbAccurateRipRe  = regexp.MustCompile(`(?i)(AccurateRip:\s*)(Active)`)
 	dbEncoderRe      = regexp.MustCompile(`(?im)^Encoder:\s*(.+)`)
 	dbTrackHeaderRe  = regexp.MustCompile(`(?im)\nTrack (\d+):([ \t]+(?:Ripped|ERROR)[^\n]+)`)
 	dbTracksRippedRe = regexp.MustCompile(`(?i)(\d+) Tracks Ripped:\s*(.+)`)
 	dbTracksAccRe    = regexp.MustCompile(`(?i)(\d+ Tracks Ripped Accurately)`)
-	dbUserStopRe     = regexp.MustCompile(`(?i)User Stopped Ripping`)
+	dbUserStopRe     = regexp.MustCompile(`(?im)^(User Stopped Ripping)`)
 	dbLBARe          = regexp.MustCompile(`(?i)(Ripped LBA\s+)([^ \t(]+(?:\s+to\s+[^ \t(]+)?)(` + "`" + `\s+\()([^)]+)(\)\s+in\s+)([^\s.]+)`)
 	dbFileRe         = regexp.MustCompile(`(?i)(Filename:\s*)(.+)`)
 	dbSecureWarnRe   = regexp.MustCompile(`(?im)^(\s*)(Secure \(Warning\))([ \t]+\[([^\]]+)\])`)
@@ -861,10 +865,14 @@ func (lc *Logchecker) dbpowerampParse() {
 	if m := dbDriveRe.FindStringSubmatch(lc.log); m != nil {
 		driveName := strings.TrimSpace(m[1])
 		driveOffset := m[2]
-		// Strip drive letter prefix [VENDOR - MODEL]
+		// Extract drive letter prefix and bracket model part
+		drivePrefix := driveName // fallback: whole name if no bracket found
+		driveBracket := ""
 		driveModel := driveName
 		if mm := dbDriveModelRe.FindStringSubmatch(driveName); mm != nil {
-			driveModel = mm[1]
+			drivePrefix = mm[1]
+			driveBracket = mm[2]
+			driveModel = strings.Trim(driveBracket, "[]")
 		}
 		lc.getDrives(driveModel)
 
@@ -877,9 +885,11 @@ func (lc *Logchecker) dbpowerampParse() {
 		}
 
 		var driveClass, offsetClass string
+		var driveAnnotated string
 		if isFake {
 			lc.account("Virtual drive used: "+driveName, 20, -1, false, false)
 			driveClass, offsetClass = "bad", "bad"
+			driveAnnotated = driveName
 		} else if len(lc.drives) > 0 {
 			lc.driveFound = true
 			driveClass = "good"
@@ -898,9 +908,14 @@ func (lc *Logchecker) dbpowerampParse() {
 					strings.Join(lc.offsets, ", ")+" (Checked against the following drive(s): "+
 					strings.Join(lc.drives, ", ")+")", 5, -1, false, false)
 			}
+			if driveBracket != "" {
+				driveAnnotated = drivePrefix + "<span class='log4'>" + driveBracket + "</span>"
+			} else {
+				driveAnnotated = driveName
+			}
 		} else {
 			driveClass = "badish"
-			driveName += " (not found in database)"
+			notInDB := " (not found in database)"
 			if driveOffset == "0" {
 				offsetClass = "bad"
 				lc.account("The drive was not found in the database, so we cannot determine the correct read offset. "+
@@ -909,9 +924,14 @@ func (lc *Logchecker) dbpowerampParse() {
 			} else {
 				offsetClass = "badish"
 			}
+			if driveBracket != "" {
+				driveAnnotated = drivePrefix + "<span class='log4'>" + driveBracket + notInDB + "</span>"
+			} else {
+				driveAnnotated = driveName + notInDB
+			}
 		}
 		lc.log = dbDriveRe.ReplaceAllString(lc.log,
-			"Ripping with drive '<span class='"+driveClass+"'>"+driveName+"</span>',  Drive offset: <span class='"+offsetClass+"'>"+driveOffset+"</span>")
+			"Ripping with drive '<span class='"+driveClass+"'>"+driveAnnotated+"</span>',  Drive offset: <span class='"+offsetClass+"'>"+driveOffset+"</span>")
 	} else {
 		lc.account("Could not verify used drive", 1, -1, false, false)
 	}
@@ -937,6 +957,13 @@ func (lc *Logchecker) dbpowerampParse() {
 		lc.log = dbFUARe.ReplaceAllString(lc.log, "FUA Cache Invalidate: <span class='"+fuaClass+"'>$1</span>")
 	}
 
+	// Cache size
+	lc.log = dbCacheRe.ReplaceAllString(lc.log, "${1}<span class='log4'>${2}</span>")
+
+	// Pass 1/2 Drive Speed
+	lc.log = dbPassSpeedRe.ReplaceAllString(lc.log,
+		"Pass 1 Drive Speed: <span class='log4'>$2</span>,  Pass 2 Drive Speed: <span class='log4'>$4</span>")
+
 	// Max Re-reads
 	if m := dbMaxReReadsRe.FindStringSubmatch(lc.log); m != nil {
 		reReads, _ := strconv.Atoi(m[1])
@@ -948,8 +975,16 @@ func (lc *Logchecker) dbpowerampParse() {
 		lc.log = dbMaxReReadsRe.ReplaceAllString(lc.log, "Maximum Re-reads: <span class='"+reClass+"'>$1</span>")
 	}
 
-	// Ultra mode
-	lc.log = dbUltraRe.ReplaceAllString(lc.log, "<span class='good'>Ultra::</span>")
+	// Bad Sector Re-rip drive speed
+	lc.log = dbBadSectorRe.ReplaceAllString(lc.log,
+		"$1<span class='log4'>$2</span>")
+
+	// Ultra mode with value annotations
+	lc.log = dbUltraRe.ReplaceAllString(lc.log,
+		"<span class='good'>Ultra:<span class='log4'>:</span></span>$1<span class='log4'>$2</span>$3<span class='log4'>$4</span>$5<span class='log4'>$6</span>$7<span class='log4'>$8</span>")
+
+	// Overread Lead-in/out
+	lc.log = dbOverreadRe.ReplaceAllString(lc.log, "${1}<span class='log4'>${2}</span>")
 
 	// AccurateRip active
 	lc.log = dbAccurateRipRe.ReplaceAllString(lc.log, "${1}<span class='good'>${2}</span>")
@@ -1104,6 +1139,7 @@ func (lc *Logchecker) dbpowerampParse() {
 		}
 	} else if dbUserStopRe.MatchString(lc.log) {
 		lc.account("Ripping was aborted by user — log is incomplete", 0, 0, false, false)
+		lc.log = dbUserStopRe.ReplaceAllString(lc.log, "<span class='bad'>$1</span>")
 	}
 
 	// Rebuild log with annotated tracks
@@ -1112,6 +1148,9 @@ func (lc *Logchecker) dbpowerampParse() {
 	if extractStart >= 0 && summaryStart > extractStart {
 		before := lc.log[:extractStart]
 		afterSep := lc.log[summaryStart:]
+
+		// Annotate "N Tracks Ripped Accurately" summary
+		afterSep = dbTracksAccRe.ReplaceAllString(afterSep, "<span class='good'>$1</span>")
 
 		// Annotate summary line: "N Tracks Ripped: X Secure, Y Secure (Warning)"
 		afterSep = dbTracksRippedRe.ReplaceAllStringFunc(afterSep, func(s string) string {
@@ -1130,7 +1169,7 @@ func (lc *Logchecker) dbpowerampParse() {
 				if reWarn.MatchString(trimmed) {
 					tokens[i] = "<span class='badish'>" + trimmed + "</span>"
 				} else if reInaccurate.MatchString(trimmed) {
-					tokens[i] = "<span class='bad'>" + trimmed + "</span>"
+					tokens[i] = "<span class='badish'>" + trimmed + "</span>"
 				} else if reSecure.MatchString(trimmed) {
 					tokens[i] = "<span class='good'>" + trimmed + "</span>"
 				} else {

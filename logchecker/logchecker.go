@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Nirzak/logchecker-go/internal/check"
 	"github.com/Nirzak/logchecker-go/internal/parser/eac"
@@ -698,54 +699,106 @@ func (lc *Logchecker) whipperParse() {
 	lc.log = renderWhipperLog(parsed)
 }
 
-func renderWhipperLog(parsed map[string]interface{}) string {
-	var sb strings.Builder
+// rpiFieldOrder defines the canonical output order of Ripping phase information fields.
+var rpiFieldOrder = []string{
+	"Drive", "Extraction engine", "Defeat audio cache", "Read offset correction",
+	"Overread into lead-out", "Gap detection", "CD-R detected",
+}
 
-	writeKV := func(indent, k string, v interface{}) {
-		switch val := v.(type) {
-		case bool:
-			if val {
-				sb.WriteString(indent + k + ": true\n")
-			} else {
-				sb.WriteString(indent + k + ": false\n")
-			}
-		case map[string]interface{}:
-			sb.WriteString(indent + k + ":\n")
-			for kk, vv := range val {
-				sb.WriteString(indent + "  " + kk + ": " + fmt.Sprintf("%v", vv) + "\n")
-			}
-		default:
-			sb.WriteString(indent + k + ": " + fmt.Sprintf("%v", val) + "\n")
+// cdMetaFieldOrder defines the canonical output order of CD metadata fields.
+var cdMetaFieldOrder = []string{
+	"Release", "Album", "CDDB Disc ID", "MusicBrainz Disc ID",
+	"MusicBrainz Disc Id", "MusicBrainz lookup URL", "MusicBrainz lookup url",
+	"MusicBrainz Release URL",
+}
+
+// tocFieldOrder defines the canonical output order of TOC track fields.
+var tocFieldOrder = []string{"Start", "Length", "Start sector", "End sector"}
+
+// trackFieldOrder defines the canonical output order of per-track fields.
+var trackFieldOrder = []string{
+	"Filename", "Pre-gap length", "Peak level", "Pre-emphasis",
+	"Extraction speed", "Extraction quality",
+	"Test CRC", "Copy CRC",
+	"AccurateRip v1", "AccurateRip v2",
+	"Status",
+}
+
+// arFieldOrder defines the canonical output order of AccurateRip sub-fields.
+var arFieldOrder = []string{"Result", "Confidence", "Local CRC", "Remote CRC"}
+
+// csrFieldOrder defines the canonical output order of Conclusive status report fields.
+var csrFieldOrder = []string{"AccurateRip summary", "Health Status", "Health status", "EOF"}
+
+func writeOrderedFields(sb *strings.Builder, indent string, m map[string]interface{}, order []string) {
+	// Write known keys in order, then any remaining keys alphabetically.
+	seen := make(map[string]bool)
+	for _, k := range order {
+		if v, ok := m[k]; ok {
+			seen[k] = true
+			writeWhipperKV(sb, indent, k, v)
 		}
 	}
+	// Any extra keys not in the order list — sort for determinism.
+	remaining := make([]string, 0)
+	for k := range m {
+		if !seen[k] {
+			remaining = append(remaining, k)
+		}
+	}
+	sort.Strings(remaining)
+	for _, k := range remaining {
+		writeWhipperKV(sb, indent, k, m[k])
+	}
+}
+
+func writeWhipperKV(sb *strings.Builder, indent, k string, v interface{}) {
+	switch val := v.(type) {
+	case bool:
+		if val {
+			sb.WriteString(indent + k + ": true\n")
+		} else {
+			sb.WriteString(indent + k + ": false\n")
+		}
+	case map[string]interface{}:
+		sb.WriteString(indent + k + ":\n")
+		writeOrderedFields(sb, indent+"  ", val, arFieldOrder)
+	default:
+		sb.WriteString(indent + k + ": " + fmt.Sprintf("%v", val) + "\n")
+	}
+}
+
+func renderWhipperLog(parsed map[string]interface{}) string {
+	var sb strings.Builder
 
 	if lcb, ok := parsed["Log created by"]; ok {
 		sb.WriteString("Log created by: " + fmt.Sprintf("%v", lcb) + "\n")
 	}
 	if lcd, ok := parsed["Log creation date"]; ok {
-		sb.WriteString("Log creation date: " + fmt.Sprintf("%v", lcd) + "\n")
+		var lcdStr string
+		if t, ok := lcd.(time.Time); ok {
+			lcdStr = t.UTC().Format(time.RFC3339)
+		} else {
+			lcdStr = fmt.Sprintf("%v", lcd)
+		}
+		sb.WriteString("Log creation date: " + lcdStr + "\n")
 	}
 	sb.WriteString("\n")
 
 	if rpi, ok := parsed["Ripping phase information"].(map[string]interface{}); ok {
 		sb.WriteString("Ripping phase information:\n")
-		for k, v := range rpi {
-			writeKV("  ", k, v)
-		}
+		writeOrderedFields(&sb, "  ", rpi, rpiFieldOrder)
 		sb.WriteString("\n")
 	}
 
 	if cd, ok := parsed["CD metadata"].(map[string]interface{}); ok {
 		sb.WriteString("CD metadata:\n")
-		for k, v := range cd {
-			writeKV("  ", k, v)
-		}
+		writeOrderedFields(&sb, "  ", cd, cdMetaFieldOrder)
 		sb.WriteString("\n")
 	}
 
 	if toc, ok := parsed["TOC"].(map[string]interface{}); ok {
 		sb.WriteString("TOC:\n")
-		// Sort track keys
 		keys := make([]string, 0, len(toc))
 		for k := range toc {
 			keys = append(keys, k)
@@ -754,9 +807,7 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 		for _, k := range keys {
 			sb.WriteString("  " + k + ":\n")
 			if t, ok := toc[k].(map[string]interface{}); ok {
-				for kk, vv := range t {
-					sb.WriteString("    " + kk + ": " + fmt.Sprintf("%v", vv) + "\n")
-				}
+				writeOrderedFields(&sb, "    ", t, tocFieldOrder)
 			}
 			sb.WriteString("\n")
 		}
@@ -772,21 +823,23 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 		for _, k := range keys {
 			sb.WriteString("  " + k + ":\n")
 			if t, ok := tracks[k].(map[string]interface{}); ok {
-				for kk, vv := range t {
+				for _, fk := range trackFieldOrder {
+					vv, ok := t[fk]
+					if !ok {
+						continue
+					}
 					switch val := vv.(type) {
 					case map[string]interface{}:
-						sb.WriteString("    " + kk + ":\n")
-						for kkk, vvv := range val {
-							sb.WriteString("      " + kkk + ": " + fmt.Sprintf("%v", vvv) + "\n")
-						}
+						sb.WriteString("    " + fk + ":\n")
+						writeOrderedFields(&sb, "      ", val, arFieldOrder)
 					case bool:
 						if val {
-							sb.WriteString("    " + kk + ": Yes\n")
+							sb.WriteString("    " + fk + ": Yes\n")
 						} else {
-							sb.WriteString("    " + kk + ": No\n")
+							sb.WriteString("    " + fk + ": No\n")
 						}
 					default:
-						sb.WriteString("    " + kk + ": " + fmt.Sprintf("%v", vv) + "\n")
+						sb.WriteString("    " + fk + ": " + fmt.Sprintf("%v", vv) + "\n")
 					}
 				}
 			}
@@ -796,9 +849,7 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 
 	if csr, ok := parsed["Conclusive status report"].(map[string]interface{}); ok {
 		sb.WriteString("Conclusive status report:\n")
-		for k, v := range csr {
-			sb.WriteString("  " + k + ": " + fmt.Sprintf("%v", v) + "\n")
-		}
+		writeOrderedFields(&sb, "  ", csr, csrFieldOrder)
 		sb.WriteString("\n")
 	}
 
@@ -1253,20 +1304,47 @@ func (lc *Logchecker) legacyParse() {
 
 	// Clean up log segments
 	var cleaned []string
-	for i, l := range lc.logs {
-		l = strings.TrimSpace(l)
+	for i, rawPiece := range lc.logs {
+		l := strings.TrimSpace(rawPiece)
 		if l == "" || regexp.MustCompile(`(?i)^\-+$`).MatchString(l) {
 			continue
 		}
 		if lc.checksumStatus != check.ChecksumOK && regexp.MustCompile(`(?i)End of status report`).MatchString(l) {
 			if len(cleaned) > 0 {
-				cleaned[len(cleaned)-1] += "\n" + l
+				// Preserve trailing blank line from the preceding piece if present.
+				var prevRaw string
+				for j := i - 1; j >= 0; j-- {
+					if strings.TrimSpace(lc.logs[j]) != "" {
+						prevRaw = lc.logs[j]
+						break
+					}
+				}
+				trailing := len(prevRaw) - len(strings.TrimRight(prevRaw, "\n\r"))
+				sep := "\n"
+				if trailing >= 2 {
+					sep = "\n\n"
+				}
+				cleaned[len(cleaned)-1] += sep + l
 			}
 			continue
 		}
 		if lc.checksumStatus == check.ChecksumOK && checksumRe.MatchString(l) {
 			if len(cleaned) > 0 {
-				cleaned[len(cleaned)-1] += "\n" + l
+				// Count trailing newlines in the preceding raw piece to decide
+				// whether a blank line appears before the checksum.
+				var prevRaw string
+				for j := i - 1; j >= 0; j-- {
+					if strings.TrimSpace(lc.logs[j]) != "" {
+						prevRaw = lc.logs[j]
+						break
+					}
+				}
+				trailing := len(prevRaw) - len(strings.TrimRight(prevRaw, "\n\r"))
+				sep := "\n"
+				if trailing >= 2 {
+					sep = "\n\n"
+				}
+				cleaned[len(cleaned)-1] += sep + l
 			}
 			continue
 		}
@@ -1539,7 +1617,7 @@ func (lc *Logchecker) legacyParse() {
 
 		// XLD album gain
 		rawLog, cnt = replaceCount(rawLog, regexp.MustCompile(`(?i)All Tracks(\s*\n)((?:.*)\n)?(\s*Album gain\s+:) (.*)?(\n\s*Peak\s+:) (.*)?`),
-			`<span class="log5">All Tracks</span>$1$2<strong>$3 <span class="log3">$4</span>`+"\n"+"$5 <span class=\"log3\">$6</span></strong>", 1)
+			`<span class="log5">All Tracks</span>$1$2<strong>$3 <span class="log3">$4</span>`+"$5 <span class=\"log3\">$6</span></strong>", 1)
 		if isXLD > 0 && cnt == 0 {
 			lc.account("Could not verify album gain", 0, -1, false, false)
 		}
@@ -2268,7 +2346,7 @@ func (lc *Logchecker) gapHandlingCallback(m []string) string {
 	case strings.Contains(m[2], "Left out"):
 		cls = "bad"
 		lc.account("Gap handling should be appended to previous track", 10, -1, false, false)
-	case strings.Contains(m[2], "Appended to previous track"):
+	case strings.Contains(strings.ToLower(m[2]), "appended to previous track"):
 		cls = "good"
 	}
 	return "<span class=\"log5\">Gap handling" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"

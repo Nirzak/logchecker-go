@@ -10,11 +10,13 @@ Unlike the original PHP version which required external Python scripts to valida
 
 ## Requirements
 
-* Go 1.25.0+
+* Go 1.25.0+ (Only for build and development. No runtime required for prebuilt binaries)
 
 ## Standalone CLI
 
 ### Installation
+
+Download from github releases : https://github.com/Nirzak/logchecker-go/releases
 
 Install via `go install`:
 

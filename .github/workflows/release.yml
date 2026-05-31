@@ -31,13 +31,13 @@ jobs:
             arch: amd64
             ext: '.exe'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.26.3'
-          cache: true
+          go-version: 'stable'
+          check-latest: true
 
       - name: Build binary
         env:

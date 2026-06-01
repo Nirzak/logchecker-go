@@ -48,6 +48,6 @@ jobs:
           go build -ldflags="-s -w" -o logchecker-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.ext }} cmd/logchecker/main.go
 
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           files: logchecker-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.ext }}

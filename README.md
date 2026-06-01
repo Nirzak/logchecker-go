@@ -101,6 +101,25 @@ func main() {
 }
 ```
 
+### Public API Reference
+
+```go
+
+lc.Parse()              // Run analysis
+
+lc.GetRipper()          // string: "EAC" | "XLD" | "whipper" | "unknown"
+lc.GetRipperVersion()   // string
+lc.GetScore()           // int 0–100
+lc.GetChecksumState()   // "checksum_ok" | "checksum_invalid" | "checksum_missing"
+lc.GetDetails()         // []string — human-readable list of deductions / notices
+lc.GetLanguage()        // string language code, e.g. "en", "ru"
+lc.GetLog()             // string — HTML-annotated log text (span-tagged)
+lc.IsCombinedLog()      // bool — true when the file holds multiple rip sessions
+
+// Control
+lc.ValidateChecksum(false) // Disable external checksum validation
+```
+
 ## Testing
 
 To run the test suite:

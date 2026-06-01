@@ -1,10 +1,10 @@
-# Logchecker — Agent Reference
+# AGENTS.md — logchecker-go
 
-> **Purpose**: This file gives AI agents a fast, accurate orientation to the `Nirzak/logchecker-go` codebase so that they can reason, modify, and extend it without having to re-read the whole source tree.
+> Guideline for AI agents working in this repository.
 
 ---
 
-## 1. What the project is
+## 1. Project Context
 
 **Logchecker** is a Go library (and CLI tool) that parses and scores CD-rip log files produced by four rippers:
 
@@ -12,113 +12,112 @@
 |---|---|---|
 | Exact Audio Copy (EAC) | `check.EAC` | Contains `"Exact Audio Copy"` |
 | X Lossless Decoder (XLD) | `check.XLD` | Contains `"X Lossless Decoder version"` |
-| whipper | `check.WHIPPER` | Contains `"Log created by: whipper"` |
-| dBpoweramp | `check.DBPOWERAMP` | First line matches `^dBpoweramp Release` |
+| whipper | `check.Whipper` | Contains `"Log created by: whipper"` |
+| dBpoweramp | `check.DBpoweramp` | First line matches `^dBpoweramp Release` |
 
 A score starts at **100** and decreases based on problems found (bad settings, checksum failures, CRC mismatches, etc.). The final score and an array of human-readable detail messages are the primary output.
 
----
+**Stack**
+- Language: Go 1.25+ (no CGO, no runtime deps)
+- Key deps: `github.com/Nirzak/eac-logchecker`, `github.com/Nirzak/xld-logchecker` (native Go checksum validators), `golang.org/x/text` (encoding detection), `gopkg.in/yaml.v3`
+- No web framework, no database, no external services at runtime
 
-## 2. Repository layout
-
-```
-logchecker-go/
-├── cmd/
-│   └── logchecker/
-│       └── main.go             # CLI wrapper for the logchecker tool
-├── internal/
-│   ├── check/
-│   │   ├── checksum.go         # Checksum state constants + validation logic
-│   │   └── ripper.go           # Detects ripper from raw log text
-│   ├── parser/
-│   │   └── eac/
-│   │       ├── translator.go   # EAC-only: detects log language, translates to English
-│   │       └── languages/      # JSON mappings for non-English to English translations
-│   └── util/
-│       └── encoding.go         # Encoding detection and conversion to UTF-8
-├── logchecker/
-│   ├── logchecker.go           # Core package — all parsing and scoring logic
-│   └── resources/
-│       └── drives.json         # ~6 000 drive entries mapped by Exact Audio Copy
-├── logchecker_test.go          # Data-provider test against real log fixtures
-├── tests/
-│   └── logs/
-│       ├── eac/                # originals/ details/ html/ utf8/
-│       ├── xld/                # originals/ details/ html/
-│       ├── whipper/            # originals/ details/ html/
-│       └── dbpoweramp/         # (reserved / extra fixtures)
-├── go.mod                      # Go module definition and dependencies
-└── README.md
-```
-
----
-
-## 3. Packages & Imports
-
-| Package | Purpose |
+**Key architectural decisions**
+| Decision | Why |
 |---|---|
-| `github.com/Nirzak/logchecker-go/logchecker` | Core API to be imported by users |
-| `github.com/Nirzak/logchecker-go/internal/check` | Internal checks (ripper detection, checksums) |
-| `github.com/Nirzak/logchecker-go/internal/util` | Internal encoding and utility functions |
-| `github.com/Nirzak/logchecker-go/internal/parser/eac` | EAC specific language parsing |
+| `internal/` packages | `check`, `util`, `parser/eac` are not part of the public API; prevents accidental import by consumers |
+| `//go:embed` for `drives.json` + language JSONs | Single-binary distribution — no external data files needed at runtime |
+| `Logchecker` struct with `reset()` on `NewFile()` | Safe re-use of a single instance across multiple files without allocation overhead |
+| `account()` / `accountTrack()` centralize scoring | All score mutations go through one place; prevents duplicate detail messages |
+| Ripper-specific parse entry points (`legacyParse`, `whipperParse`, `dbpowerampParse`) | EAC/XLD share legacy logic; whipper and dBpoweramp have divergent formats |
+| Fixture-driven tests (`tests/logs/*/details/*.json` + `html/*.log`) | Regression tests against real-world logs with known-good outputs |
 
 ---
 
-## 4. Core Struct: `Logchecker`
+## 2. Development Commands
 
-**File**: [`logchecker/logchecker.go`](logchecker/logchecker.go)
+```bash
+# Setup — requires Go 1.25+
+go mod download
 
-### Public API
+# Build CLI binary
+go build -o logchecker ./cmd/logchecker/main.go
 
+# Run all tests
+go test ./...
+
+# Run tests with verbose output (shows per-fixture subtests)
+go test -v ./...
+
+# Run tests for a specific ripper
+go test -v -run TestLogchecker/eac ./...
+
+# Run only HTML output regression tests
+go test -v -run TestHTMLOutput ./...
+
+# Lint (install golangci-lint first)
+golangci-lint run ./...
+
+# Vet
+go vet ./...
+
+# Format check
+gofmt -l .
+
+# Format in place
+gofmt -w .
+
+# CLI usage
+logchecker analyze path/to/file.log
+logchecker analyze --html path/to/file.log out.html details.json
+logchecker decode  path/to/file.log   # detect + dump UTF-8
+logchecker translate -l de path/to/file.log
+logchecker version
+```
+
+**Non-obvious flags**
+- `--no_text`: suppress log body output (prints only score summary)
+- `--html`: print raw HTML annotation to stdout instead of stripping tags
+- Third positional arg to `analyze` writes a `details.json` — this is what the test fixtures are generated from
+
+---
+
+## 3. Code Style & Conventions
+
+### Naming
+- Files: `snake_case.go`, prefixed by concern — `parser_legacy.go`, `parser_whipper.go`, `parser_dbpoweramp.go`
+- Exported types/functions: `PascalCase` — `Logchecker`, `NewFile`, `GetScore`
+- Unexported functions/fields: `camelCase` — `legacyParse`, `driveCallback`, `checksumStatus`
+- Constants in `internal/check`: ALL_CAPS-free, plain string constants — `ChecksumOK`, `EAC`, `Whipper`
+- Regex vars: named with `Re` suffix, declared at package level as `var` — `eacChecksumRe`, `dbpowerampRe`
+
+### Import order (standard Go goimports grouping)
 ```go
-lc := logchecker.New()
+import (
+    // stdlib
+    "fmt"
+    "regexp"
 
-// Load a file (resets all internal state)
-err := lc.NewFile("/path/to/file.log")
+    // internal
+    "github.com/Nirzak/logchecker-go/internal/check"
+    "github.com/Nirzak/logchecker-go/internal/util"
 
-// Run analysis
-lc.Parse()
-
-// Results
-lc.GetRipper()          // string: "EAC" | "XLD" | "whipper" | "unknown"
-lc.GetRipperVersion()   // string
-lc.GetScore()           // int 0–100
-lc.GetChecksumState()   // "checksum_ok" | "checksum_invalid" | "checksum_missing"
-lc.GetDetails()         // []string — human-readable list of deductions / notices
-lc.GetLanguage()        // string language code, e.g. "en", "ru"
-lc.GetLog()             // string — HTML-annotated log text (span-tagged)
-lc.IsCombinedLog()      // bool — true when the file holds multiple rip sessions
-
-// Control
-lc.ValidateChecksum(false) // Disable external checksum validation
+    // third-party
+    "golang.org/x/text/encoding"
+)
 ```
 
-### Parse flow (`Parse()`)
+### Error handling
+- Library code (`logchecker/`, `internal/`) **never** calls `os.Exit` or `panic` — return errors up the call stack
+- `Parse()` is intentionally error-free at the signature level: on fatal decode/ripper failure it sets `lc.score = 0` and appends to `lc.details` via `account()`
+- CLI (`cmd/logchecker/main.go`) is the **only** place that calls `os.Exit(1)` — after printing to `os.Stderr`
+- Use sentinel errors for expected failure modes: `check.ErrUnknownRipper`, `eac.ErrUnknownLanguage`, `eac.ErrInvalidFile`
+- Error strings: lowercase, no trailing punctuation (`"could not detect log encoding"` not `"Could not detect log encoding."`)
 
-```
-Parse()
- ├── util.DecodeEncoding()           Converts log to UTF-8 (BOM detection + charmap fallback)
- ├── check.GetRipper()               Determines ripper type
- ├── if DBPOWERAMP → dbpowerampParse()  Settings + per-track regex parsing
- ├── if WHIPPER → whipperParse()     YAML-based parsing
- └── else → legacyParse()
-          ├── if EAC → eac.Translate Auto-detect + translate non-English to English
-          ├── Split log into sections by checksum delimiter or "End of status report"
-          ├── Per-section: regexp loops over line items
-          │    Each callback annotates the log text with HTML spans
-          │    AND calls account() or accountTrack() if a problem is detected
-          └── checkTracks() — fails score to 0 if no tracks found
-```
-
-### Scoring mechanics
-
-- `account(msg, decrease, setScore, inclCombined, notice)` — **global** deduction.  
-  - `decrease` → `lc.score -= decrease`  
-  - `setScore` → `lc.score = setScore` (absolute override)  
-  - Deduplication: same message string is never added twice.
-- `accountTrack(msg, decrease)` — **per-track** deduction.  
-  - Accumulated per track (applied at end of loop).  
-  - Track-level messages carry `"Track NN: …"` prefix.
+### Logging / output standards
+- The library emits **zero** output to stdout/stderr — all feedback goes into `lc.details` via `account()`
+- `[Notice]` prefix (via `notice=true` on `account()`) marks informational-only details that do NOT deduct points
+- Score detail format: `"Message text (-N point(s))"` — always produced by `account()`, never hand-formatted
 
 ### HTML annotation classes
 
@@ -133,130 +132,163 @@ Parse()
 | `log4` | Bold — field values |
 | `log5` | Underline — field labels |
 
----
-
-## 5. Checksum validation
-
-**File**: [`internal/check/checksum.go`](internal/check/checksum.go)
-
-Unlike the original PHP version which required Python tools, the Go version incorporates checksum verification directly using native Go ports.
-
-| Ripper | Method | Dependency |
-|---|---|---|
-| whipper | SHA-256 hash computed in Go, compared to last line of log | none |
-| dBpoweramp | Always `CHECKSUM_MISSING` — no embedded checksum | none |
-| EAC | Uses native Go package | `github.com/Nirzak/eac-logchecker` |
-| XLD | Uses native Go package | `github.com/Nirzak/xld-logchecker` |
+Stricly maintain the above classes. do not invent new classes
 
 ---
 
-## 6. Drive offset matching
+## 4. Architecture & Structure
 
-- `logchecker/resources/drives.json` — JSON array of `[drive_name_lowercase, offset_int]` pairs.
-- Loaded via `go:embed` when the package is initialized.
-- Matching uses `normalizeDriveName()` to strip alias substitutions (e.g. `HL-DT-ST` → `LG Electronics`), whitespace collapse, and revision suffixes before exact matching.
+```
+logchecker-go/
+├── cmd/logchecker/main.go        # CLI only — thin wrapper, no business logic
+├── internal/
+│   ├── check/
+│   │   ├── ripper.go             # GetRipper() — detects ripper from raw text
+│   │   └── checksum.go           # Validate() — returns Checksum* constants
+│   ├── parser/eac/
+│   │   ├── translator.go         # GetLanguage(), Translate() — EAC i18n
+│   │   └── languages/            # master.json + per-lang JSON translation maps
+│   └── util/encoding.go          # DecodeEncoding() — UTF-16/Latin-1 → UTF-8
+├── logchecker/
+│   ├── logchecker.go             # Public API: New(), NewFile(), Parse(), Get*()
+│   ├── scoring.go                # account(), accountTrack() — all score mutation
+│   ├── callbacks.go              # HTML annotation callbacks (one per log field)
+│   ├── regex_util.go             # Pure regex helpers: splitWithDelim, compareVersions
+│   ├── parser_legacy.go          # EAC + XLD parse logic
+│   ├── parser_whipper.go         # whipper parse logic
+│   ├── parser_dbpoweramp.go      # dBpoweramp parse logic
+│   ├── drive.go                  # getDrives() — Levenshtein drive lookup
+│   └── resources/drives.json     # Embedded drive DB (~6000 entries)
+├── logchecker_test.go            # All tests — fixture-driven
+└── tests/logs/{eac,xld,whipper,dbpoweramp}/
+    ├── originals/                # Input log files (source of truth)
+    ├── details/                  # Expected JSON output (score, details, checksum)
+    ├── html/                     # Expected HTML-annotated output
+    └── utf8/                     # UTF-8 decoded versions (EAC only)
+```
 
----
+### Parse flow (`Parse()`)
 
-## 7. EAC multi-language support
+```
+Parse()
+ ├── util.DecodeEncoding(scoringFn)     UTF-16/Latin-1 → UTF-8; scoring callback
+ │    └── scoringFn tries eac.GetLanguage() + eac.Translate() per encoding candidate
+ │         to pick the best charset — happens before ripper detection
+ ├── check.GetRipper()                  Detect ripper; score=0 + return if unknown
+ ├── switch ripper
+ │    ├── DBpoweramp → dbpowerampParse()   Regex-only; no checksum validation
+ │    ├── Whipper    → whipperParse()      YAML unmarshal + field checks
+ │    └── default    → legacyParse()       EAC + XLD
+ │         ├── [EAC only] eac.GetLanguage() + eac.Translate() → rewrite lc.log to English
+ │         ├── util.NormalizeLineEndings()
+ │         ├── Split lc.log into lc.logs[] — 3-way branch:
+ │         │    ├── EAC checksum present  → split on `==== Log checksum ... ====`
+ │         │    ├── XLD signature present → split on `--- BEGIN/END XLD SIGNATURE ---`
+ │         │    └── neither (checksumStatus=Missing) → split on `End of status report`
+ │         │         └── strip CUETools DB Plugin segments
+ │         ├── Per-section loop (each is one rip session for combined logs):
+ │         │    ├── replaceCountCallback() over ~40 regex patterns
+ │         │    │    Each callback: annotates log text with HTML spans
+ │         │    │    AND calls account()/accountTrack() on problems found
+ │         │    ├── Checksum validation (check.Validate()) if checksumStatus==OK
+ │         │    ├── checkTracks(logIdx) — sets score=0 if zero tracks found
+ │         │    └── Reset per-session state (arTracks, arSummary, secureMode)
+ │         └── Merge per-session track scores into lc.details + lc.score
+```
 
-- **Detection**: `eac.GetLanguage()` scans `master.json` for EAC-specific marker strings.
-- **Translation**: `eac.Translate()` does regex-replacement of foreign phrases. Keys are integers; case-sensitivity differs by key range (`> 16` uses case-insensitive matching). Translation phrases are sorted by descending length to prevent shorter phrases corrupting longer translations.
-- **Supported languages (16)**: bg, cs, de, en, es, fr, it, jp, ko, nl, pl, ru, se, sk, sr, zh.
-
----
-
-## 8. whipper parsing specifics
-
-- Log format is YAML — parsed via `gopkg.in/yaml.v3`.
-- Pre-parse fixups handle two known whipper bugs:
-  1. Un-escaped YAML strings in `Release`/`Album` fields.
-  2. CRCs starting with `0` that `yaml.v3` would interpret as octal.
-- Minimum supported whipper version: **0.7.3** (earlier versions have octal track number bugs).
-
----
-
-## 9. CLI interface
-
-The CLI is located in `cmd/logchecker/main.go`.
-
-| Command | Key options |
+### Where to add new features
+| Feature type | Location |
 |---|---|
-| `analyze` / `analyse` | `--html`, `--no_text`, optional `out_file`, optional `details` (JSON) |
-| `decode` | Converts log encoding to UTF-8; prints to stdout or file |
-| `translate` | `--language (-l)` to force language code |
+| New ripper support | Add constant in `internal/check/ripper.go` → new `parser_<ripper>.go` in `logchecker/` → `switch` case in `logchecker.go:Parse()` |
+| New scoring rule for existing ripper | Add callback in `callbacks.go` (if HTML annotation needed) or inline in the parser file; call `account()` / `accountTrack()` |
+| New CLI subcommand | Add `case` to `main()` switch + `cmdFoo()` function in `cmd/logchecker/main.go` |
+| New language support | Add JSON file to `internal/parser/eac/languages/` + entry in `master.json`; `//go:embed` picks it up automatically |
+| Encoding edge case | `internal/util/encoding.go` only |
 
 ---
 
-## 10. Testing
+## 5. Critical Rules (Non-Negotiable)
 
+1. **Never mutate score outside `account()` / `accountTrack()`** — direct assignment to `lc.score` is only allowed in `reset()` and on unrecoverable parse failure in `Parse()`.
+
+2. **Never add `os.Exit` or `panic` inside `logchecker/` or `internal/`** — these packages are imported as a library.
+
+3. **Never break the public API of `logchecker/` without a major version bump** — `New()`, `NewFile()`, `Parse()`, and all `Get*()` methods are the stable contract.
+
+4. **Never hardcode drive names, score values, or HTML class strings as bare literals in parser files** — drives live in `resources/drives.json`; HTML classes are `good`/`bad`/`badish`/`log4`/`log5`; penalty values must be traceable to the PHP reference implementation.
+
+5. **Never modify test fixtures (`tests/logs/*/details/*.json`, `html/*.log`) to make a failing test pass** — fix the code. Fixtures are the ground truth derived from the PHP reference implementation.
+
+6. **Never add external HTTP calls or filesystem side effects to the library** — the library is pure CPU/memory; `NewFile()` is the only I/O entry point.
+
+7. **`LevenshteinDistance` is a package-level var for testing only** — do not increase it as a workaround for a failing drive lookup.
+
+---
+
+## 6. Testing Requirements
+
+### Structure
+- All tests live in `logchecker_test.go` (package `logchecker_test`) — black-box testing of the public API only
+- `TestLogchecker`: validates `ripper`, `version`, `language`, `combined`, `score`, `checksum`, `details` against `tests/logs/*/details/*.json`
+- `TestHTMLOutput`: validates full annotated HTML output against `tests/logs/*/html/*.log`
+
+
+
+### Adding tests for a new log
 ```bash
-go test -v ./...       # runs the standard Go test framework
+# 1. Place the original log
+cp new.log tests/logs/eac/originals/new.log
+
+# 2. Generate the expected fixture
+logchecker analyze tests/logs/eac/originals/new.log \
+  tests/logs/eac/html/new.log \
+  tests/logs/eac/details/new.json
+
+# 3. Verify the fixture looks correct, then commit both files
 ```
 
-### Test fixture layout (`tests/logs/<ripper>/`)
-
-```
-originals/   ← raw .log files fed to Logchecker
-details/     ← expected JSON output (ripper, version, language, combined, score, checksum, details[])
-html/        ← expected getLog() HTML output
-utf8/        ← UTF-8 re-encoded versions (for decode command tests)
+### Running targeted tests
+```bash
+go test -v -run "TestLogchecker/eac/combined_1.log" ./...
+go test -v -run "TestHTMLOutput/whipper" ./...
 ```
 
-`logchecker_test.go` iterates all files in `tests/logs/*/originals/`, parses them, and asserts equality with the corresponding `details/*.json` and `html/*.log` fixtures.
+### Coverage expectations
+- Every new ripper rule (`account()` call) **must** have at least one fixture that exercises it
+- All code paths in `internal/` packages must be covered by the fixture suite or explicit unit tests
+- `checksum_invalid` fixtures may report `checksum_ok` in environments without the external validator — this is explicitly tolerated in the test harness; do not work around it differently
 
 ---
 
-## 11. Dependencies
+## 7. Agent Behavior Guidelines
 
-### `go.mod` Requirements
+### Edits vs new files
+- **Prefer editing existing files.** A new scoring rule for EAC goes into `parser_legacy.go` and a callback in `callbacks.go` — not a new file.
+- Create a new file only for a genuinely new ripper parser (`parser_<name>.go`) or a new `internal/` utility package.
 
-| Package | Used for |
-|---|---|
-| `go 1.25.0` | Language runtime |
-| `golang.org/x/text` | Encoding detection and codepage fallbacks |
-| `gopkg.in/yaml.v3` | Parsing whipper YAML logs |
-| `github.com/Nirzak/eac-logchecker` | Native Go port of EAC logchecker |
-| `github.com/Nirzak/xld-logchecker` | Native Go port of XLD logchecker |
+### Before writing any code
+1. Check `regex_util.go` for existing helpers (`splitWithDelim`, `replaceCount`, `compareVersions`) before implementing string/regex operations.
+2. Check `callbacks.go` for an existing callback pattern before writing a new HTML annotation.
+3. Check `internal/check/ripper.go` constants before referencing ripper names as string literals.
 
----
+### Assumptions
+- Never assume a log file is valid UTF-8 — always route raw bytes through `util.DecodeEncoding()`.
+- Never assume `lc.ripper` is populated before `Parse()` returns.
+- When in doubt about expected score behavior, check `tests/logs/*/details/*.json` for the nearest similar fixture.
 
-## 12. Important constants and tunables
+### Commit message format
+```
+<type>(<scope>): <short imperative summary>
 
-| Constant / key | Default | Location | Effect |
-|---|---|---|---|
-| `validateChecksum` | `true` | instance | Set via `lc.ValidateChecksum(false)` |
-| `check.ChecksumOk` | `"checksum_ok"` | `internal/check/checksum.go` | Passed checksum or tool missing |
-| `check.ChecksumInvalid` | `"checksum_invalid"` | `internal/check/checksum.go` | Failed/Tampered log |
-| `check.ChecksumMissing` | `"checksum_missing"` | `internal/check/checksum.go` | No checksum present |
+Types : feat | fix | refactor | test | docs | chore
+Scope : logchecker | cli | eac | xld | whipper | dbpoweramp | internal | tests
 
----
+Examples:
+  feat(eac): penalize logs with null drive offset
+  fix(whipper): handle SHA-256 hash on final line without trailing newline
+  test(xld): add fixture for XLD combined log with bad CRC
+  refactor(internal): extract encoding scorer into named function
+```
 
-## 13. Key scoring deductions (representative list)
-
-| Condition | Points |
-|---|---|
-| Unknown log / corrupt encoding | −100 (score → 0) |
-| EAC version older than 0.99 | −30 |
-| Range rip detected | −30 |
-| CRC mismatch per track | −30 |
-| No test-and-copy used | −10 |
-| Rip not in Secure mode AND no T+C | −40 additional |
-| Accurate stream not Yes | −20 |
-| C2 pointers used | −10 |
-| Defeat audio cache not Yes | −10 |
-| Incorrect gap handling | −10 |
-| Normalization active | −100 (score → 0) |
-| Virtual / fake drive used | −20 |
-| Incorrect read offset | −5 |
-| ID3 tags added to FLAC | −1 |
-| Suspicious/timing position per track | −20 |
-| Read error per track (capped 10) | −1 to −10 |
-
----
-
-## 14. Patterns to follow when modifying
-
-1. **Adding a new check**: Add or modify the matching regex in `logchecker.go`. Extract substrings and call `lc.account()` or `lc.accountTrack()` when issues are detected.
-2. **Adding a new language**: Update `internal/parser/eac/languages/<code>.json` using the integer-keyed schema, and add the detection string to `master.json`.
-3. **Updating test fixtures**: When scoring logic changes, the `details` arrays in `logchecker_test.go` will complain. Adjust them to properly reflect the new scores.
+- Subject line ≤ 72 characters, imperative mood, no trailing period
+- Never commit fixture JSON/HTML changes without an accompanying code change that motivated them

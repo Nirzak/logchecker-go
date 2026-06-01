@@ -388,21 +388,33 @@ func writeOrderedFields(sb *strings.Builder, indent string, m map[string]interfa
 
 func writeWhipperKV(sb *strings.Builder, indent, k string, v interface{}) {
 	if v == nil {
-		sb.WriteString(indent + k + ": \n")
+		sb.WriteString(indent)
+		sb.WriteString(k)
+		sb.WriteString(": \n")
 		return
 	}
 	switch val := v.(type) {
 	case bool:
 		if val {
-			sb.WriteString(indent + k + ": true\n")
+			sb.WriteString(indent)
+			sb.WriteString(k)
+			sb.WriteString(": true\n")
 		} else {
-			sb.WriteString(indent + k + ": false\n")
+			sb.WriteString(indent)
+			sb.WriteString(k)
+			sb.WriteString(": false\n")
 		}
 	case map[string]interface{}:
-		sb.WriteString(indent + k + ":\n")
+		sb.WriteString(indent)
+		sb.WriteString(k)
+		sb.WriteString(":\n")
 		writeOrderedFields(sb, indent+"  ", val, arFieldOrder)
 	default:
-		sb.WriteString(indent + k + ": " + fmt.Sprintf("%v", val) + "\n")
+		sb.WriteString(indent)
+		sb.WriteString(k)
+		sb.WriteString(": ")
+		sb.WriteString(fmt.Sprintf("%v", val))
+		sb.WriteString("\n")
 	}
 }
 
@@ -410,7 +422,9 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 	var sb strings.Builder
 
 	if lcb, ok := parsed["Log created by"]; ok {
-		sb.WriteString("Log created by: " + fmt.Sprintf("%v", lcb) + "\n")
+		sb.WriteString("Log created by: ")
+		sb.WriteString(fmt.Sprintf("%v", lcb))
+		sb.WriteString("\n")
 	}
 	if lcd, ok := parsed["Log creation date"]; ok {
 		var lcdStr string
@@ -419,7 +433,9 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 		} else {
 			lcdStr = fmt.Sprintf("%v", lcd)
 		}
-		sb.WriteString("Log creation date: " + lcdStr + "\n")
+		sb.WriteString("Log creation date: ")
+		sb.WriteString(lcdStr)
+		sb.WriteString("\n")
 	}
 	sb.WriteString("\n")
 
@@ -450,7 +466,9 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 			return keys[i] < keys[j]
 		})
 		for _, k := range keys {
-			sb.WriteString("  " + k + ":\n")
+			sb.WriteString("  ")
+			sb.WriteString(k)
+			sb.WriteString(":\n")
 			if t, ok := toc[k].(map[string]interface{}); ok {
 				writeOrderedFields(&sb, "    ", t, tocFieldOrder)
 			}
@@ -473,7 +491,9 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 			return keys[i] < keys[j]
 		})
 		for _, k := range keys {
-			sb.WriteString("  " + k + ":\n")
+			sb.WriteString("  ")
+			sb.WriteString(k)
+			sb.WriteString(":\n")
 			if t, ok := tracks[k].(map[string]interface{}); ok {
 				for _, fk := range trackFieldOrder {
 					vv, ok := t[fk]
@@ -482,19 +502,31 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 					}
 					switch val := vv.(type) {
 					case map[string]interface{}:
-						sb.WriteString("    " + fk + ":\n")
+						sb.WriteString("    ")
+						sb.WriteString(fk)
+						sb.WriteString(":\n")
 						writeOrderedFields(&sb, "      ", val, arFieldOrder)
 					case bool:
 						if val {
-							sb.WriteString("    " + fk + ": Yes\n")
+							sb.WriteString("    ")
+							sb.WriteString(fk)
+							sb.WriteString(": Yes\n")
 						} else {
-							sb.WriteString("    " + fk + ": No\n")
+							sb.WriteString("    ")
+							sb.WriteString(fk)
+							sb.WriteString(": No\n")
 						}
 					default:
 						if vv == nil {
-							sb.WriteString("    " + fk + ": \n")
+							sb.WriteString("    ")
+							sb.WriteString(fk)
+							sb.WriteString(": \n")
 						} else {
-							sb.WriteString("    " + fk + ": " + fmt.Sprintf("%v", vv) + "\n")
+							sb.WriteString("    ")
+							sb.WriteString(fk)
+							sb.WriteString(": ")
+							sb.WriteString(fmt.Sprintf("%v", vv))
+							sb.WriteString("\n")
 						}
 					}
 				}
@@ -510,7 +542,9 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 	}
 
 	if hash, ok := parsed["SHA-256 hash"]; ok {
-		sb.WriteString("SHA-256 hash: " + fmt.Sprintf("%v", hash) + "\n")
+		sb.WriteString("SHA-256 hash: ")
+		sb.WriteString(fmt.Sprintf("%v", hash))
+		sb.WriteString("\n")
 	}
 
 	return sb.String()

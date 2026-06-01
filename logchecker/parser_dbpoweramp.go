@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	dbVersionRe      = regexp.MustCompile(`(?im)^dBpoweramp Release ([^\s]+)( Digital Audio Extraction Log from )(.+)`)
+	dbVersionRe      = regexp.MustCompile(`(?im)^(dBpoweramp Release )([^\s]+)( Digital Audio Extraction Log from )(.+)`)
 	dbDriveRe        = regexp.MustCompile(`(?i)Ripping with drive '([^']+)',\s*Drive offset:\s*([+-]?\d+)`)
 	dbDriveModelRe   = regexp.MustCompile(`^([A-Z]:\s+)(\[.+\])\s*$`)
 	dbC2Re           = regexp.MustCompile(`(?i)Using C2:\s*(Yes|No)`)
@@ -28,7 +28,7 @@ var (
 	dbTracksRippedRe = regexp.MustCompile(`(?i)(\d+) Tracks Ripped:\s*(.+)`)
 	dbTracksAccRe    = regexp.MustCompile(`(?i)(\d+ Tracks Ripped Accurately)`)
 	dbUserStopRe     = regexp.MustCompile(`(?im)^(User Stopped Ripping)`)
-	dbLBARe          = regexp.MustCompile(`(?i)(Ripped LBA\s+)([^ \t(]+(?:\s+to\s+[^ \t(]+)?)(` + "`" + `\s+\()([^)]+)(\)\s+in\s+)([^\s.]+)`)
+	dbLBARe          = regexp.MustCompile(`(?i)(Ripped LBA\s+)([^ \t(]+(?:\s+to\s+[^ \t(]+)?)(\s+\()([^)]+)(\)\s+in\s+)([^\s.]+)`)
 	dbFileRe         = regexp.MustCompile(`(?i)(Filename:\s*)(.+)`)
 	dbSecureWarnRe   = regexp.MustCompile(`(?im)^(\s*)(Secure \(Warning\))([ \t]+\[([^\]]+)\])`)
 	dbSecureRe       = regexp.MustCompile(`(?im)^(\s*)Secure([ \t]+\[[^\]]+\])`)
@@ -50,7 +50,7 @@ func (lc *Logchecker) dbpowerampParse() {
 	if m := regexp.MustCompile(`(?im)^dBpoweramp Release ([^\s]+)`).FindStringSubmatch(lc.log); m != nil {
 		lc.ripperVersion = m[1]
 		verNum, _ := strconv.ParseFloat(m[1], 64)
-		lc.log = regexp.MustCompile(`(?im)^(dBpoweramp Release )([^\s]+)( Digital Audio Extraction Log from )(.+)`).
+		lc.log = dbVersionRe.
 			ReplaceAllString(lc.log, "<span class='good'>$1<span class='log1'>$2</span>$3<span class='log1'>$4</span></span>")
 		if verNum < 14 {
 			lc.account("[Notice] dBpoweramp version older than 14 — older versions had less robust secure ripping.",
@@ -250,7 +250,7 @@ func (lc *Logchecker) dbpowerampParse() {
 		}
 
 		// Annotate LBA
-		headerRest = regexp.MustCompile(`(?i)(Ripped LBA\s+)([^ \t(]+(?:\s+to\s+[^ \t(]+)?)(\s+\()([^)]+)(\)\s+in\s+)([^\s.]+)`).
+		headerRest = dbLBARe.
 			ReplaceAllString(headerRest, "$1<span class='log1'>$2</span>$3<span class='log1'>$4</span>$5<span class='log1'>$6</span>")
 		headerRest = dbFileRe.ReplaceAllString(headerRest, "$1<span class='log3'>$2</span>")
 		if isError {

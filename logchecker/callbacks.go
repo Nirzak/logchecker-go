@@ -314,7 +314,7 @@ func (lc *Logchecker) arXldCallback(m []string) string {
 }
 
 func (lc *Logchecker) arSummaryConfXldCallback(s string) string {
-	re := regexp.MustCompile(`(?i)(Track +\d+ +: +)(OK +)\(A?R?\d?,? ?confidence +(\d+).*?\)(.*)\ n`)
+	re := regexp.MustCompile(`(?i)(Track +\d+ +: +)(OK +)\(A?R?\d?,? ?confidence +(\d+).*?\)(.*)\n`)
 	re2 := regexp.MustCompile(`(?i)(Track +\d+ +: +)(NG|Not Found).*?\n`)
 	if m := re.FindStringSubmatch(s); m != nil {
 		n, _ := strconv.Atoi(m[3])

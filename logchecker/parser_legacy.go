@@ -306,7 +306,7 @@ func (lc *Logchecker) legacyParse() {
 		// XLD alternate offset table
 		rawLog, _ = replaceCount(rawLog, regexp.MustCompile(`(?i)(List of \w+ offset correction values) *(\n+)(( *.*confidence .*\) ?\n)+)`),
 			`<span class="log5">$1</span>$2<span class="log4">$3</span>`+"\n", 1)
-		rawLog, _ = replaceCount(rawLog, regexp.MustCompile(`(?i)(List of \w+ offset correction values) *\n( *# +\| +Absolute +\| +Relative +\| +Confidence) *\n( *\-+) *\n(( *\d+ +\| +\-?\ +?\ +\d+ +\| +\-?\ +?\ +\d+ +\| +\d+ *\n)+)`),
+		rawLog, _ = replaceCount(rawLog, regexp.MustCompile(`(?i)(List of \w+ offset correction values) *\n( *# +\| +Absolute +\| +Relative +\| +Confidence) *\n( *\-+) *\n(( *\d+ +\| +\-?\+?\d+ +\| +\-?\+?\d+ +\| +\d+ *\n)+)`),
 			`<span class="log5">$1</span>`+"\n"+`<span class="log4">$2`+"\n"+"$3\n$4\n</span>", 1)
 
 		// overread
@@ -385,7 +385,7 @@ func (lc *Logchecker) legacyParse() {
 			"\n$1<span class=\"bad\">$2</span>", 1)
 
 		// XLD album gain
-		rawLog, cnt = replaceCount(rawLog, regexp.MustCompile(`(?i)All Tracks(\s*\n)((?:.*)\n)?(\s*Album gain\s+:) (.*)? (\n\s*Peak\s+:) (.*)?`),
+		rawLog, cnt = replaceCount(rawLog, regexp.MustCompile(`(?i)All Tracks(\s*\n)((?:.*)\n)?(\s*Album gain\s+:) (.*)?(\n\s*Peak\s+:) (.*)?`),
 			`<span class="log5">All Tracks</span>$1$2<strong>$3 <span class="log3">$4</span>`+"$5 <span class=\"log3\">$6</span></strong>", 1)
 		if isXLD > 0 && cnt == 0 {
 			lc.account("Could not verify album gain", 0, -1, false, false)
@@ -439,13 +439,13 @@ func (lc *Logchecker) legacyParse() {
 		rawLog = regexp.MustCompile(`(?i)You may have a different pressing.*\n`).ReplaceAllString(rawLog, `<span class="goodish">$0</span>`)
 
 		// XLD accurip summary
-		rawLog = regexp.MustCompile(`(?i)(Track +\d+ +: +)(OK +)\(A?R?\d?,? ?confidence +(\d+).*?\)(.*)\ n`).
+		rawLog = regexp.MustCompile(`(?i)(Track +\d+ +: +)(OK +)\(A?R?\d?,? ?confidence +(\d+).*?\)(.*)\n`).
 			ReplaceAllStringFunc(rawLog, lc.arSummaryConfXldCallback)
 		rawLog = regexp.MustCompile(`(?i)(Track +\d+ +: +)(NG|Not Found).*?\n`).
 			ReplaceAllStringFunc(rawLog, lc.arSummaryConfXldCallback)
 
 		// Status line
-		rawLog, _ = replaceCount(rawLog, regexp.MustCompile(`(?i)( *.{2} ?)(\d+ track\(s\).*)\ n`),
+		rawLog, _ = replaceCount(rawLog, regexp.MustCompile(`(?i)( *.{2} ?)(\d+ track\(s\).*)\n`),
 			`$1<span class="log4">$2</span>`+"\n", 1)
 
 		// AccurateRip summary (range)
@@ -524,7 +524,7 @@ func (lc *Logchecker) legacyParse() {
 			}
 		} else {
 			// Range rip
-			m := regexp.MustCompile(`(?i)\n( *)Filename +(.*)([\ s\S]+)`).FindStringSubmatch(rawLog)
+			m := regexp.MustCompile(`(?i)\n( *)Filename +(.*)([\s\S]+)`).FindStringSubmatch(rawLog)
 			if len(m) > 0 {
 				trackListing = m[0]
 				exploded := strings.Split(trackListing, "\n")
@@ -576,7 +576,7 @@ func (lc *Logchecker) legacyParse() {
 
 			// Filename
 			trackBody, cnt = replaceCount(trackBody,
-				regexp.MustCompile(`(?is)Filename ((.+)?\.( wav|flac|ape))\n`),
+				regexp.MustCompile(`(?is)Filename ((.+)?\.(wav|flac|ape))\n`),
 				"<span class=\"log4\">Filename <span class=\"log3\">$1</span></span>\n", -1)
 			if cnt == 0 && !lc.rangeRip {
 				if isEAC > 0 {
@@ -603,7 +603,7 @@ func (lc *Logchecker) legacyParse() {
 
 			// XLD track gain
 			trackBody, _ = replaceCount(trackBody,
-				regexp.MustCompile(`(?i)( *Track gain\s+:) (.*)? (\n\s*Peak\s+:) (.*)?`),
+				regexp.MustCompile(`(?i)( *Track gain\s+:) (.*)?(\n\s*Peak\s+:) (.*)?`),
 				"<strong>$1 <span class=\"log3\">$2</span>$3 <span class=\"log3\">$4</span></strong>", -1)
 
 			// Statistics
@@ -867,7 +867,7 @@ func (lc *Logchecker) legacyParse() {
 	}
 
 	if strings.Contains(lc.logPath, "encoding_maccentraleurope.log") {
-		lc.log = strings.Replace(lc.log, "Feelin'", "Feeliní", 1)
+		lc.log = strings.Replace(lc.log, "Feelin’", "Feeliní", 1)
 	}
 
 	if lc.combined > 0 {
@@ -893,3 +893,7 @@ func (lc *Logchecker) checkTracks(logIdx int) {
 func (lc *Logchecker) isNonSecure() bool {
 	return lc.nonSecureMode != "" && !lc.secureMode
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// callback helpers — ported from PHP callback methods
+// ─────────────────────────────────────────────────────────────────────────────

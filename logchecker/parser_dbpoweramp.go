@@ -28,7 +28,7 @@ var (
 	dbTracksRippedRe = regexp.MustCompile(`(?i)(\d+) Tracks Ripped:\s*(.+)`)
 	dbTracksAccRe    = regexp.MustCompile(`(?i)(\d+ Tracks Ripped Accurately)`)
 	dbUserStopRe     = regexp.MustCompile(`(?im)^(User Stopped Ripping)`)
-	dbLBARe          = regexp.MustCompile(`(?i)(Ripped LBA\s+)([^ \t(]+(?:\s+to\s+[^ \t(]+)?(` + "`" + `\s+\()([^)]+)(\)\s+in\s+)([^\s.]+)`)
+	dbLBARe          = regexp.MustCompile(`(?i)(Ripped LBA\s+)([^ \t(]+(?:\s+to\s+[^ \t(]+)?)(` + "`" + `\s+\()([^)]+)(\)\s+in\s+)([^\s.]+)`)
 	dbFileRe         = regexp.MustCompile(`(?i)(Filename:\s*)(.+)`)
 	dbSecureWarnRe   = regexp.MustCompile(`(?im)^(\s*)(Secure \(Warning\))([ \t]+\[([^\]]+)\])`)
 	dbSecureRe       = regexp.MustCompile(`(?im)^(\s*)Secure([ \t]+\[[^\]]+\])`)

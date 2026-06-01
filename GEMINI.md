@@ -1,1 +1,0 @@
-Read and follow agents.md from the project directory

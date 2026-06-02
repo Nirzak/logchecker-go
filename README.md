@@ -8,6 +8,8 @@ This project is a pure Go rewrite of the original PHP Logchecker.
 
 Unlike the original PHP version which required external Python scripts to validate EAC and XLD checksums, this Go version has all checksum verification built-in via native Go libraries (`github.com/Nirzak/eac-logchecker` and `github.com/Nirzak/xld-logchecker`).
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/Nirzak/logchecker-go)](https://goreportcard.com/report/github.com/Nirzak/logchecker-go)  [![Go Reference](https://pkg.go.dev/badge/github.com/Nirzak/logchecker-go.svg)](https://pkg.go.dev/github.com/Nirzak/logchecker-go)
+
 ## Requirements
 
 * Go 1.25.0+ (Only for build and development. No runtime required for prebuilt binaries)

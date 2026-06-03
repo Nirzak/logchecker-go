@@ -1,0 +1,409 @@
+Exact Audio Copy <span class="log1">V1.3</span> from <span class="log1">2. September 2016</span>
+
+<span class='good'>EAC extraction logfile from <span class='log5'>10. December 2020, 15:22</span></span>
+
+<span class="log4">Cryptic Fate / Shreshtho</span>
+
+<span class="log5">Used Drive  </span>: <span class="good">PLDS    DVD+-RW DS-8A5SH   Adapter: 1  ID: 0</span>
+
+<span class="log5">Read mode               </span>: <span class="good">Secure</span>
+<span class="log5">Utilize accurate stream </span>: <span class="good">Yes</span>
+<span class="log5">Defeat audio cache      </span>: <span class="good">Yes</span>
+<span class="log5">Make use of C2 pointers </span>: <span class="good">No</span>
+
+<span class="log5">Read offset correction                      </span>: <span class="good">6</span>
+<span class="log5">Overread into Lead-In and Lead-Out          </span>: <span class="log4">No</span>
+<span class="log5">Fill up missing offset samples with silence </span>: <span class="good">Yes</span>
+<span class="log5">Delete leading and trailing silent blocks   </span>: <span class="good">No</span>
+<span class="log5">Null samples used in CRC calculations       </span>: <span class="good">Yes</span>
+<span class="log5">Used interface                              </span>: <span class="log4">Native Win32 interface for Win NT & 2000</span>
+<span class="log5">Gap handling                                </span>: <span class="good">Appended to previous track</span>
+
+<span class="log5">Used output format              </span>: <span class="log4">User Defined Encoder</span>
+<span class="log5">Selected bitrate                </span>: <span class="log4">1024 kBit/s</span>
+<span class="log5">Quality                         </span>: <span class="log4">High</span>
+<span class="log5">Add ID3 tag                     </span>: <span class="good">No</span>
+<span class="log5">Command line compressor         </span>: <span class="log4">C:\Program Files\Exact Audio Copy\FLAC\FLAC.EXE</span>
+<span class="log5">Additional command line options </span>: <span class="log4">-8 -V -T "ARTIST=%artist%" -T "TITLE=%title%" -T "ALBUM=%albumtitle%" -T "DATE=%year%" -T 
+"TRACKNUMBER=%tracknr%" -T "GENRE=%genre%" -T "PERFORMER=%albuminterpret%" -T "COMPOSER=%composer%" %haslyrics%--tag-from-file=LYRICS="%lyricsfile%"%haslyrics% -T "ALBUMARTIST=%albumartist%" -T "DISCNUMBER=%cdnumber%" -T "TOTALDISCS=%totalcds%" -T "TOTALTRACKS=%numtracks%" -T "COMMENT=%comment%" %source% -o %dest%</span>
+
+
+<span class="log4 log5">TOC of the extracted CD</span>
+
+<strong>     Track |   Start  |  Length  | Start sector | End sector </strong>
+    <strong>---------------------------------------------------------</strong>
+        <span class="log4">1</span>  <strong>|</strong>  <span class="log1">0:00.00</span> <strong>|</strong>  <span class="log1">0:48.20</span> <strong>|</strong>         <span class="log1">0</span>    <strong>|</strong>     <span class="log1">3619</span>   
+        <span class="log4">2</span>  <strong>|</strong>  <span class="log1">0:48.20</span> <strong>|</strong>  <span class="log1">6:13.37</span> <strong>|</strong>      <span class="log1">3620</span>    <strong>|</strong>    <span class="log1">31631</span>   
+        <span class="log4">3</span>  <strong>|</strong>  <span class="log1">7:01.57</span> <strong>|</strong>  <span class="log1">4:52.11</span> <strong>|</strong>     <span class="log1">31632</span>    <strong>|</strong>    <span class="log1">53542</span>   
+        <span class="log4">4</span>  <strong>|</strong> <span class="log1">11:53.68</span> <strong>|</strong>  <span class="log1">6:01.05</span> <strong>|</strong>     <span class="log1">53543</span>    <strong>|</strong>    <span class="log1">80622</span>   
+        <span class="log4">5</span>  <strong>|</strong> <span class="log1">17:54.73</span> <strong>|</strong>  <span class="log1">8:49.04</span> <strong>|</strong>     <span class="log1">80623</span>    <strong>|</strong>   <span class="log1">120301</span>   
+        <span class="log4">6</span>  <strong>|</strong> <span class="log1">26:44.02</span> <strong>|</strong>  <span class="log1">5:52.19</span> <strong>|</strong>    <span class="log1">120302</span>    <strong>|</strong>   <span class="log1">146720</span>   
+        <span class="log4">7</span>  <strong>|</strong> <span class="log1">32:36.21</span> <strong>|</strong>  <span class="log1">7:26.09</span> <strong>|</strong>    <span class="log1">146721</span>    <strong>|</strong>   <span class="log1">180179</span>   
+        <span class="log4">8</span>  <strong>|</strong> <span class="log1">40:02.30</span> <strong>|</strong>  <span class="log1">5:01.02</span> <strong>|</strong>    <span class="log1">180180</span>    <strong>|</strong>   <span class="log1">202756</span>   
+        <span class="log4">9</span>  <strong>|</strong> <span class="log1">45:03.32</span> <strong>|</strong>  <span class="log1">5:11.58</span> <strong>|</strong>    <span class="log1">202757</span>    <strong>|</strong>   <span class="log1">226139</span>   
+       <span class="log4">10</span>  <strong>|</strong> <span class="log1">50:15.15</span> <strong>|</strong> <span class="log1">10:44.54</span> <strong>|</strong>    <span class="log1">226140</span>    <strong>|</strong>   <span class="log1">274493</span>   
+       <span class="log4">11</span>  <strong>|</strong> <span class="log1">60:59.69</span> <strong>|</strong>  <span class="log1">7:20.25</span> <strong>|</strong>    <span class="log1">274494</span>    <strong>|</strong>   <span class="log1">307518</span>   
+       <span class="log4">12</span>  <strong>|</strong> <span class="log1">68:20.19</span> <strong>|</strong>  <span class="log1">1:05.72</span> <strong>|</strong>    <span class="log1">307519</span>    <strong>|</strong>   <span class="log1">312465</span>   
+
+
+<span class="log5">Track</span>  <span class="log4 log1">1</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\01 - Dhulikona.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="log4">Peak level <span class="log3">100.0 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">1.6 X</span></span>
+     <span class="log4">Track quality <span class="log3">100.0 %</span></span>
+     <span class="log4">Test CRC <span class="good">0872CA9D</span></span>
+     <span class="log4">Copy CRC <span class="good">0872CA9D</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="good">Copy OK</span>
+
+<span class="log5">Track</span>  <span class="log4 log1">2</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\02 - Bhoboghurey.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="log4">Peak level <span class="log3">100.0 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">1.0 X</span></span>
+     <span class="log4">Track quality <span class="log3">99.6 %</span></span>
+     <span class="log4">Test CRC <span class="good">8087D81D</span></span>
+     <span class="log4">Copy CRC <span class="good">8087D81D</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="good">Copy OK</span>
+
+<span class="log5">Track</span>  <span class="log4 log1">3</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\03 - Protibad.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="log4">Peak level <span class="log3">100.0 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">2.8 X</span></span>
+     <span class="log4">Track quality <span class="log3">99.9 %</span></span>
+     <span class="log4">Test CRC <span class="good">112049EB</span></span>
+     <span class="log4">Copy CRC <span class="good">112049EB</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="good">Copy OK</span>
+
+<span class="log5">Track</span>  <span class="log4 log1">4</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\04 - Lobher Agun.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="log4">Peak level <span class="log3">100.0 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">3.6 X</span></span>
+     <span class="log4">Track quality <span class="log3">100.0 %</span></span>
+     <span class="log4">Test CRC <span class="good">E9ED2E7A</span></span>
+     <span class="log4">Copy CRC <span class="good">E9ED2E7A</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="good">Copy OK</span>
+
+<span class="log5">Track</span>  <span class="log4 log1">5</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\05 - Shreshtho.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="log4">Peak level <span class="log3">100.0 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">4.2 X</span></span>
+     <span class="log4">Track quality <span class="log3">100.0 %</span></span>
+     <span class="log4">Test CRC <span class="good">8E6FD3D6</span></span>
+     <span class="log4">Copy CRC <span class="good">8E6FD3D6</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="good">Copy OK</span>
+
+<span class="log5">Track</span>  <span class="log4 log1">6</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\06 - Amar Shathey Aay.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="log4">Peak level <span class="log3">96.5 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">3.9 X</span></span>
+     <span class="log4">Track quality <span class="log3">99.9 %</span></span>
+     <span class="log4">Test CRC <span class="good">3B78488A</span></span>
+     <span class="log4">Copy CRC <span class="good">3B78488A</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="good">Copy OK</span>
+
+<span class="log5">Track</span>  <span class="log4 log1">7</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\07 - Shwadhin Bangla Betar Kendro.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Suspicious position <span class="log4">0:03:59</span></span>
+
+     <span class="log4">Peak level <span class="log3">100.0 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">1.5 X</span></span>
+     <span class="log4">Track quality <span class="log3">99.6 %</span></span>
+     <span class="log4">Test CRC <span class="bad">3BE133A8</span></span>
+     <span class="log4">Copy CRC <span class="bad">E5B0019F</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="log3">Copy finished</span>
+
+<span class="log5">Track</span>  <span class="log4 log1">8</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\08 - Shesh Train.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Suspicious position <span class="log4">0:01:17</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:01:25</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:01:35</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:02:20</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:02:22</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:03:07</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:03:26</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:03:32</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:03:53</span></span> - 0:03:54
+     <span class="bad">Suspicious position <span class="log4">0:04:06</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:04:13</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:04:25</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:04:39</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:04:41</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:04:46</span></span>
+     <span class="bad">Suspicious position <span class="log4">0:04:49</span></span>
+
+     <span class="log4">Peak level <span class="log3">94.9 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">0.1 X</span></span>
+     <span class="log4">Track quality <span class="log3">96.8 %</span></span>
+     <span class="log4">Test CRC <span class="bad">828F197E</span></span>
+     <span class="log4">Copy CRC <span class="bad">093CED1C</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="log3">Copy finished</span>
+
+<span class="log5">Track</span>  <span class="log4 log1">9</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\09 - Shweto Shuvrota.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Suspicious position <span class="log4">0:00:00</span></span>
+
+     <span class="bad">Copy aborted</span>
+
+<span class="log5">Track</span> <span class="log4 log1">10</span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Copy aborted</span>
+
+<span class="log5">Track</span> <span class="log4 log1">11</span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Copy aborted</span>
+
+<span class="log5">Track</span> <span class="log4 log1">12</span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Copy aborted</span>
+
+
+ <span class="badish"><span class="log4">8 track(s) not present in the AccurateRip database</span>
+</span> <span class="bad">4 track(s) canceled
+</span>
+<span class="badish">No tracks could be verified as accurate
+</span>
+<span class="bad">There were errors</span>
+
+<span class="good">End of status report</span>
+<span class='good'>==== Log checksum DE991D9515CBA7A4F841A2EFFB10656F7C3D065DC5B692A64F701E9F11833434 ====</span>
+
+<strong>------------------------------------------------------------</strong>
+
+Exact Audio Copy <span class="log1">V1.3</span> from <span class="log1">2. September 2016</span>
+
+<span class='good'>EAC extraction logfile from <span class='log5'>10. December 2020, 15:31</span></span>
+
+<span class="log4">Cryptic Fate / Shreshtho</span>
+
+<span class="log5">Used Drive  </span>: <span class="good">PLDS    DVD+-RW DS-8A5SH   Adapter: 1  ID: 0</span>
+
+<span class="log5">Read mode               </span>: <span class="good">Secure</span>
+<span class="log5">Utilize accurate stream </span>: <span class="good">Yes</span>
+<span class="log5">Defeat audio cache      </span>: <span class="good">Yes</span>
+<span class="log5">Make use of C2 pointers </span>: <span class="good">No</span>
+
+<span class="log5">Read offset correction                      </span>: <span class="good">6</span>
+<span class="log5">Overread into Lead-In and Lead-Out          </span>: <span class="log4">No</span>
+<span class="log5">Fill up missing offset samples with silence </span>: <span class="good">Yes</span>
+<span class="log5">Delete leading and trailing silent blocks   </span>: <span class="good">No</span>
+<span class="log5">Null samples used in CRC calculations       </span>: <span class="good">Yes</span>
+<span class="log5">Used interface                              </span>: <span class="log4">Native Win32 interface for Win NT & 2000</span>
+<span class="log5">Gap handling                                </span>: <span class="good">Appended to previous track</span>
+
+<span class="log5">Used output format              </span>: <span class="log4">User Defined Encoder</span>
+<span class="log5">Selected bitrate                </span>: <span class="log4">1024 kBit/s</span>
+<span class="log5">Quality                         </span>: <span class="log4">High</span>
+<span class="log5">Add ID3 tag                     </span>: <span class="good">No</span>
+<span class="log5">Command line compressor         </span>: <span class="log4">C:\Program Files\Exact Audio Copy\FLAC\FLAC.EXE</span>
+<span class="log5">Additional command line options </span>: <span class="log4">-8 -V -T "ARTIST=%artist%" -T "TITLE=%title%" -T "ALBUM=%albumtitle%" -T "DATE=%year%" -T 
+"TRACKNUMBER=%tracknr%" -T "GENRE=%genre%" -T "PERFORMER=%albuminterpret%" -T "COMPOSER=%composer%" %haslyrics%--tag-from-file=LYRICS="%lyricsfile%"%haslyrics% -T "ALBUMARTIST=%albumartist%" -T "DISCNUMBER=%cdnumber%" -T "TOTALDISCS=%totalcds%" -T "TOTALTRACKS=%numtracks%" -T "COMMENT=%comment%" %source% -o %dest%</span>
+
+
+<span class="log4 log5">TOC of the extracted CD</span>
+
+<strong>     Track |   Start  |  Length  | Start sector | End sector </strong>
+    <strong>---------------------------------------------------------</strong>
+        <span class="log4">1</span>  <strong>|</strong>  <span class="log1">0:00.00</span> <strong>|</strong>  <span class="log1">0:48.20</span> <strong>|</strong>         <span class="log1">0</span>    <strong>|</strong>     <span class="log1">3619</span>   
+        <span class="log4">2</span>  <strong>|</strong>  <span class="log1">0:48.20</span> <strong>|</strong>  <span class="log1">6:13.37</span> <strong>|</strong>      <span class="log1">3620</span>    <strong>|</strong>    <span class="log1">31631</span>   
+        <span class="log4">3</span>  <strong>|</strong>  <span class="log1">7:01.57</span> <strong>|</strong>  <span class="log1">4:52.11</span> <strong>|</strong>     <span class="log1">31632</span>    <strong>|</strong>    <span class="log1">53542</span>   
+        <span class="log4">4</span>  <strong>|</strong> <span class="log1">11:53.68</span> <strong>|</strong>  <span class="log1">6:01.05</span> <strong>|</strong>     <span class="log1">53543</span>    <strong>|</strong>    <span class="log1">80622</span>   
+        <span class="log4">5</span>  <strong>|</strong> <span class="log1">17:54.73</span> <strong>|</strong>  <span class="log1">8:49.04</span> <strong>|</strong>     <span class="log1">80623</span>    <strong>|</strong>   <span class="log1">120301</span>   
+        <span class="log4">6</span>  <strong>|</strong> <span class="log1">26:44.02</span> <strong>|</strong>  <span class="log1">5:52.19</span> <strong>|</strong>    <span class="log1">120302</span>    <strong>|</strong>   <span class="log1">146720</span>   
+        <span class="log4">7</span>  <strong>|</strong> <span class="log1">32:36.21</span> <strong>|</strong>  <span class="log1">7:26.09</span> <strong>|</strong>    <span class="log1">146721</span>    <strong>|</strong>   <span class="log1">180179</span>   
+        <span class="log4">8</span>  <strong>|</strong> <span class="log1">40:02.30</span> <strong>|</strong>  <span class="log1">5:01.02</span> <strong>|</strong>    <span class="log1">180180</span>    <strong>|</strong>   <span class="log1">202756</span>   
+        <span class="log4">9</span>  <strong>|</strong> <span class="log1">45:03.32</span> <strong>|</strong>  <span class="log1">5:11.58</span> <strong>|</strong>    <span class="log1">202757</span>    <strong>|</strong>   <span class="log1">226139</span>   
+       <span class="log4">10</span>  <strong>|</strong> <span class="log1">50:15.15</span> <strong>|</strong> <span class="log1">10:44.54</span> <strong>|</strong>    <span class="log1">226140</span>    <strong>|</strong>   <span class="log1">274493</span>   
+       <span class="log4">11</span>  <strong>|</strong> <span class="log1">60:59.69</span> <strong>|</strong>  <span class="log1">7:20.25</span> <strong>|</strong>    <span class="log1">274494</span>    <strong>|</strong>   <span class="log1">307518</span>   
+       <span class="log4">12</span>  <strong>|</strong> <span class="log1">68:20.19</span> <strong>|</strong>  <span class="log1">1:05.72</span> <strong>|</strong>    <span class="log1">307519</span>    <strong>|</strong>   <span class="log1">312465</span>   
+
+
+<span class="log5">Track</span> <span class="log4 log1">11</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\11 - Protibad Millennium Remix.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Copy aborted</span>
+
+
+<span class="badish">No tracks could be verified as accurate
+</span>
+<span class="bad">There were errors</span>
+
+<span class="good">End of status report</span>
+<span class='good'>==== Log checksum 502D76193E4A883CCC5342200FE1C15856521EC60DE90F6DD28443879CDB0EB9 ====</span>
+
+<strong>------------------------------------------------------------</strong>
+
+Exact Audio Copy <span class="log1">V1.3</span> from <span class="log1">2. September 2016</span>
+
+<span class='good'>EAC extraction logfile from <span class='log5'>10. December 2020, 15:39</span></span>
+
+<span class="log4">Cryptic Fate / Shreshtho</span>
+
+<span class="log5">Used Drive  </span>: <span class="good">PLDS    DVD+-RW DS-8A5SH   Adapter: 1  ID: 0</span>
+
+<span class="log5">Read mode </span>: <span class="bad">Burst</span>
+
+<span class="log5">Read offset correction                      </span>: <span class="good">6</span>
+<span class="log5">Overread into Lead-In and Lead-Out          </span>: <span class="log4">No</span>
+<span class="log5">Fill up missing offset samples with silence </span>: <span class="good">Yes</span>
+<span class="log5">Delete leading and trailing silent blocks   </span>: <span class="good">No</span>
+<span class="log5">Null samples used in CRC calculations       </span>: <span class="good">Yes</span>
+<span class="log5">Used interface                              </span>: <span class="log4">Native Win32 interface for Win NT & 2000</span>
+<span class="log5">Gap handling                                </span>: <span class="good">Appended to previous track</span>
+
+<span class="log5">Used output format              </span>: <span class="log4">User Defined Encoder</span>
+<span class="log5">Selected bitrate                </span>: <span class="log4">1024 kBit/s</span>
+<span class="log5">Quality                         </span>: <span class="log4">High</span>
+<span class="log5">Add ID3 tag                     </span>: <span class="good">No</span>
+<span class="log5">Command line compressor         </span>: <span class="log4">C:\Program Files\Exact Audio Copy\FLAC\FLAC.EXE</span>
+<span class="log5">Additional command line options </span>: <span class="log4">-8 -V -T "ARTIST=%artist%" -T "TITLE=%title%" -T "ALBUM=%albumtitle%" -T "DATE=%year%" -T 
+"TRACKNUMBER=%tracknr%" -T "GENRE=%genre%" -T "PERFORMER=%albuminterpret%" -T "COMPOSER=%composer%" %haslyrics%--tag-from-file=LYRICS="%lyricsfile%"%haslyrics% -T "ALBUMARTIST=%albumartist%" -T "DISCNUMBER=%cdnumber%" -T "TOTALDISCS=%totalcds%" -T "TOTALTRACKS=%numtracks%" -T "COMMENT=%comment%" %source% -o %dest%</span>
+
+
+<span class="log4 log5">TOC of the extracted CD</span>
+
+<strong>     Track |   Start  |  Length  | Start sector | End sector </strong>
+    <strong>---------------------------------------------------------</strong>
+        <span class="log4">1</span>  <strong>|</strong>  <span class="log1">0:00.00</span> <strong>|</strong>  <span class="log1">0:48.20</span> <strong>|</strong>         <span class="log1">0</span>    <strong>|</strong>     <span class="log1">3619</span>   
+        <span class="log4">2</span>  <strong>|</strong>  <span class="log1">0:48.20</span> <strong>|</strong>  <span class="log1">6:13.37</span> <strong>|</strong>      <span class="log1">3620</span>    <strong>|</strong>    <span class="log1">31631</span>   
+        <span class="log4">3</span>  <strong>|</strong>  <span class="log1">7:01.57</span> <strong>|</strong>  <span class="log1">4:52.11</span> <strong>|</strong>     <span class="log1">31632</span>    <strong>|</strong>    <span class="log1">53542</span>   
+        <span class="log4">4</span>  <strong>|</strong> <span class="log1">11:53.68</span> <strong>|</strong>  <span class="log1">6:01.05</span> <strong>|</strong>     <span class="log1">53543</span>    <strong>|</strong>    <span class="log1">80622</span>   
+        <span class="log4">5</span>  <strong>|</strong> <span class="log1">17:54.73</span> <strong>|</strong>  <span class="log1">8:49.04</span> <strong>|</strong>     <span class="log1">80623</span>    <strong>|</strong>   <span class="log1">120301</span>   
+        <span class="log4">6</span>  <strong>|</strong> <span class="log1">26:44.02</span> <strong>|</strong>  <span class="log1">5:52.19</span> <strong>|</strong>    <span class="log1">120302</span>    <strong>|</strong>   <span class="log1">146720</span>   
+        <span class="log4">7</span>  <strong>|</strong> <span class="log1">32:36.21</span> <strong>|</strong>  <span class="log1">7:26.09</span> <strong>|</strong>    <span class="log1">146721</span>    <strong>|</strong>   <span class="log1">180179</span>   
+        <span class="log4">8</span>  <strong>|</strong> <span class="log1">40:02.30</span> <strong>|</strong>  <span class="log1">5:01.02</span> <strong>|</strong>    <span class="log1">180180</span>    <strong>|</strong>   <span class="log1">202756</span>   
+        <span class="log4">9</span>  <strong>|</strong> <span class="log1">45:03.32</span> <strong>|</strong>  <span class="log1">5:11.58</span> <strong>|</strong>    <span class="log1">202757</span>    <strong>|</strong>   <span class="log1">226139</span>   
+       <span class="log4">10</span>  <strong>|</strong> <span class="log1">50:15.15</span> <strong>|</strong> <span class="log1">10:44.54</span> <strong>|</strong>    <span class="log1">226140</span>    <strong>|</strong>   <span class="log1">274493</span>   
+       <span class="log4">11</span>  <strong>|</strong> <span class="log1">60:59.69</span> <strong>|</strong>  <span class="log1">7:20.25</span> <strong>|</strong>    <span class="log1">274494</span>    <strong>|</strong>   <span class="log1">307518</span>   
+       <span class="log4">12</span>  <strong>|</strong> <span class="log1">68:20.19</span> <strong>|</strong>  <span class="log1">1:05.72</span> <strong>|</strong>    <span class="log1">307519</span>    <strong>|</strong>   <span class="log1">312465</span>   
+
+
+<span class="log5">Track</span>  <span class="log4 log1">9</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\09 - Shweto Shuvrota.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="log4">Peak level <span class="log3">92.3 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">10.2 X</span></span>
+     <span class="log4">Test CRC <span class="bad">F7C1C6CB</span></span>
+     <span class="log4">Copy CRC <span class="bad">633D6C56</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="good">Copy OK</span>
+
+<span class="log5">Track</span> <span class="log4 log1">10</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\10 - Dreamslayer.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Timing problem <span class="log4">0:05:55</span></span>
+
+     <span class="log4">Peak level <span class="log3">100.0 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">14.9 X</span></span>
+     <span class="log4">Test CRC <span class="bad">7290737E</span></span>
+     <span class="log4">Copy CRC <span class="bad">6B4AC1A8</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="log3">Copy finished</span>
+
+<span class="log5">Track</span> <span class="log4 log1">11</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\11 - Protibad Millennium Remix.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Timing problem <span class="log4">0:06:39</span></span>
+     <span class="bad">Timing problem <span class="log4">0:06:50</span></span> - 0:06:51
+     <span class="bad">Timing problem <span class="log4">0:06:53</span></span>
+     <span class="bad">Timing problem <span class="log4">0:06:56</span></span> - 0:06:58
+     <span class="bad">Timing problem <span class="log4">0:07:03</span></span> - 0:07:04
+     <span class="bad">Timing problem <span class="log4">0:07:06</span></span>
+     <span class="bad">Timing problem <span class="log4">0:07:09</span></span> - 0:07:10
+     <span class="bad">Timing problem <span class="log4">0:07:12</span></span>
+     <span class="bad">Timing problem <span class="log4">0:07:14</span></span> - 0:07:19
+
+     <span class="log4">Peak level <span class="log3">100.0 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">7.2 X</span></span>
+     <span class="log4">Test CRC <span class="bad">0F86074D</span></span>
+     <span class="log4">Copy CRC <span class="bad">6F52AB83</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="log3">Copy finished</span>
+
+<span class="log5">Track</span> <span class="log4 log1">12</span>
+
+     <span class="log4">Filename <span class="log3">D:\S CD RIPS\Cryptic Fate - Shreshtho (2002) [G-Series]\12 - Pepsi Promo.wav</span></span>
+
+     <span class="log4">Pre-gap length  <span class="log3">0:00:02.00</span></span>
+
+     <span class="bad">Timing problem <span class="log4">0:00:00</span></span> - 0:00:08
+     <span class="bad">Timing problem <span class="log4">0:00:10</span></span> - 0:00:11
+     <span class="bad">Timing problem <span class="log4">0:00:13</span></span>
+     <span class="bad">Timing problem <span class="log4">0:00:15</span></span>
+     <span class="bad">Timing problem <span class="log4">0:00:21</span></span>
+     <span class="bad">Timing problem <span class="log4">0:00:24</span></span>
+
+     <span class="log4">Peak level <span class="log3">87.2 %</span></span>
+     <span class="log4">Extraction speed <span class="log3">3.7 X</span></span>
+     <span class="log4">Test CRC <span class="bad">1EA8A5A4</span></span>
+     <span class="log4">Copy CRC <span class="bad">B25D7A6E</span></span>
+     <span class="badish">Track not present in AccurateRip database</span>
+     <span class="log3">Copy finished</span>
+
+
+<span class="badish">None of the tracks are present in the AccurateRip database</span>
+
+<span class="good">No errors occurred</span>
+
+<span class="good">End of status report</span>
+<span class='good'>==== Log checksum 9342A34D1FA4971A84B8236382A57528A08F2970A5231065E0A8403464A369B6 ====</span>

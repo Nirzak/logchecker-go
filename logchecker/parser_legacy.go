@@ -814,7 +814,7 @@ func (lc *Logchecker) legacyParse() {
 		lc.logs[logIdx] = rawLog
 		lc.checkTracks(logIdx)
 
-		if lc.isNonSecure() {
+		if lc.nonSecureMode != "" {
 			lc.account(lc.nonSecureMode+" mode was used", 20, -1, false, false)
 		}
 

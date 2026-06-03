@@ -21,7 +21,7 @@ var drivesJSON []byte
 var LevenshteinDistance = 0
 
 // Version of the logchecker library.
-const Version = "1.14.4"
+const Version = "1.14.6"
 
 // drive entry from drives.json: [name, offset]
 type driveEntry [2]interface{}

@@ -30,7 +30,7 @@ var (
 
 func main() {
 	client := &http.Client{Timeout: 5 * time.Second}
-	resp, err := client.Get("http://www.accuraterip.com/driveoffsets.htm")
+	resp, err := client.Get("https://www.accuraterip.com/driveoffsets.htm")
 	if err != nil {
 		log.Fatalf("fetch failed: %v", err)
 	}

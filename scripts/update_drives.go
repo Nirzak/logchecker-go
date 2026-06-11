@@ -29,8 +29,13 @@ var (
 )
 
 func main() {
-	client := &http.Client{Timeout: 5 * time.Second}
-	resp, err := client.Get("http://www.accuraterip.com/driveoffsets.htm")
+	client := &http.Client{Timeout: 30 * time.Second}
+	req, err := http.NewRequest("GET", "https://www.accuraterip.com/driveoffsets.htm", nil)
+	if err != nil {
+		log.Fatalf("request build failed: %v", err)
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; logchecker-go/1.0)")
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("fetch failed: %v", err)
 	}

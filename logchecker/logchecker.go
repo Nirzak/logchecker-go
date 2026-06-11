@@ -5,7 +5,6 @@ package logchecker
 import (
 	_ "embed"
 	"encoding/json"
-	"math"
 	"os"
 	"strings"
 
@@ -213,5 +212,3 @@ func (lc *Logchecker) Parse() {
 	}
 }
 
-// suppress unused import warning
-var _ = math.Abs

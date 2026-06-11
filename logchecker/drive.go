@@ -34,6 +34,7 @@ func normalizeDriveName(name string) string {
 	return strings.ToLower(strings.TrimSpace(name))
 }
 
+// levenshtein computes the edit distance between s and t using O(n) space.
 func levenshtein(s, t string) int {
 	sr := []rune(s)
 	tr := []rune(t)
@@ -44,39 +45,23 @@ func levenshtein(s, t string) int {
 	if lt == 0 {
 		return ls
 	}
-	d := make([][]int, ls+1)
-	for i := range d {
-		d[i] = make([]int, lt+1)
-	}
-	for i := 0; i <= ls; i++ {
-		d[i][0] = i
-	}
+	prev := make([]int, lt+1)
+	curr := make([]int, lt+1)
 	for j := 0; j <= lt; j++ {
-		d[0][j] = j
+		prev[j] = j
 	}
 	for i := 1; i <= ls; i++ {
+		curr[0] = i
 		for j := 1; j <= lt; j++ {
 			cost := 1
 			if sr[i-1] == tr[j-1] {
 				cost = 0
 			}
-			d[i][j] = min3(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+cost)
+			curr[j] = min(prev[j]+1, min(curr[j-1]+1, prev[j-1]+cost))
 		}
+		prev, curr = curr, prev
 	}
-	return d[ls][lt]
-}
-
-func min3(a, b, c int) int {
-	if a < b {
-		if a < c {
-			return a
-		}
-		return c
-	}
-	if b < c {
-		return b
-	}
-	return c
+	return prev[lt]
 }
 
 func (lc *Logchecker) getDrives(driveName string) {

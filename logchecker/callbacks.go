@@ -2,7 +2,6 @@ package logchecker
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -147,9 +146,7 @@ func (lc *Logchecker) c2PointersCallback(m []string) string {
 
 func (lc *Logchecker) c2PointersEacPre99Callback(m []string) string {
 	cls := "good"
-	if strings.ToLower(m[1]) == "no " {
-		cls = "good"
-	} else {
+	if strings.ToLower(m[1]) != "no " {
 		cls = "bad"
 		lc.account("C2 pointers were used", 10, -1, false, false)
 	}
@@ -258,6 +255,14 @@ func (lc *Logchecker) addId3TagCallback(m []string) string {
 	return "<span class=\"log5\">Add ID3 tag" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
 }
 
+// combinedSuffix returns " (N) " when this is a combined log, otherwise "".
+func (lc *Logchecker) combinedSuffix() string {
+	if lc.combined > 0 {
+		return fmt.Sprintf(" (%d) ", lc.currLog)
+	}
+	return ""
+}
+
 func (lc *Logchecker) testCopyCallback(m []string) string {
 	cls := "good"
 	if m[1] != m[3] {
@@ -265,12 +270,7 @@ func (lc *Logchecker) testCopyCallback(m []string) string {
 		lc.accountTrack("CRC mismatch: "+m[1]+" and "+m[3], 30)
 		if !lc.secureMode {
 			lc.decreaseTrack += 20
-			lc.badTrack = append(lc.badTrack, "Rip "+func() string {
-				if lc.combined > 0 {
-					return fmt.Sprintf(" (%d) ", lc.currLog)
-				}
-				return ""
-			}()+"was not done in Secure mode, and experienced CRC mismatches (-20 points)")
+			lc.badTrack = append(lc.badTrack, "Rip "+lc.combinedSuffix()+"was not done in Secure mode, and experienced CRC mismatches (-20 points)")
 			lc.secureMode = true
 		}
 	}
@@ -285,12 +285,7 @@ func (lc *Logchecker) testCopyXldCallback(m []string) string {
 		lc.accountTrack("CRC mismatch: "+m[2]+" and "+m[5], 30)
 		if !lc.secureMode {
 			lc.decreaseTrack += 20
-			lc.badTrack = append(lc.badTrack, "Rip "+func() string {
-				if lc.combined > 0 {
-					return fmt.Sprintf(" (%d) ", lc.currLog)
-				}
-				return ""
-			}()+"was not done with Secure Ripper / in CDParanoia mode, and experienced CRC mismatches (-20 points)")
+			lc.badTrack = append(lc.badTrack, "Rip "+lc.combinedSuffix()+"was not done with Secure Ripper / in CDParanoia mode, and experienced CRC mismatches (-20 points)")
 			lc.secureMode = true
 		}
 	}
@@ -314,8 +309,8 @@ func (lc *Logchecker) arXldCallback(m []string) string {
 }
 
 func (lc *Logchecker) arSummaryConfXldCallback(s string) string {
-	re := regexp.MustCompile(`(?i)(Track +\d+ +: +)(OK +)\(A?R?\d?,? ?confidence +(\d+).*?\)(.*)\n`)
-	re2 := regexp.MustCompile(`(?i)(Track +\d+ +: +)(NG|Not Found).*?\n`)
+	re := xldSumOKRe
+	re2 := xldSumNGRe
 	if m := re.FindStringSubmatch(s); m != nil {
 		n, _ := strconv.Atoi(m[3])
 		cls := "good"
@@ -331,7 +326,7 @@ func (lc *Logchecker) arSummaryConfXldCallback(s string) string {
 }
 
 func (lc *Logchecker) arSummaryConfCallback(s string) string {
-	re := regexp.MustCompile(`(?i)(Track +\d+ +.*?accurately ripped\.? *)(\(confidence +)(\d+)\)(.*)\n`)
+	re := arSummaryConfRe
 	m := re.FindStringSubmatch(s)
 	if m == nil {
 		return s

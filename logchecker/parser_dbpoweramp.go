@@ -39,7 +39,21 @@ var (
 	dbARCRCRe        = regexp.MustCompile(`(?i)(AccurateRip CRC:\s*)([0-9A-F]{8})`)
 	dbARVerConfRe    = regexp.MustCompile(`(?i)(AccurateRip Verified Confidence\s*)(\d+)(\s*\[[^\]\s]+\s+)([0-9A-F]{8})(\])`)
 	dbDiscIDRe       = regexp.MustCompile(`(?i)(\[DiscID:\s*)([^\]]+)(\])`)
-	dbReRipFramesRe  = regexp.MustCompile(`(?i)Re-Rip (\d+) Frames`)
+	dbReRipFramesRe    = regexp.MustCompile(`(?i)Re-Rip (\d+) Frames`)
+
+	// Inline-hoisted dbpoweramp regexes
+	dbVersionCheckRe   = regexp.MustCompile(`(?im)^dBpoweramp Release ([^\s]+)`)
+	dbLossyEncRe       = regexp.MustCompile(`(?i)mp3|aac|ogg|wma|opus`)
+	dbDriveSettingsRe  = regexp.MustCompile(`(?im)^(Drive & Settings)\s*$`)
+	dbExtrLogRe        = regexp.MustCompile(`(?im)^(Extraction Log)\s*$`)
+	dbSepLineRe        = regexp.MustCompile(`(?im)^-{3,}\s*$`)
+	dbARAccurateBodyRe = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Accurate\s*\(confidence\s*\d+\).*)`)
+	dbARInaccBodyRe    = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Inaccurate.*)`)
+	dbARNotInDBBodyRe  = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Not in Database.*)`)
+	dbInaccSummaryRe   = regexp.MustCompile(`(?i)(\d+)\s*Inaccurate`)
+	dbSummWarnRe       = regexp.MustCompile(`(?i)^\d+\s+Secure\s*\(Warning\)$`)
+	dbSummSecureRe     = regexp.MustCompile(`(?i)^\d+\s+Secure$`)
+	dbSummInaccRe      = regexp.MustCompile(`(?i)^\d+\s+Inaccurate`)
 )
 
 func (lc *Logchecker) dbpowerampParse() {
@@ -47,7 +61,7 @@ func (lc *Logchecker) dbpowerampParse() {
 	lc.log = util.NormalizeLineEndings(lc.log)
 
 	// Version
-	if m := regexp.MustCompile(`(?im)^dBpoweramp Release ([^\s]+)`).FindStringSubmatch(lc.log); m != nil {
+	if m := dbVersionCheckRe.FindStringSubmatch(lc.log); m != nil {
 		lc.ripperVersion = m[1]
 		verNum, _ := strconv.ParseFloat(m[1], 64)
 		lc.log = dbVersionRe.
@@ -190,7 +204,7 @@ func (lc *Logchecker) dbpowerampParse() {
 	if m := dbEncoderRe.FindStringSubmatch(lc.log); m != nil {
 		enc := strings.TrimSpace(m[1])
 		encClass := "good"
-		if regexp.MustCompile(`(?i)mp3|aac|ogg|wma|opus`).MatchString(enc) {
+		if dbLossyEncRe.MatchString(enc) {
 			encClass = "bad"
 			lc.account("Lossy encoder detected — rip is not lossless", 0, 0, false, false)
 		} else if strings.Contains(strings.ToLower(enc), `wave`) {
@@ -200,11 +214,11 @@ func (lc *Logchecker) dbpowerampParse() {
 	}
 
 	// Section headers
-	lc.log = regexp.MustCompile(`(?im)^(Drive & Settings)\s*$`).
+	lc.log = dbDriveSettingsRe.
 		ReplaceAllString(lc.log, "<span class='log4 log5'>$1</span>")
-	lc.log = regexp.MustCompile(`(?im)^(Extraction Log)\s*$`).
+	lc.log = dbExtrLogRe.
 		ReplaceAllString(lc.log, "<span class='log4 log5'>$1</span>")
-	lc.log = regexp.MustCompile(`(?im)^-{3,}\s*$`).
+	lc.log = dbSepLineRe.
 		ReplaceAllString(lc.log, "<strong>$0</strong>")
 
 	// Track parsing
@@ -277,17 +291,17 @@ func (lc *Logchecker) dbpowerampParse() {
 				"$1<span class='good'>Secure$2</span>")
 			statusAnnotated = true
 		} else if dbARAccurateRe.MatchString(trackBody) {
-			trackBody = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Accurate\s*\(confidence\s*\d+\).*)`).
+			trackBody = dbARAccurateBodyRe.
 				ReplaceAllString(trackBody, "$1<span class='good'>$2</span>")
 			statusAnnotated = true
 		} else if dbARInaccurateRe.MatchString(trackBody) {
 			inaccurateCount++
 			lc.accountTrack("AccurateRip: Inaccurate — data integrity cannot be confirmed", 10)
-			trackBody = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Inaccurate.*)`).
+			trackBody = dbARInaccBodyRe.
 				ReplaceAllString(trackBody, "$1<span class='bad'>$2</span>")
 			statusAnnotated = true
 		} else if dbARNotInDBRe.MatchString(trackBody) {
-			trackBody = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Not in Database.*)`).
+			trackBody = dbARNotInDBBodyRe.
 				ReplaceAllString(trackBody, "$1<span class='badish'>$2</span>")
 			statusAnnotated = true
 		}
@@ -327,7 +341,7 @@ func (lc *Logchecker) dbpowerampParse() {
 			lc.account("No tracks were ripped successfully", 0, 0, false, false)
 		}
 		summaryInaccurate := 0
-		if si := regexp.MustCompile(`(?i)(\d+)\s*Inaccurate`).FindStringSubmatch(m[2]); si != nil {
+		if si := dbInaccSummaryRe.FindStringSubmatch(m[2]); si != nil {
 			summaryInaccurate, _ = strconv.Atoi(si[1])
 		}
 		if summaryInaccurate != inaccurateCount {
@@ -357,9 +371,9 @@ func (lc *Logchecker) dbpowerampParse() {
 			}
 			total := m[1]
 			detailStr := m[2]
-			reWarn := regexp.MustCompile(`(?i)^\d+\s+Secure\s*\(Warning\)$`)
-			reSecure := regexp.MustCompile(`(?i)^\d+\s+Secure$`)
-			reInaccurate := regexp.MustCompile(`(?i)^\d+\s+Inaccurate`)
+			reWarn := dbSummWarnRe
+			reSecure := dbSummSecureRe
+			reInaccurate := dbSummInaccRe
 			tokens := strings.Split(detailStr, ",")
 			for i, tok := range tokens {
 				trimmed := strings.TrimSpace(tok)

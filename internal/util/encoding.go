@@ -145,11 +145,6 @@ func isCleanText(s string) bool {
 	return true
 }
 
-type decoder interface {
-	Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error)
-	Reset()
-}
-
 func decodeWith(d interface {
 	Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error)
 	Reset()

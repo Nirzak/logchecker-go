@@ -31,6 +31,14 @@
 ## Step 5: Miscellaneous
 - [x] 5.4 Move `encoding_maccentraleurope.log` hack into test infra (add comment)
 
+## Not implemented (plan.md sections 2.2, 2.4, 4.x — structural refactoring, highest regression risk, lower priority):
+
+2.2: findTrackBoundary helper extraction
+2.4: xldStatCallback error-capping helper
+4.1: legacyParse function split
+4.2: Unified drive validation
+4.3: driveEntry struct refactor
+
 ## Verification
 - [x] Run `go test ./...` — all pass
 - [x] Run `go vet ./...` — clean

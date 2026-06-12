@@ -39,7 +39,7 @@ var (
 	dbARCRCRe        = regexp.MustCompile(`(?i)(AccurateRip CRC:\s*)([0-9A-F]{8})`)
 	dbARVerConfRe    = regexp.MustCompile(`(?i)(AccurateRip Verified Confidence\s*)(\d+)(\s*\[[^\]\s]+\s+)([0-9A-F]{8})(\])`)
 	dbDiscIDRe       = regexp.MustCompile(`(?i)(\[DiscID:\s*)([^\]]+)(\])`)
-	dbReRipFramesRe    = regexp.MustCompile(`(?i)Re-Rip (\d+) Frames`)
+	dbReRipFramesRe  = regexp.MustCompile(`(?i)Re-Rip (\d+) Frames`)
 
 	// Inline-hoisted dbpoweramp regexes
 	dbVersionCheckRe   = regexp.MustCompile(`(?im)^dBpoweramp Release ([^\s]+)`)

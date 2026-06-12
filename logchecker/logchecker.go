@@ -211,4 +211,3 @@ func (lc *Logchecker) Parse() {
 		lc.legacyParse()
 	}
 }
-

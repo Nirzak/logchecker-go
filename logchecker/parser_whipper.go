@@ -21,7 +21,7 @@ var (
 func (lc *Logchecker) whipperParse() {
 	if m := whipperVersionRe.FindStringSubmatch(lc.log); m != nil {
 		if compareVersions(m[1], "0.7.3") < 0 {
-			lc.account("Logs must be produced by whipper 0.7.3+.", 100, -1, false, false)
+			lc.accountDeduction("Logs must be produced by whipper 0.7.3+.", 100)
 			return
 		}
 	}
@@ -45,12 +45,12 @@ func (lc *Logchecker) whipperParse() {
 
 	var parsedRaw interface{}
 	if err := yaml.Unmarshal([]byte(fixed), &parsedRaw); err != nil {
-		lc.account("Could not parse whipper log.", 100, -1, false, false)
+		lc.accountDeduction("Could not parse whipper log.", 100)
 		return
 	}
 	parsed, ok := sanitizeYAMLMap(parsedRaw).(map[string]interface{})
 	if !ok {
-		lc.account("Could not parse whipper log.", 100, -1, false, false)
+		lc.accountDeduction("Could not parse whipper log.", 100)
 		return
 	}
 
@@ -61,7 +61,7 @@ func (lc *Logchecker) whipperParse() {
 			lc.ripperVersion = parts[1]
 		}
 		if lc.ripperVersion == "" || compareVersions(lc.ripperVersion, "0.7.3") < 0 {
-			lc.account("Logs must be produced by whipper 0.7.3+", 100, -1, false, false)
+			lc.accountDeduction("Logs must be produced by whipper 0.7.3+", 100)
 			return
 		}
 		// Annotate
@@ -105,7 +105,7 @@ func (lc *Logchecker) whipperParse() {
 		}
 
 		if isFake {
-			lc.account("Virtual drive used: "+drive, 20, -1, false, false)
+			lc.accountVirtualDrive(drive)
 			rpi["Drive"] = "<span class='bad'>" + drive + "</span>"
 		} else {
 			lc.getDrives(drive)
@@ -124,17 +124,13 @@ func (lc *Logchecker) whipperParse() {
 					offsetClass = "good"
 				} else {
 					offsetClass = "bad"
-					lc.account("Incorrect read offset for drive. Correct offsets are: "+
-						strings.Join(lc.offsets, ", ")+" (Checked against the following drive(s): "+
-						strings.Join(lc.drives, ", ")+")", 5, -1, false, false)
+					lc.accountIncorrectOffset()
 				}
 			} else {
 				drive += " (not found in database)"
 				if offsetStr == "0" {
 					offsetClass = "bad"
-					lc.account("The drive was not found in the database, so we cannot determine the correct read "+
-						"offset. However, the read offset in this case was 0, which is almost never correct. "+
-						"As such, we are assuming that the offset is incorrect", 5, -1, false, false)
+					lc.accountZeroOffsetUnknownDrive()
 				}
 			}
 			rpi["Drive"] = fmt.Sprintf("<span class='%s'>%s</span>", driveClass, drive)
@@ -163,7 +159,7 @@ func (lc *Logchecker) whipperParse() {
 			}
 		}
 		if defeatClass == "bad" {
-			lc.account(`"Defeat audio cache" should be Yes/true`, 10, -1, false, false)
+			lc.accountDeduction(`"Defeat audio cache" should be Yes/true`, 10)
 		}
 		rpi["Defeat audio cache"] = fmt.Sprintf("<span class='%s'>%s</span>", defeatClass, defeatStr)
 
@@ -238,7 +234,7 @@ func (lc *Logchecker) whipperParse() {
 			crcClass := "good"
 			if testCRC != copyCRC {
 				crcClass = "bad"
-				lc.account(fmt.Sprintf("CRC mismatch: %s and %s", testCRC, copyCRC), 30, -1, false, false)
+				lc.accountDeduction(fmt.Sprintf("CRC mismatch: %s and %s", testCRC, copyCRC), 30)
 			}
 			t["Test CRC"] = fmt.Sprintf("<span class='%s'>%s</span>", crcClass, testCRC)
 			t["Copy CRC"] = fmt.Sprintf("<span class='%s'>%s</span>", crcClass, copyCRC)
@@ -457,14 +453,7 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 		for k := range toc {
 			keys = append(keys, k)
 		}
-		sort.Slice(keys, func(i, j int) bool {
-			ni, err1 := strconv.Atoi(keys[i])
-			nj, err2 := strconv.Atoi(keys[j])
-			if err1 == nil && err2 == nil {
-				return ni < nj
-			}
-			return keys[i] < keys[j]
-		})
+		sortNumericStrings(keys)
 		for _, k := range keys {
 			sb.WriteString("  ")
 			sb.WriteString(k)
@@ -482,14 +471,7 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 		for k := range tracks {
 			keys = append(keys, k)
 		}
-		sort.Slice(keys, func(i, j int) bool {
-			ni, err1 := strconv.Atoi(keys[i])
-			nj, err2 := strconv.Atoi(keys[j])
-			if err1 == nil && err2 == nil {
-				return ni < nj
-			}
-			return keys[i] < keys[j]
-		})
+		sortNumericStrings(keys)
 		for _, k := range keys {
 			sb.WriteString("  ")
 			sb.WriteString(k)

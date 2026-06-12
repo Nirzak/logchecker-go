@@ -70,6 +70,21 @@ func (lc *Logchecker) accountTrack(msg string, decrease int) {
 	lc.badTrack = append(lc.badTrack, "Track "+tn+combinedPart+": "+msg+append2)
 }
 
+// accountDeduction is the common case: deduct points, no combined suffix, no notice.
+func (lc *Logchecker) accountDeduction(msg string, decrease int) {
+	lc.account(msg, decrease, -1, false, false)
+}
+
+// accountNotice records an informational message with no score deduction.
+func (lc *Logchecker) accountNotice(msg string) {
+	lc.account(msg, 0, -1, false, true)
+}
+
+// accountFatal sets the score to a specific absolute value (usually 0).
+func (lc *Logchecker) accountFatal(msg string, setScore int) {
+	lc.account(msg, 0, setScore, false, false)
+}
+
 // sortNumericStrings sorts a slice of numeric strings in ascending numeric order.
 // Non-numeric strings sort lexicographically after all numeric strings.
 func sortNumericStrings(ss []string) {

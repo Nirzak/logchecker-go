@@ -9,13 +9,13 @@ import (
 func (lc *Logchecker) driveCallback(m []string) string {
 	driveName := strings.TrimSpace(m[2])
 	if driveName == "(null) (null) (revision (null))" {
-		lc.account("Null drive used", 20, -1, false, false)
-		return "<span class=\"log5\">Used Drive" + m[1] + "</span>: <span class=\"bad\">" + m[2] + "</span>"
+		lc.accountDeduction("Null drive used", 20)
+		return settingLine("Used Drive", m[1], cssBad, m[2])
 	}
 	for _, f := range lc.fakeDrives {
 		if driveName == f {
-			lc.account("Virtual drive used: "+m[2], 20, -1, false, false)
-			return "<span class=\"log5\">Used Drive" + m[1] + "</span>: <span class=\"bad\">" + m[2] + "</span>"
+			lc.accountVirtualDrive(m[2])
+			return settingLine("Used Drive", m[1], cssBad, m[2])
 		}
 	}
 	lc.getDrives(driveName)
@@ -28,7 +28,7 @@ func (lc *Logchecker) driveCallback(m []string) string {
 		displayName += " (not found in database)"
 		lc.driveFound = false
 	}
-	return "<span class=\"log5\">Used Drive" + m[1] + "</span>: <span class=\"" + cls + "\">" + displayName + "</span>"
+	return settingLine("Used Drive", m[1], cls, displayName)
 }
 
 func (lc *Logchecker) mediaTypeXldCallback(m []string) string {
@@ -38,7 +38,7 @@ func (lc *Logchecker) mediaTypeXldCallback(m []string) string {
 	} else {
 		lc.account("Not a pressed cd", 0, -1, true, true)
 	}
-	return "<span class=\"log5\">Media type" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Media type", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) readModeCallback(m []string) string {
@@ -49,9 +49,9 @@ func (lc *Logchecker) readModeCallback(m []string) string {
 		lc.secureMode = false
 		lc.nonSecureMode = m[2]
 	}
-	s := "<span class=\"log5\">Read mode" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	s := settingLine("Read mode", m[1], cls, m[2])
 	if len(m) > 3 && m[3] != "" {
-		s += "<span class=\"log4\">" + m[3] + "</span>"
+		s += spanClass(cssLog4, m[3])
 	}
 	return s
 }
@@ -66,7 +66,7 @@ func (lc *Logchecker) ripperModeXldCallback(m []string) string {
 	} else {
 		lc.secureMode = false
 	}
-	return "<span class=\"log5\">Ripper mode" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Ripper mode", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) cdparanoiaModeXldCallback(m []string) string {
@@ -76,85 +76,85 @@ func (lc *Logchecker) cdparanoiaModeXldCallback(m []string) string {
 	} else {
 		lc.secureMode = false
 	}
-	return "<span class=\"log5\">Use cdparanoia mode" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Use cdparanoia mode", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) maxRetryCountCallback(m []string) string {
 	n, _ := strconv.Atoi(m[2])
-	cls := "goodish"
+	cls := cssGoodish
 	if n < 10 {
-		cls = "badish"
-		lc.account("Low \"max retry count\" (potentially bad setting)", 0, -1, false, false)
+		cls = cssBadish
+		lc.accountDeduction(`Low "max retry count" (potentially bad setting)`, 0)
 	}
-	return "<span class=\"log5\">Max retry count" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Max retry count", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) accurateStreamCallback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if m[2] != "Yes" {
-		cls = "bad"
-		lc.account(`"Utilize accurate stream" should be yes`, 20, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction(`"Utilize accurate stream" should be yes`, 20)
 	}
-	return "<span class=\"log5\">Utilize accurate stream" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Utilize accurate stream", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) accurateStreamEacPre9Callback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if strings.ToLower(m[1]) == "no " {
-		cls = "bad"
-		lc.account(`"accurate stream" should be yes`, 20, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction(`"accurate stream" should be yes`, 20)
 	}
-	return ", <span class=\"" + cls + "\">" + m[1] + "accurate stream</span>"
+	return ", " + spanClass(cls, m[1]+"accurate stream")
 }
 
 func (lc *Logchecker) defeatAudioCacheCallback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if m[2] != "Yes" {
-		cls = "bad"
-		lc.account(`"Defeat audio cache" should be yes`, 10, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction(`"Defeat audio cache" should be yes`, 10)
 	}
-	return "<span class=\"log5\">Defeat audio cache" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Defeat audio cache", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) defeatAudioCacheEacPre99Callback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if strings.ToLower(m[1]) == "no " {
-		cls = "bad"
-		lc.account("Audio cache not disabled", 10, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("Audio cache not disabled", 10)
 	}
-	return " <span class=\"" + cls + "\">" + m[1] + "disable cache</span>"
+	return " " + spanClass(cls, m[1]+"disable cache")
 }
 
 func (lc *Logchecker) defeatAudioCacheXldCallback(m []string) string {
-	cls := "bad"
+	cls := cssBad
 	if strings.HasPrefix(m[2], "OK") || strings.HasPrefix(m[2], "YES") {
-		cls = "good"
+		cls = cssGood
 	} else {
-		lc.account(`"Disable audio cache" should be yes/ok`, 10, -1, false, false)
+		lc.accountDeduction(`"Disable audio cache" should be yes/ok`, 10)
 	}
-	return "<span class=\"log5\">Disable audio cache" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Disable audio cache", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) c2PointersCallback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if strings.ToLower(m[2]) == "yes" {
-		cls = "bad"
-		lc.account("C2 pointers were used", 10, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("C2 pointers were used", 10)
 	}
-	return "<span class=\"log5\">Make use of C2 pointers" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Make use of C2 pointers", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) c2PointersEacPre99Callback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if strings.ToLower(m[1]) != "no " {
-		cls = "bad"
-		lc.account("C2 pointers were used", 10, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("C2 pointers were used", 10)
 	}
-	return "with <span class=\"" + cls + "\">" + m[1] + "C2</span>"
+	return "with " + spanClass(cls, m[1]+"C2")
 }
 
 func (lc *Logchecker) readOffsetCallback(m []string) string {
-	cls := "badish"
+	cls := cssBadish
 	if lc.driveFound {
 		found := false
 		for _, o := range lc.offsets {
@@ -164,95 +164,90 @@ func (lc *Logchecker) readOffsetCallback(m []string) string {
 			}
 		}
 		if found {
-			cls = "good"
+			cls = cssGood
 		} else {
-			cls = "bad"
-			msg := "Incorrect read offset for drive. Correct offsets are: " +
-				strings.Join(lc.offsets, ", ") +
-				" (Checked against the following drive(s): " + strings.Join(lc.drives, ", ") + ")"
-			lc.account(msg, 5, -1, false, false)
+			cls = cssBad
+			lc.accountIncorrectOffset()
 		}
 	} else if m[2] == "0" {
-		cls = "bad"
-		lc.account("The drive was not found in the database, so we cannot determine the correct read offset. "+
-			"However, the read offset in this case was 0, which is almost never correct. As such, we are "+
-			"assuming that the offset is incorrect", 5, -1, false, false)
+		cls = cssBad
+		lc.accountZeroOffsetUnknownDrive()
 	}
-	return "<span class=\"log5\">Read offset correction" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Read offset correction", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) fillOffsetSamplesCallback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if m[2] != "Yes" {
-		cls = "bad"
-		lc.account("Does not fill up missing offset samples with silence", 5, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("Does not fill up missing offset samples with silence", 5)
 	}
-	return "<span class=\"log5\">Fill up missing offset samples with silence" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Fill up missing offset samples with silence", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) deleteSilentBlocksCallback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if m[3] == "Yes" {
-		cls = "bad"
-		lc.account("Deletes leading and trailing silent blocks", 5, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("Deletes leading and trailing silent blocks", 5)
 	}
-	return "<span class=\"log5\">Delete leading and trailing silent blocks" + m[1] + m[2] + "</span>: <span class=\"" + cls + "\">" + m[3] + "</span>"
+	return settingLine("Delete leading and trailing silent blocks", m[1]+m[2], cls, m[3])
 }
 
 func (lc *Logchecker) nullSamplesCallback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if m[2] != "Yes" {
-		cls = "bad"
-		lc.account("Null samples should be used in CRC calculations", 5, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("Null samples should be used in CRC calculations", 5)
 	}
-	return "<span class=\"log5\">Null samples used in CRC calculations" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Null samples used in CRC calculations", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) normalizeEacCallback(m []string) string {
-	lc.account("Normalization should be not be active", 100, -1, false, false)
-	return "<span class=\"log5\">Normalize to" + m[1] + "</span>: <span class=\"bad\">" + m[2] + "</span>"
+	lc.accountDeduction("Normalization should be not be active", 100)
+	return settingLine("Normalize to", m[1], cssBad, m[2])
 }
 
 func (lc *Logchecker) gapHandlingCallback(m []string) string {
-	cls := "goodish"
+	cls := cssGoodish
 	switch {
 	case strings.Contains(m[2], "Not detected"):
-		cls = "bad"
-		lc.account("Gap handling was not detected", 10, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("Gap handling was not detected", 10)
 	case strings.Contains(m[2], "Appended to next track"):
-		cls = "bad"
-		lc.account("Gap handling should be appended to previous track", 10, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("Gap handling should be appended to previous track", 10)
 	case strings.Contains(m[2], "Left out"):
-		cls = "bad"
-		lc.account("Gap handling should be appended to previous track", 10, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("Gap handling should be appended to previous track", 10)
 	case strings.Contains(strings.ToLower(m[2]), "appended to previous track"):
-		cls = "good"
+		cls = cssGood
 		m[2] = strings.ReplaceAll(m[2], "Track", "track")
 	}
-	return "<span class=\"log5\">Gap handling" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Gap handling", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) gapHandlingXldCallback(m []string) string {
 	lower := strings.ToLower(m[2])
-	cls := "badish"
+	cls := cssBadish
 	if strings.Contains(lower, "not") {
-		cls = "bad"
-		lc.account("Incorrect gap handling", 10, -1, false, false)
+		cls = cssBad
+		lc.accountDeduction("Incorrect gap handling", 10)
 	} else if strings.Contains(lower, "analyzed") && strings.Contains(lower, "appended") {
-		cls = "good"
+		cls = cssGood
 	} else {
-		lc.account("Incomplete gap handling", 10, -1, false, false)
+		lc.accountDeduction("Incomplete gap handling", 10)
 	}
-	return "<span class=\"log5\">Gap status" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Gap status", m[1], cls, m[2])
 }
 
 func (lc *Logchecker) addId3TagCallback(m []string) string {
-	cls := "good"
+	cls := cssGood
 	if m[2] == "Yes" {
-		cls = "badish"
-		lc.account("ID3 tags should not be added to FLAC files - they are mainly for MP3 files. FLACs should have vorbis comments for tags instead.", 1, -1, false, false)
+		cls = cssBadish
+		lc.accountDeduction("ID3 tags should not be added to FLAC files - they are mainly for MP3 files. FLACs should have vorbis comments for tags instead.", 1)
 	}
-	return "<span class=\"log5\">Add ID3 tag" + m[1] + "</span>: <span class=\"" + cls + "\">" + m[2] + "</span>"
+	return settingLine("Add ID3 tag", m[1], cls, m[2])
 }
 
 // combinedSuffix returns " (N) " when this is a combined log, otherwise "".

@@ -188,7 +188,7 @@ func (lc *Logchecker) Parse() {
 	})
 	if err != nil {
 		lc.score = 0
-		lc.account("Could not detect log encoding, log is corrupt.", 0, 0, false, false)
+		lc.accountFatal("Could not detect log encoding, log is corrupt.", 0)
 		return
 	}
 	lc.log = decoded
@@ -196,7 +196,7 @@ func (lc *Logchecker) Parse() {
 	ripper, err := check.GetRipper(lc.log)
 	if err != nil {
 		lc.score = 0
-		lc.account("Unknown log file, could not determine ripper.", 0, 0, false, false)
+		lc.accountFatal("Unknown log file, could not determine ripper.", 0)
 		lc.ripper = check.Unknown
 		return
 	}

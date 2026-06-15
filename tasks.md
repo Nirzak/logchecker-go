@@ -36,7 +36,6 @@
 2.2: findTrackBoundary helper extraction
 2.4: xldStatCallback error-capping helper
 4.1: legacyParse function split
-4.2: Unified drive validation
 4.3: driveEntry struct refactor
 
 ## Verification

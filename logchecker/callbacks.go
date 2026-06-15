@@ -12,23 +12,12 @@ func (lc *Logchecker) driveCallback(m []string) string {
 		lc.accountDeduction("Null drive used", 20)
 		return settingLine("Used Drive", m[1], cssBad, m[2])
 	}
-	for _, f := range lc.fakeDrives {
-		if driveName == f {
-			lc.accountVirtualDrive(m[2])
-			return settingLine("Used Drive", m[1], cssBad, m[2])
-		}
-	}
-	lc.getDrives(driveName)
-	cls := "badish"
+	res := lc.validateDrive(driveName, driveName, "")
 	displayName := m[2]
-	if len(lc.drives) > 0 {
-		cls = "good"
-		lc.driveFound = true
-	} else {
+	if !res.InDB && !res.IsFake {
 		displayName += " (not found in database)"
-		lc.driveFound = false
 	}
-	return settingLine("Used Drive", m[1], cls, displayName)
+	return settingLine("Used Drive", m[1], res.DriveClass, displayName)
 }
 
 func (lc *Logchecker) mediaTypeXldCallback(m []string) string {

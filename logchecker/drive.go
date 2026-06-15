@@ -105,3 +105,66 @@ func (lc *Logchecker) getDrives(driveName string) {
 		}
 	}
 }
+
+// driveResult carries the class/state outcomes of validateDrive so each
+// parser can build its own HTML annotation format.
+type driveResult struct {
+	DriveClass  string
+	OffsetClass string
+	IsFake      bool
+	InDB        bool
+}
+
+// validateDrive performs the canonical drive validation flow shared by all
+// three parsers (EAC/XLD callbacks, whipper, dBpoweramp):
+//
+//  1. Fake-drive guard — sets DriveClass/OffsetClass to "bad", fires accountVirtualDrive.
+//  2. DB lookup via getDrives.
+//  3. Offset match when drive is found (skipped when offsetStr == "").
+//  4. Zero-offset guard when drive is not found (skipped when offsetStr == "").
+//
+// driveName is the display name used in accountVirtualDrive messages.
+// lookupName is the normalised model string passed to getDrives (may equal driveName).
+// offsetStr is the rip-offset value to compare against lc.offsets.
+// Pass offsetStr == "" to skip offset validation (EAC/XLD, where readOffsetCallback
+// handles the offset check separately after getDrives has populated lc.drives/offsets).
+func (lc *Logchecker) validateDrive(driveName, lookupName, offsetStr string) driveResult {
+	for _, f := range lc.fakeDrives {
+		if strings.TrimSpace(driveName) == f {
+			lc.accountVirtualDrive(driveName)
+			return driveResult{DriveClass: cssBad, OffsetClass: cssBad, IsFake: true}
+		}
+	}
+
+	lc.getDrives(lookupName)
+
+	if len(lc.drives) > 0 {
+		lc.driveFound = true
+		if offsetStr == "" {
+			return driveResult{DriveClass: cssGood, InDB: true}
+		}
+		found := false
+		for _, o := range lc.offsets {
+			if o == offsetStr {
+				found = true
+				break
+			}
+		}
+		if found {
+			return driveResult{DriveClass: cssGood, OffsetClass: cssGood, InDB: true}
+		}
+		lc.accountIncorrectOffset()
+		return driveResult{DriveClass: cssGood, OffsetClass: cssBad, InDB: true}
+	}
+
+	// Drive not in DB.
+	lc.driveFound = false
+	if offsetStr == "" {
+		return driveResult{DriveClass: cssBadish}
+	}
+	if offsetStr == "0" {
+		lc.accountZeroOffsetUnknownDrive()
+		return driveResult{DriveClass: cssBadish, OffsetClass: cssBad}
+	}
+	return driveResult{DriveClass: cssBadish, OffsetClass: cssBadish}
+}

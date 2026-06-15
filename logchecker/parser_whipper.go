@@ -96,48 +96,19 @@ func (lc *Logchecker) whipperParse() {
 			offsetStr = v
 		}
 
-		isFake := false
-		for _, f := range lc.fakeDrives {
-			if strings.TrimSpace(drive) == f {
-				isFake = true
-				break
-			}
-		}
+		res := lc.validateDrive(drive, drive, offsetStr)
 
-		if isFake {
-			lc.accountVirtualDrive(drive)
+		if res.IsFake {
 			rpi["Drive"] = "<span class='bad'>" + drive + "</span>"
 		} else {
-			lc.getDrives(drive)
-			driveClass := "badish"
-			offsetClass := "badish"
-			if len(lc.drives) > 0 {
-				driveClass = "good"
-				found := false
-				for _, o := range lc.offsets {
-					if o == offsetStr {
-						found = true
-						break
-					}
-				}
-				if found {
-					offsetClass = "good"
-				} else {
-					offsetClass = "bad"
-					lc.accountIncorrectOffset()
-				}
-			} else {
+			if !res.InDB {
 				drive += " (not found in database)"
-				if offsetStr == "0" {
-					offsetClass = "bad"
-					lc.accountZeroOffsetUnknownDrive()
-				}
 			}
-			rpi["Drive"] = fmt.Sprintf("<span class='%s'>%s</span>", driveClass, drive)
+			rpi["Drive"] = fmt.Sprintf("<span class='%s'>%s</span>", res.DriveClass, drive)
 			if n, err := strconv.Atoi(offsetStr); err == nil && n > 0 {
 				offsetStr = "+" + offsetStr
 			}
-			rpi["Read offset correction"] = fmt.Sprintf("<span class='%s'>%s</span>", offsetClass, offsetStr)
+			rpi["Read offset correction"] = fmt.Sprintf("<span class='%s'>%s</span>", res.OffsetClass, offsetStr)
 		}
 
 		// Defeat audio cache

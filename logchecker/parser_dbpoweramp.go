@@ -84,52 +84,22 @@ func (lc *Logchecker) dbpowerampParse() {
 			driveBracket = mm[2]
 			driveModel = strings.Trim(driveBracket, "[]")
 		}
-		lc.getDrives(driveModel)
-
-		isFake := false
-		for _, f := range lc.fakeDrives {
-			if strings.TrimSpace(driveName) == f {
-				isFake = true
-				break
-			}
-		}
+		res := lc.validateDrive(driveName, driveModel, driveOffset)
 
 		var driveClass, offsetClass string
 		var driveAnnotated string
-		if isFake {
-			lc.accountVirtualDrive(driveName)
-			driveClass, offsetClass = "bad", "bad"
+		driveClass = res.DriveClass
+		offsetClass = res.OffsetClass
+		if res.IsFake {
 			driveAnnotated = driveName
-		} else if len(lc.drives) > 0 {
-			lc.driveFound = true
-			driveClass = "good"
-			found := false
-			for _, o := range lc.offsets {
-				if o == driveOffset {
-					found = true
-					break
-				}
-			}
-			if found {
-				offsetClass = "good"
-			} else {
-				offsetClass = "bad"
-				lc.accountIncorrectOffset()
-			}
+		} else if res.InDB {
 			if driveBracket != "" {
 				driveAnnotated = drivePrefix + "<span class='log4'>" + driveBracket + "</span>"
 			} else {
 				driveAnnotated = driveName
 			}
 		} else {
-			driveClass = "badish"
 			notInDB := " (not found in database)"
-			if driveOffset == "0" {
-				offsetClass = "bad"
-				lc.accountZeroOffsetUnknownDrive()
-			} else {
-				offsetClass = "badish"
-			}
 			if driveBracket != "" {
 				driveAnnotated = drivePrefix + "<span class='log4'>" + driveBracket + notInDB + "</span>"
 			} else {
@@ -138,6 +108,7 @@ func (lc *Logchecker) dbpowerampParse() {
 		}
 		lc.log = dbDriveRe.ReplaceAllString(lc.log,
 			"Ripping with drive '<span class='"+driveClass+"'>"+driveAnnotated+"</span>',  Drive offset: <span class='"+offsetClass+"'>"+driveOffset+"</span>")
+
 	} else {
 		lc.accountDeduction("Could not verify used drive", 1)
 	}

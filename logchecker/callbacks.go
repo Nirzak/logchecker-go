@@ -319,13 +319,6 @@ func (lc *Logchecker) arSummaryConfCallback(s string) string {
 	cls := "good"
 	if n < 2 {
 		cls = "goodish"
-		if _, ok := lc.arSummary["goodish"]; !ok {
-			lc.arSummary["goodish"] = []int{}
-		}
-	} else {
-		if _, ok := lc.arSummary["good"]; !ok {
-			lc.arSummary["good"] = []int{}
-		}
 	}
 	return "<span class =\"" + cls + "\">" + s + "</span>"
 }

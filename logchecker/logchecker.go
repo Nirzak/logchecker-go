@@ -54,7 +54,6 @@ type Logchecker struct {
 	combined         int // 0 = not combined, >0 = number of sessions
 	currLog          int
 	rangeRip         bool
-	arSummary        map[string]interface{}
 	xldSecureRipper  bool
 	validateChecksum bool
 	fakeDrives       []string
@@ -124,7 +123,6 @@ func (lc *Logchecker) reset() {
 	lc.combined = 0
 	lc.currLog = 0
 	lc.rangeRip = false
-	lc.arSummary = make(map[string]interface{})
 	lc.xldSecureRipper = false
 	lc.language = "en"
 }

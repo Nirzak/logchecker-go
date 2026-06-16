@@ -636,14 +636,8 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 		ReplaceAllStringFunc(rawLog, lc.arSummaryConfCallback)
 	rawLog, cnt = replaceCount(rawLog, arNotInDBRe,
 		`<span class="badish">$1</span>`+"\n", -1)
-	if cnt > 0 {
-		lc.arSummary["bad"] = cnt
-	}
 	rawLog, cnt = replaceCount(rawLog, arCannotVerRe,
 		`<span class="badish">$1</span>`+"\n", -1)
-	if cnt > 0 {
-		lc.arSummary["bad"] = cnt
-	}
 
 	// Range rip detection
 	rawLog, range1Cnt := replaceCount(rawLog, selRangeRe,
@@ -666,7 +660,6 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 
 	// Reset per-log state
 	lc.arTracks = make(map[string]int)
-	lc.arSummary = make(map[string]interface{})
 	lc.secureMode = true
 	lc.nonSecureMode = ""
 }

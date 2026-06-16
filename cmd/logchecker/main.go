@@ -70,8 +70,8 @@ func cmdAnalyze(args []string) {
 		detailsFile = positional[2]
 	}
 
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		fmt.Fprintln(os.Stderr, "Invalid file")
+	if _, err := os.Stat(file); err != nil {
+		fmt.Fprintf(os.Stderr, "Invalid file: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -95,7 +95,7 @@ func cmdAnalyze(args []string) {
 		}{
 			Ripper:   lc.GetRipper(),
 			Version:  nilIfEmpty(lc.GetRipperVersion()),
-			Language: nilIfEmptyStr(lc.GetLanguage()),
+			Language: nilIfEmpty(lc.GetLanguage()),
 			Combined: lc.IsCombinedLog(),
 			Score:    lc.GetScore(),
 			Checksum: lc.GetChecksumState(),
@@ -148,8 +148,6 @@ func htmlToConsole(s string) string {
 	s = strings.ReplaceAll(s, "</span>", "")
 	s = strings.ReplaceAll(s, "</strong>", "")
 	s = strings.ReplaceAll(s, "<strong>", "")
-	re := strings.NewReplacer()
-	_ = re
 	// Strip all <span ...> opening tags.
 	for {
 		start := strings.Index(s, "<span")
@@ -166,13 +164,6 @@ func htmlToConsole(s string) string {
 }
 
 func nilIfEmpty(s string) interface{} {
-	if s == "" {
-		return nil
-	}
-	return s
-}
-
-func nilIfEmptyStr(s string) interface{} {
 	if s == "" {
 		return nil
 	}

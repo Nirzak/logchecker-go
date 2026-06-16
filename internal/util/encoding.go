@@ -75,6 +75,8 @@ func tryDecode(data []byte, scoreFunc func(string) int) (string, bool) {
 	candidates := []struct {
 		enc encoding.Encoding
 	}{
+		{MacCentralEurope},    // Mac Central European
+		{charmap.Macintosh},   // MacRoman
 		{charmap.Windows1252}, // Western European (most common EAC)
 		{charmap.Windows1250}, // Central European
 		{charmap.Windows1251}, // Cyrillic (rutracker logs)
@@ -145,11 +147,6 @@ func isCleanText(s string) bool {
 	return true
 }
 
-type decoder interface {
-	Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error)
-	Reset()
-}
-
 func decodeWith(d interface {
 	Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error)
 	Reset()
@@ -168,4 +165,70 @@ func NormalizeLineEndings(s string) string {
 	s = strings.ReplaceAll(s, "\r\n", "\n")
 	s = strings.ReplaceAll(s, "\r", "")
 	return s
+}
+
+// MacCentralEurope is the Macintosh Central European (CP10029) encoding.
+var MacCentralEurope encoding.Encoding = macCentralEurope{}
+
+type macCentralEurope struct{}
+
+func (macCentralEurope) NewDecoder() *encoding.Decoder {
+	return &encoding.Decoder{
+		Transformer: &macCentralEuropeDecoder{},
+	}
+}
+
+func (macCentralEurope) NewEncoder() *encoding.Encoder {
+	return nil
+}
+
+func (macCentralEurope) String() string {
+	return "MacCentralEurope"
+}
+
+type macCentralEuropeDecoder struct{}
+
+// this is required by transform.Transformer
+func (macCentralEuropeDecoder) Reset() {}
+
+var cp10029Table = [128]rune{
+	0x00C4, 0x0100, 0x0101, 0x00C9, 0x0104, 0x00D6, 0x00DC, 0x00E1,
+	0x0105, 0x010C, 0x00E4, 0x010D, 0x0106, 0x0107, 0x00E9, 0x0179,
+	0x017A, 0x010E, 0x00ED, 0x010F, 0x0112, 0x0113, 0x0116, 0x00F3,
+	0x0117, 0x00F4, 0x00F6, 0x00F5, 0x00FA, 0x011A, 0x011B, 0x00FC,
+	0x2020, 0x00B0, 0x0118, 0x00A3, 0x00A7, 0x2022, 0x00B6, 0x00DF,
+	0x00AE, 0x00A9, 0x2122, 0x0119, 0x00A8, 0x2260, 0x0123, 0x012E,
+	0x012F, 0x012A, 0x2264, 0x2265, 0x012B, 0x0136, 0x2202, 0x2211,
+	0x0142, 0x013B, 0x013C, 0x013D, 0x013E, 0x0139, 0x013A, 0x0145,
+	0x0146, 0x0143, 0x00AC, 0x221A, 0x0144, 0x0147, 0x2206, 0x00AB,
+	0x00BB, 0x2026, 0x00A0, 0x0148, 0x0150, 0x00D5, 0x0151, 0x014C,
+	0x2013, 0x2014, 0x201C, 0x201D, 0x2018, 0x2019, 0x00F7, 0x25CA,
+	0x014D, 0x0154, 0x0155, 0x0158, 0x2039, 0x203A, 0x0159, 0x0156,
+	0x0157, 0x0160, 0x201A, 0x201E, 0x0161, 0x015A, 0x015B, 0x00C1,
+	0x0164, 0x0165, 0x00CD, 0x017D, 0x017E, 0x016A, 0x00D3, 0x00D4,
+	0x016B, 0x016E, 0x00DA, 0x016F, 0x0170, 0x0171, 0x0172, 0x0173,
+	0x00DD, 0x00FD, 0x0137, 0x017B, 0x0141, 0x017C, 0x0122, 0x02C7,
+}
+
+func (macCentralEuropeDecoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	for nSrc < len(src) {
+		b := src[nSrc]
+		var r rune
+		if b < 128 {
+			r = rune(b)
+		} else {
+			r = cp10029Table[b-128]
+		}
+
+		size := utf8.RuneLen(r)
+		if nDst+size > len(dst) {
+			err = transform.ErrShortDst
+			break
+		}
+
+		utf8.EncodeRune(dst[nDst:], r)
+		nDst += size
+		nSrc++
+	}
+	return nDst, nSrc, err
 }

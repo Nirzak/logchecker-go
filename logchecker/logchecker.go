@@ -5,7 +5,6 @@ package logchecker
 import (
 	_ "embed"
 	"encoding/json"
-	"math"
 	"os"
 	"strings"
 
@@ -23,8 +22,12 @@ var LevenshteinDistance = 0
 // Version of the logchecker library.
 const Version = "1.14.6"
 
-// drive entry from drives.json: [name, offset]
-type driveEntry [2]interface{}
+// driveEntry holds one drive from drives.json. Offset is normalized to a
+// string at load time so the lookup hot path needs no type assertions.
+type driveEntry struct {
+	Name   string
+	Offset string
+}
 
 // Logchecker holds all state for a single parse run.
 type Logchecker struct {
@@ -51,7 +54,6 @@ type Logchecker struct {
 	combined         int // 0 = not combined, >0 = number of sessions
 	currLog          int
 	rangeRip         bool
-	arSummary        map[string]interface{}
 	xldSecureRipper  bool
 	validateChecksum bool
 	fakeDrives       []string
@@ -79,9 +81,8 @@ func New() *Logchecker {
 		for _, entry := range raw {
 			if len(entry) >= 2 {
 				name, ok1 := entry[0].(string)
-				offset := entry[1]
 				if ok1 {
-					lc.allDrives = append(lc.allDrives, driveEntry{name, offset})
+					lc.allDrives = append(lc.allDrives, driveEntry{name, offsetToString(entry[1])})
 				}
 			}
 		}
@@ -122,7 +123,6 @@ func (lc *Logchecker) reset() {
 	lc.combined = 0
 	lc.currLog = 0
 	lc.rangeRip = false
-	lc.arSummary = make(map[string]interface{})
 	lc.xldSecureRipper = false
 	lc.language = "en"
 }
@@ -189,7 +189,7 @@ func (lc *Logchecker) Parse() {
 	})
 	if err != nil {
 		lc.score = 0
-		lc.account("Could not detect log encoding, log is corrupt.", 0, 0, false, false)
+		lc.accountFatal("Could not detect log encoding, log is corrupt.", 0)
 		return
 	}
 	lc.log = decoded
@@ -197,7 +197,7 @@ func (lc *Logchecker) Parse() {
 	ripper, err := check.GetRipper(lc.log)
 	if err != nil {
 		lc.score = 0
-		lc.account("Unknown log file, could not determine ripper.", 0, 0, false, false)
+		lc.accountFatal("Unknown log file, could not determine ripper.", 0)
 		lc.ripper = check.Unknown
 		return
 	}
@@ -212,6 +212,3 @@ func (lc *Logchecker) Parse() {
 		lc.legacyParse()
 	}
 }
-
-// suppress unused import warning
-var _ = math.Abs

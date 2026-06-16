@@ -40,6 +40,20 @@ var (
 	dbARVerConfRe    = regexp.MustCompile(`(?i)(AccurateRip Verified Confidence\s*)(\d+)(\s*\[[^\]\s]+\s+)([0-9A-F]{8})(\])`)
 	dbDiscIDRe       = regexp.MustCompile(`(?i)(\[DiscID:\s*)([^\]]+)(\])`)
 	dbReRipFramesRe  = regexp.MustCompile(`(?i)Re-Rip (\d+) Frames`)
+
+	// Inline-hoisted dbpoweramp regexes
+	dbVersionCheckRe   = regexp.MustCompile(`(?im)^dBpoweramp Release ([^\s]+)`)
+	dbLossyEncRe       = regexp.MustCompile(`(?i)mp3|aac|ogg|wma|opus`)
+	dbDriveSettingsRe  = regexp.MustCompile(`(?im)^(Drive & Settings)\s*$`)
+	dbExtrLogRe        = regexp.MustCompile(`(?im)^(Extraction Log)\s*$`)
+	dbSepLineRe        = regexp.MustCompile(`(?im)^-{3,}\s*$`)
+	dbARAccurateBodyRe = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Accurate\s*\(confidence\s*\d+\).*)`)
+	dbARInaccBodyRe    = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Inaccurate.*)`)
+	dbARNotInDBBodyRe  = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Not in Database.*)`)
+	dbInaccSummaryRe   = regexp.MustCompile(`(?i)(\d+)\s*Inaccurate`)
+	dbSummWarnRe       = regexp.MustCompile(`(?i)^\d+\s+Secure\s*\(Warning\)$`)
+	dbSummSecureRe     = regexp.MustCompile(`(?i)^\d+\s+Secure$`)
+	dbSummInaccRe      = regexp.MustCompile(`(?i)^\d+\s+Inaccurate`)
 )
 
 func (lc *Logchecker) dbpowerampParse() {
@@ -47,14 +61,13 @@ func (lc *Logchecker) dbpowerampParse() {
 	lc.log = util.NormalizeLineEndings(lc.log)
 
 	// Version
-	if m := regexp.MustCompile(`(?im)^dBpoweramp Release ([^\s]+)`).FindStringSubmatch(lc.log); m != nil {
+	if m := dbVersionCheckRe.FindStringSubmatch(lc.log); m != nil {
 		lc.ripperVersion = m[1]
 		verNum, _ := strconv.ParseFloat(m[1], 64)
 		lc.log = dbVersionRe.
 			ReplaceAllString(lc.log, "<span class='good'>$1<span class='log1'>$2</span>$3<span class='log1'>$4</span></span>")
 		if verNum < 14 {
-			lc.account("[Notice] dBpoweramp version older than 14 — older versions had less robust secure ripping.",
-				0, -1, false, false)
+			lc.accountDeduction("[Notice] dBpoweramp version older than 14 — older versions had less robust secure ripping.", 0)
 		}
 	}
 
@@ -71,56 +84,22 @@ func (lc *Logchecker) dbpowerampParse() {
 			driveBracket = mm[2]
 			driveModel = strings.Trim(driveBracket, "[]")
 		}
-		lc.getDrives(driveModel)
-
-		isFake := false
-		for _, f := range lc.fakeDrives {
-			if strings.TrimSpace(driveName) == f {
-				isFake = true
-				break
-			}
-		}
+		res := lc.validateDrive(driveName, driveModel, driveOffset)
 
 		var driveClass, offsetClass string
 		var driveAnnotated string
-		if isFake {
-			lc.account("Virtual drive used: "+driveName, 20, -1, false, false)
-			driveClass, offsetClass = "bad", "bad"
+		driveClass = res.DriveClass
+		offsetClass = res.OffsetClass
+		if res.IsFake {
 			driveAnnotated = driveName
-		} else if len(lc.drives) > 0 {
-			lc.driveFound = true
-			driveClass = "good"
-			found := false
-			for _, o := range lc.offsets {
-				if o == driveOffset {
-					found = true
-					break
-				}
-			}
-			if found {
-				offsetClass = "good"
-			} else {
-				offsetClass = "bad"
-				lc.account("Incorrect read offset for drive. Correct offsets are: "+
-					strings.Join(lc.offsets, ", ")+" (Checked against the following drive(s): "+
-					strings.Join(lc.drives, ", ")+")", 5, -1, false, false)
-			}
+		} else if res.InDB {
 			if driveBracket != "" {
 				driveAnnotated = drivePrefix + "<span class='log4'>" + driveBracket + "</span>"
 			} else {
 				driveAnnotated = driveName
 			}
 		} else {
-			driveClass = "badish"
 			notInDB := " (not found in database)"
-			if driveOffset == "0" {
-				offsetClass = "bad"
-				lc.account("The drive was not found in the database, so we cannot determine the correct read offset. "+
-					"However, the read offset in this case was 0, which is almost never correct. "+
-					"As such, we are assuming that the offset is incorrect", 5, -1, false, false)
-			} else {
-				offsetClass = "badish"
-			}
 			if driveBracket != "" {
 				driveAnnotated = drivePrefix + "<span class='log4'>" + driveBracket + notInDB + "</span>"
 			} else {
@@ -129,8 +108,9 @@ func (lc *Logchecker) dbpowerampParse() {
 		}
 		lc.log = dbDriveRe.ReplaceAllString(lc.log,
 			"Ripping with drive '<span class='"+driveClass+"'>"+driveAnnotated+"</span>',  Drive offset: <span class='"+offsetClass+"'>"+driveOffset+"</span>")
+
 	} else {
-		lc.account("Could not verify used drive", 1, -1, false, false)
+		lc.accountDeduction("Could not verify used drive", 1)
 	}
 
 	// C2
@@ -138,7 +118,7 @@ func (lc *Logchecker) dbpowerampParse() {
 		c2Class := "good"
 		if strings.ToLower(m[1]) == "yes" {
 			c2Class = "bad"
-			lc.account("C2 pointers were used", 10, -1, false, false)
+			lc.accountDeduction("C2 pointers were used", 10)
 		}
 		lc.log = dbC2Re.ReplaceAllString(lc.log, "Using C2: <span class='"+c2Class+"'>$1</span>")
 	}
@@ -148,8 +128,7 @@ func (lc *Logchecker) dbpowerampParse() {
 		fuaClass := "good"
 		if strings.ToLower(m[1]) == "no" {
 			fuaClass = "badish"
-			lc.account("[Notice] FUA Cache Invalidate is disabled (audio cache may not be fully defeated).",
-				0, -1, false, false)
+			lc.accountDeduction("[Notice] FUA Cache Invalidate is disabled (audio cache may not be fully defeated).", 0)
 		}
 		lc.log = dbFUARe.ReplaceAllString(lc.log, "FUA Cache Invalidate: <span class='"+fuaClass+"'>$1</span>")
 	}
@@ -167,7 +146,7 @@ func (lc *Logchecker) dbpowerampParse() {
 		reClass := "good"
 		if reReads < 10 {
 			reClass = "bad"
-			lc.account("Maximum re-reads is too low (< 10), which may reduce rip quality", 5, -1, false, false)
+			lc.accountDeduction("Maximum re-reads is too low (< 10), which may reduce rip quality", 5)
 		}
 		lc.log = dbMaxReReadsRe.ReplaceAllString(lc.log, "Maximum Re-reads: <span class='"+reClass+"'>$1</span>")
 	}
@@ -190,9 +169,9 @@ func (lc *Logchecker) dbpowerampParse() {
 	if m := dbEncoderRe.FindStringSubmatch(lc.log); m != nil {
 		enc := strings.TrimSpace(m[1])
 		encClass := "good"
-		if regexp.MustCompile(`(?i)mp3|aac|ogg|wma|opus`).MatchString(enc) {
+		if dbLossyEncRe.MatchString(enc) {
 			encClass = "bad"
-			lc.account("Lossy encoder detected — rip is not lossless", 0, 0, false, false)
+			lc.accountFatal("Lossy encoder detected — rip is not lossless", 0)
 		} else if strings.Contains(strings.ToLower(enc), `wave`) {
 			encClass = "badish"
 		}
@@ -200,17 +179,17 @@ func (lc *Logchecker) dbpowerampParse() {
 	}
 
 	// Section headers
-	lc.log = regexp.MustCompile(`(?im)^(Drive & Settings)\s*$`).
+	lc.log = dbDriveSettingsRe.
 		ReplaceAllString(lc.log, "<span class='log4 log5'>$1</span>")
-	lc.log = regexp.MustCompile(`(?im)^(Extraction Log)\s*$`).
+	lc.log = dbExtrLogRe.
 		ReplaceAllString(lc.log, "<span class='log4 log5'>$1</span>")
-	lc.log = regexp.MustCompile(`(?im)^-{3,}\s*$`).
+	lc.log = dbSepLineRe.
 		ReplaceAllString(lc.log, "<strong>$0</strong>")
 
 	// Track parsing
 	trackHeaders := dbTrackHeaderRe.FindAllStringSubmatchIndex(lc.log, -1)
 	if len(trackHeaders) == 0 {
-		lc.account("No tracks found in log", 0, 0, false, false)
+		lc.accountFatal("No tracks found in log", 0)
 		return
 	}
 
@@ -277,17 +256,17 @@ func (lc *Logchecker) dbpowerampParse() {
 				"$1<span class='good'>Secure$2</span>")
 			statusAnnotated = true
 		} else if dbARAccurateRe.MatchString(trackBody) {
-			trackBody = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Accurate\s*\(confidence\s*\d+\).*)`).
+			trackBody = dbARAccurateBodyRe.
 				ReplaceAllString(trackBody, "$1<span class='good'>$2</span>")
 			statusAnnotated = true
 		} else if dbARInaccurateRe.MatchString(trackBody) {
 			inaccurateCount++
 			lc.accountTrack("AccurateRip: Inaccurate — data integrity cannot be confirmed", 10)
-			trackBody = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Inaccurate.*)`).
+			trackBody = dbARInaccBodyRe.
 				ReplaceAllString(trackBody, "$1<span class='bad'>$2</span>")
 			statusAnnotated = true
 		} else if dbARNotInDBRe.MatchString(trackBody) {
-			trackBody = regexp.MustCompile(`(?im)^(\s*)(AccurateRip:\s*Not in Database.*)`).
+			trackBody = dbARNotInDBBodyRe.
 				ReplaceAllString(trackBody, "$1<span class='badish'>$2</span>")
 			statusAnnotated = true
 		}
@@ -324,18 +303,18 @@ func (lc *Logchecker) dbpowerampParse() {
 	if m := dbTracksRippedRe.FindStringSubmatch(lc.log); m != nil {
 		total, _ := strconv.Atoi(m[1])
 		if total == 0 {
-			lc.account("No tracks were ripped successfully", 0, 0, false, false)
+			lc.accountFatal("No tracks were ripped successfully", 0)
 		}
 		summaryInaccurate := 0
-		if si := regexp.MustCompile(`(?i)(\d+)\s*Inaccurate`).FindStringSubmatch(m[2]); si != nil {
+		if si := dbInaccSummaryRe.FindStringSubmatch(m[2]); si != nil {
 			summaryInaccurate, _ = strconv.Atoi(si[1])
 		}
 		if summaryInaccurate != inaccurateCount {
-			lc.account(fmt.Sprintf("[Notice] Summary inaccurate count (%d) does not match per-track count (%d)",
-				summaryInaccurate, inaccurateCount), 0, -1, false, false)
+			lc.accountDeduction(fmt.Sprintf("[Notice] Summary inaccurate count (%d) does not match per-track count (%d)",
+				summaryInaccurate, inaccurateCount), 0)
 		}
 	} else if dbUserStopRe.MatchString(lc.log) {
-		lc.account("Ripping was aborted by user — log is incomplete", 0, 0, false, false)
+		lc.accountFatal("Ripping was aborted by user — log is incomplete", 0)
 		lc.log = dbUserStopRe.ReplaceAllString(lc.log, "<span class='bad'>$1</span>")
 	}
 
@@ -357,9 +336,9 @@ func (lc *Logchecker) dbpowerampParse() {
 			}
 			total := m[1]
 			detailStr := m[2]
-			reWarn := regexp.MustCompile(`(?i)^\d+\s+Secure\s*\(Warning\)$`)
-			reSecure := regexp.MustCompile(`(?i)^\d+\s+Secure$`)
-			reInaccurate := regexp.MustCompile(`(?i)^\d+\s+Inaccurate`)
+			reWarn := dbSummWarnRe
+			reSecure := dbSummSecureRe
+			reInaccurate := dbSummInaccRe
 			tokens := strings.Split(detailStr, ",")
 			for i, tok := range tokens {
 				trimmed := strings.TrimSpace(tok)

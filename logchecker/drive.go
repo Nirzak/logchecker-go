@@ -34,6 +34,7 @@ func normalizeDriveName(name string) string {
 	return strings.ToLower(strings.TrimSpace(name))
 }
 
+// levenshtein computes the edit distance between s and t using O(n) space.
 func levenshtein(s, t string) int {
 	sr := []rune(s)
 	tr := []rune(t)
@@ -44,39 +45,23 @@ func levenshtein(s, t string) int {
 	if lt == 0 {
 		return ls
 	}
-	d := make([][]int, ls+1)
-	for i := range d {
-		d[i] = make([]int, lt+1)
-	}
-	for i := 0; i <= ls; i++ {
-		d[i][0] = i
-	}
+	prev := make([]int, lt+1)
+	curr := make([]int, lt+1)
 	for j := 0; j <= lt; j++ {
-		d[0][j] = j
+		prev[j] = j
 	}
 	for i := 1; i <= ls; i++ {
+		curr[0] = i
 		for j := 1; j <= lt; j++ {
 			cost := 1
 			if sr[i-1] == tr[j-1] {
 				cost = 0
 			}
-			d[i][j] = min3(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+cost)
+			curr[j] = min(prev[j]+1, min(curr[j-1]+1, prev[j-1]+cost))
 		}
+		prev, curr = curr, prev
 	}
-	return d[ls][lt]
-}
-
-func min3(a, b, c int) int {
-	if a < b {
-		if a < c {
-			return a
-		}
-		return c
-	}
-	if b < c {
-		return b
-	}
-	return c
+	return prev[lt]
 }
 
 func (lc *Logchecker) getDrives(driveName string) {
@@ -90,23 +75,10 @@ func (lc *Logchecker) getDrives(driveName string) {
 	buckets := make([]bucket, maxDist)
 
 	for _, entry := range lc.allDrives {
-		name, _ := entry[0].(string)
-		offset := entry[1]
-		dist := levenshtein(name, normalized)
+		dist := levenshtein(entry.Name, normalized)
 		if dist < maxDist {
-			buckets[dist].drives = append(buckets[dist].drives, name)
-			var offStr string
-			switch v := offset.(type) {
-			case float64:
-				offStr = strconv.Itoa(int(v))
-			case int:
-				offStr = strconv.Itoa(v)
-			case string:
-				offStr = v
-			default:
-				offStr = fmt.Sprintf("%v", v)
-			}
-			buckets[dist].offsets = append(buckets[dist].offsets, offStr)
+			buckets[dist].drives = append(buckets[dist].drives, entry.Name)
+			buckets[dist].offsets = append(buckets[dist].offsets, entry.Offset)
 		}
 	}
 
@@ -119,4 +91,82 @@ func (lc *Logchecker) getDrives(driveName string) {
 			break
 		}
 	}
+}
+
+// offsetToString normalizes a drives.json offset value to its string form.
+// JSON numbers decode as float64; ints/strings are tolerated for robustness.
+func offsetToString(offset interface{}) string {
+	switch v := offset.(type) {
+	case float64:
+		return strconv.Itoa(int(v))
+	case int:
+		return strconv.Itoa(v)
+	case string:
+		return v
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}
+
+// driveResult carries the class/state outcomes of validateDrive so each
+// parser can build its own HTML annotation format.
+type driveResult struct {
+	DriveClass  string
+	OffsetClass string
+	IsFake      bool
+	InDB        bool
+}
+
+// validateDrive performs the canonical drive validation flow shared by all
+// three parsers (EAC/XLD callbacks, whipper, dBpoweramp):
+//
+//  1. Fake-drive guard — sets DriveClass/OffsetClass to "bad", fires accountVirtualDrive.
+//  2. DB lookup via getDrives.
+//  3. Offset match when drive is found (skipped when offsetStr == "").
+//  4. Zero-offset guard when drive is not found (skipped when offsetStr == "").
+//
+// driveName is the display name used in accountVirtualDrive messages.
+// lookupName is the normalised model string passed to getDrives (may equal driveName).
+// offsetStr is the rip-offset value to compare against lc.offsets.
+// Pass offsetStr == "" to skip offset validation (EAC/XLD, where readOffsetCallback
+// handles the offset check separately after getDrives has populated lc.drives/offsets).
+func (lc *Logchecker) validateDrive(driveName, lookupName, offsetStr string) driveResult {
+	for _, f := range lc.fakeDrives {
+		if strings.TrimSpace(driveName) == f {
+			lc.accountVirtualDrive(driveName)
+			return driveResult{DriveClass: cssBad, OffsetClass: cssBad, IsFake: true}
+		}
+	}
+
+	lc.getDrives(lookupName)
+
+	if len(lc.drives) > 0 {
+		lc.driveFound = true
+		if offsetStr == "" {
+			return driveResult{DriveClass: cssGood, InDB: true}
+		}
+		found := false
+		for _, o := range lc.offsets {
+			if o == offsetStr {
+				found = true
+				break
+			}
+		}
+		if found {
+			return driveResult{DriveClass: cssGood, OffsetClass: cssGood, InDB: true}
+		}
+		lc.accountIncorrectOffset()
+		return driveResult{DriveClass: cssGood, OffsetClass: cssBad, InDB: true}
+	}
+
+	// Drive not in DB.
+	lc.driveFound = false
+	if offsetStr == "" {
+		return driveResult{DriveClass: cssBadish}
+	}
+	if offsetStr == "0" {
+		lc.accountZeroOffsetUnknownDrive()
+		return driveResult{DriveClass: cssBadish, OffsetClass: cssBad}
+	}
+	return driveResult{DriveClass: cssBadish, OffsetClass: cssBadish}
 }

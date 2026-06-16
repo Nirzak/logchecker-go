@@ -2,8 +2,20 @@ package logchecker
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 )
+
+// pointsStr returns " (-N point(s))" or "" when n == 0.
+func pointsStr(n int) string {
+	if n == 0 {
+		return ""
+	}
+	if n == 1 {
+		return fmt.Sprintf(" (-%d point)", n)
+	}
+	return fmt.Sprintf(" (-%d points)", n)
+}
 
 // account adds a message and applies score changes.
 // decrease > 0 subtracts from score. setScore >= 0 sets score to that value.
@@ -19,19 +31,11 @@ func (lc *Logchecker) account(msg string, decrease int, setScore int, inclCombin
 	}
 	append2 := ""
 	if decrease > 0 {
-		if decrease == 1 {
-			append2 = fmt.Sprintf(" (-%d point)", decrease)
-		} else {
-			append2 = fmt.Sprintf(" (-%d points)", decrease)
-		}
+		append2 = pointsStr(decrease)
 	} else if setScore >= 0 {
 		d := 100 - setScore
 		if d > 0 {
-			if d == 1 {
-				append2 = fmt.Sprintf(" (-%d point)", d)
-			} else {
-				append2 = fmt.Sprintf(" (-%d points)", d)
-			}
+			append2 = pointsStr(d)
 		}
 	}
 
@@ -57,15 +61,45 @@ func (lc *Logchecker) accountTrack(msg string, decrease int) {
 	append2 := ""
 	if decrease > 0 {
 		lc.decreaseTrack += decrease
-		if decrease == 1 {
-			append2 = fmt.Sprintf(" (-%d point)", decrease)
-		} else {
-			append2 = fmt.Sprintf(" (-%d points)", decrease)
-		}
+		append2 = pointsStr(decrease)
 	}
 	combinedPart := ""
 	if lc.combined > 0 {
 		combinedPart = fmt.Sprintf(" (%d)", lc.currLog)
 	}
 	lc.badTrack = append(lc.badTrack, "Track "+tn+combinedPart+": "+msg+append2)
+}
+
+// accountDeduction is the common case: deduct points, no combined suffix, no notice.
+func (lc *Logchecker) accountDeduction(msg string, decrease int) {
+	lc.account(msg, decrease, -1, false, false)
+}
+
+// accountNotice records an informational message with no score deduction.
+func (lc *Logchecker) accountNotice(msg string) {
+	lc.account(msg, 0, -1, false, true)
+}
+
+// accountFatal sets the score to a specific absolute value (usually 0).
+func (lc *Logchecker) accountFatal(msg string, setScore int) {
+	lc.account(msg, 0, setScore, false, false)
+}
+
+// sortNumericStrings sorts a slice of numeric strings in ascending numeric order.
+// Non-numeric strings sort lexicographically after all numeric strings.
+func sortNumericStrings(ss []string) {
+	sort.Slice(ss, func(i, j int) bool {
+		ni, erri := strconv.Atoi(ss[i])
+		nj, errj := strconv.Atoi(ss[j])
+		if erri == nil && errj == nil {
+			return ni < nj
+		}
+		if erri == nil {
+			return true
+		}
+		if errj == nil {
+			return false
+		}
+		return ss[i] < ss[j]
+	})
 }

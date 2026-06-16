@@ -337,67 +337,31 @@ func (lc *Logchecker) xldStatCallback(m []string) string {
 
 	switch lower {
 	case "read error":
-		cls := "good"
-		if n > 0 {
-			cls = "bad"
-			err := n
-			if err > 10 {
-				err = 10
-			}
-			suffix := ""
-			if n != 1 {
-				suffix = "s"
-			}
-			lc.accountTrack("Read error"+suffix+" detected", err)
+		suffix := ""
+		if n != 1 {
+			suffix = "s"
 		}
-		return "<span class=\"log4\">" + text + "</span> <span class=\"" + cls + "\">" + m[3] + "</span>"
+		return lc.xldErrorStat(text, m[3], "Read error"+suffix+" detected", n)
 	case "skipped (treated as error)":
-		cls := "good"
-		if n > 0 {
-			cls = "bad"
-			err := n
-			if err > 10 {
-				err = 10
-			}
-			suffix := ""
-			if n != 1 {
-				suffix = "s"
-			}
-			lc.accountTrack("Skipped error"+suffix+" detected", err)
+		suffix := ""
+		if n != 1 {
+			suffix = "s"
 		}
-		return "<span class=\"log4\">" + text + "</span> <span class=\"" + cls + "\">" + m[3] + "</span>"
+		return lc.xldErrorStat(text, m[3], "Skipped error"+suffix+" detected", n)
 	case "inconsistency in error sectors":
-		cls := "good"
-		if n > 0 {
-			cls = "bad"
-			err := n
-			if err > 10 {
-				err = 10
-			}
-			suffix := "y"
-			if n != 1 {
-				suffix = "ies"
-			}
-			lc.accountTrack("Inconsistenc"+suffix+" in error sectors detected", err)
+		suffix := "y"
+		if n != 1 {
+			suffix = "ies"
 		}
-		return "<span class=\"log4\">" + text + "</span> <span class=\"" + cls + "\">" + m[3] + "</span>"
+		return lc.xldErrorStat(text, m[3], "Inconsistenc"+suffix+" in error sectors detected", n)
 	case "damaged sector count":
-		cls := "good"
-		if n > 0 {
-			cls = "bad"
-			err := n
-			if err > 10 {
-				err = 10
-			}
-			lc.accountTrack("Damaged sector count of "+m[3], err)
-		}
-		return "<span class=\"log4\">" + text + "</span> <span class=\"" + cls + "\">" + m[3] + "</span>"
+		return lc.xldErrorStat(text, m[3], "Damaged sector count of "+m[3], n)
 	default:
-		cls := "goodish"
+		cls := cssGoodish
 		if n > 0 {
-			cls = "badish"
+			cls = cssBadish
 		}
-		return "<span class=\"log4\">" + text + "</span> <span class=\"" + cls + "\">" + m[3] + "</span>"
+		return spanClass(cssLog4, text) + " " + spanClass(cls, m[3])
 	}
 }
 

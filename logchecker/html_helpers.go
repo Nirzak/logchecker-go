@@ -37,3 +37,20 @@ func (lc *Logchecker) accountZeroOffsetUnknownDrive() {
 			"However, the read offset in this case was 0, which is almost never correct. "+
 			"As such, we are assuming that the offset is incorrect", 5)
 }
+
+// xldErrorStat renders one XLD status line (label + count) and, when n > 0,
+// records a per-track deduction capped at 10 points. text is the label span
+// content (m[1]+m[2]), valueStr is the raw count string (m[3]), and msg is the
+// pre-built deduction message. Used by the error cases of xldStatCallback.
+func (lc *Logchecker) xldErrorStat(text, valueStr, msg string, n int) string {
+	cls := cssGood
+	if n > 0 {
+		cls = cssBad
+		errCount := n
+		if errCount > 10 {
+			errCount = 10
+		}
+		lc.accountTrack(msg, errCount)
+	}
+	return spanClass(cssLog4, text) + " " + spanClass(cls, valueStr)
+}

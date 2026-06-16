@@ -622,24 +622,7 @@ func (lc *Logchecker) legacyParse() {
 			if len(m) > 0 {
 				trackListing = m[0]
 				exploded := strings.Split(trackListing, "\n")
-				i := len(exploded) - 1
-				for i >= 0 {
-					found := false
-					for _, end := range logEnds {
-						if strings.HasSuffix(exploded[i], end) {
-							i--
-							found = true
-							break
-						}
-					}
-					if found {
-						break
-					}
-					if trackEndRe.MatchString(exploded[i]) {
-						break
-					}
-					i--
-				}
+				i := findTrackBoundary(exploded, logEnds)
 				trackListing = strings.Join(exploded[:i+1], "\n")
 				fullTracks = splitWithCaptures(trackListing, trackSplitRe)
 				trackBodies = trackSplitRe.Split(trackListing, -1)
@@ -652,25 +635,6 @@ func (lc *Logchecker) legacyParse() {
 			m := rangeHeaderRe.FindStringSubmatch(rawLog)
 			if len(m) > 0 {
 				trackListing = m[0]
-				exploded := strings.Split(trackListing, "\n")
-				i := len(exploded) - 1
-				for i >= 0 {
-					found := false
-					for _, end := range logEnds {
-						if strings.HasSuffix(exploded[i], end) {
-							i--
-							found = true
-							break
-						}
-					}
-					if found {
-						break
-					}
-					if trackEndRe.MatchString(exploded[i]) {
-						break
-					}
-					i--
-				}
 				// Use original m[0] (full match) for split — not trimmed exploded.
 				fullTracks = splitWithCaptures(trackListing, rangeSplitRe)
 				trackBodies = rangeSplitRe.Split(trackListing, -1)
@@ -982,6 +946,32 @@ func (lc *Logchecker) legacyParse() {
 	if lc.combined > 0 {
 		lc.details = append([]string{fmt.Sprintf("Combined Log (%d)", lc.combined)}, lc.details...)
 	}
+}
+
+// findTrackBoundary scans exploded lines backwards and returns the index of the
+// last line belonging to the track listing. Lines ending in any logEnds marker
+// (and an immediately preceding line) are trimmed off; iteration also stops at a
+// trackEndRe match. Returns -1 if every line is trimmed.
+func findTrackBoundary(exploded []string, logEnds []string) int {
+	i := len(exploded) - 1
+	for i >= 0 {
+		found := false
+		for _, end := range logEnds {
+			if strings.HasSuffix(exploded[i], end) {
+				i--
+				found = true
+				break
+			}
+		}
+		if found {
+			break
+		}
+		if trackEndRe.MatchString(exploded[i]) {
+			break
+		}
+		i--
+	}
+	return i
 }
 
 func (lc *Logchecker) checkTracks(logIdx int) {

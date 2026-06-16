@@ -23,6 +23,7 @@
 ## Step 4: Shared Logic
 - [x] 2.2 Extract `findTrackBoundary` helper (parser_legacy.go)
 - [x] 2.4 Extract `xldErrorStat` error-capping helper (callbacks.go)
+- [x] 4.3 driveEntry struct refactor (logchecker.go, drive.go)
 - [x] 2.3 Extract `combinedSuffix()` method (callbacks.go)
 - [x] 2.5 Replace `min3` with builtin `min` (drive.go)
 - [x] 2.6 Levenshtein O(n) single-row DP
@@ -33,10 +34,9 @@
 ## Step 5: Miscellaneous
 - [x] 5.4 Move `encoding_maccentraleurope.log` hack into test infra (add comment)
 
-## Not implemented (plan.md sections 4.x — structural refactoring, highest regression risk, lower priority):
+## Not implemented (plan.md section 4.1 — structural refactoring, highest regression risk, lower priority):
 
 4.1: legacyParse function split
-4.3: driveEntry struct refactor
 
 ## Verification
 - [x] Run `go test ./...` — all pass

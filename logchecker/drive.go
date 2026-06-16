@@ -75,23 +75,10 @@ func (lc *Logchecker) getDrives(driveName string) {
 	buckets := make([]bucket, maxDist)
 
 	for _, entry := range lc.allDrives {
-		name, _ := entry[0].(string)
-		offset := entry[1]
-		dist := levenshtein(name, normalized)
+		dist := levenshtein(entry.Name, normalized)
 		if dist < maxDist {
-			buckets[dist].drives = append(buckets[dist].drives, name)
-			var offStr string
-			switch v := offset.(type) {
-			case float64:
-				offStr = strconv.Itoa(int(v))
-			case int:
-				offStr = strconv.Itoa(v)
-			case string:
-				offStr = v
-			default:
-				offStr = fmt.Sprintf("%v", v)
-			}
-			buckets[dist].offsets = append(buckets[dist].offsets, offStr)
+			buckets[dist].drives = append(buckets[dist].drives, entry.Name)
+			buckets[dist].offsets = append(buckets[dist].offsets, entry.Offset)
 		}
 	}
 
@@ -103,6 +90,21 @@ func (lc *Logchecker) getDrives(driveName string) {
 			lc.offsets = b.offsets
 			break
 		}
+	}
+}
+
+// offsetToString normalizes a drives.json offset value to its string form.
+// JSON numbers decode as float64; ints/strings are tolerated for robustness.
+func offsetToString(offset interface{}) string {
+	switch v := offset.(type) {
+	case float64:
+		return strconv.Itoa(int(v))
+	case int:
+		return strconv.Itoa(v)
+	case string:
+		return v
+	default:
+		return fmt.Sprintf("%v", v)
 	}
 }
 

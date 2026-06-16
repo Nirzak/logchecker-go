@@ -22,8 +22,12 @@ var LevenshteinDistance = 0
 // Version of the logchecker library.
 const Version = "1.14.6"
 
-// drive entry from drives.json: [name, offset]
-type driveEntry [2]interface{}
+// driveEntry holds one drive from drives.json. Offset is normalized to a
+// string at load time so the lookup hot path needs no type assertions.
+type driveEntry struct {
+	Name   string
+	Offset string
+}
 
 // Logchecker holds all state for a single parse run.
 type Logchecker struct {
@@ -78,9 +82,8 @@ func New() *Logchecker {
 		for _, entry := range raw {
 			if len(entry) >= 2 {
 				name, ok1 := entry[0].(string)
-				offset := entry[1]
 				if ok1 {
-					lc.allDrives = append(lc.allDrives, driveEntry{name, offset})
+					lc.allDrives = append(lc.allDrives, driveEntry{name, offsetToString(entry[1])})
 				}
 			}
 		}

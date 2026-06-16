@@ -655,6 +655,28 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 		lc.accountDeduction("Range rip detected", 30)
 	}
 
+	rawLog = lc.legacyParseTracks(logIdx, rawLog, isEAC, isXLD)
+
+	lc.logs[logIdx] = rawLog
+	lc.checkTracks(logIdx)
+
+	if lc.nonSecureMode != "" {
+		lc.accountDeduction(lc.nonSecureMode+" mode was used", 20)
+	}
+
+	// Reset per-log state
+	lc.arTracks = make(map[string]int)
+	lc.arSummary = make(map[string]interface{})
+	lc.secureMode = true
+	lc.nonSecureMode = ""
+}
+
+// legacyParseTracks parses the track-listing region of one rip session: it
+// splits the listing into per-track bodies, annotates each (filename, CRC, AR
+// status, copy result), records per-track scoring into lc.tracks[logIdx], and
+// returns rawLog with the formatted track listing and XLD all-track stats
+// substituted in. Called by legacyParseSession.
+func (lc *Logchecker) legacyParseTracks(logIdx int, rawLog string, isEAC, isXLD int) string {
 	// --- Track parsing ---
 	formattedTrackListing := ""
 	trackListing := ""
@@ -719,7 +741,7 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 		}
 
 		// Filename
-		trackBody, cnt = replaceCount(trackBody,
+		trackBody, cnt := replaceCount(trackBody,
 			filenameRe,
 			"<span class=\"log4\">Filename <span class=\"log3\">$1</span></span>\n", -1)
 		if cnt == 0 && !lc.rangeRip {
@@ -947,18 +969,7 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 		rawLog, _ = replaceCountCallback(rawLog, pat, lc.xldAllStatCallback, 1)
 	}
 
-	lc.logs[logIdx] = rawLog
-	lc.checkTracks(logIdx)
-
-	if lc.nonSecureMode != "" {
-		lc.accountDeduction(lc.nonSecureMode+" mode was used", 20)
-	}
-
-	// Reset per-log state
-	lc.arTracks = make(map[string]int)
-	lc.arSummary = make(map[string]interface{})
-	lc.secureMode = true
-	lc.nonSecureMode = ""
+	return rawLog
 }
 
 // findTrackBoundary scans exploded lines backwards and returns the index of the

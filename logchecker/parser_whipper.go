@@ -16,6 +16,7 @@ var (
 	whipperVersionRe = regexp.MustCompile(`whipper ([0-9]+\.[0-9]+\.[0-9]+)`)
 	crcRe            = regexp.MustCompile(`CRC: ([A-Z0-9]+)`)
 	logCreatedByRe   = regexp.MustCompile(`(?i)^(whipper)\s+([^\s]+)`)
+	fixFieldRe       = regexp.MustCompile(`  (Release|Album): (.+)`)
 )
 
 func (lc *Logchecker) whipperParse() {
@@ -27,7 +28,6 @@ func (lc *Logchecker) whipperParse() {
 	}
 
 	// Fix un-escaped YAML strings for Release/Album fields.
-	fixFieldRe := regexp.MustCompile(`  (Release|Album): (.+)`)
 	fixed := fixFieldRe.ReplaceAllStringFunc(lc.log, func(s string) string {
 		m := fixFieldRe.FindStringSubmatch(s)
 		if m == nil {

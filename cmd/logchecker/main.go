@@ -70,8 +70,8 @@ func cmdAnalyze(args []string) {
 		detailsFile = positional[2]
 	}
 
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		fmt.Fprintln(os.Stderr, "Invalid file")
+	if _, err := os.Stat(file); err != nil {
+		fmt.Fprintf(os.Stderr, "Invalid file: %v\n", err)
 		os.Exit(1)
 	}
 

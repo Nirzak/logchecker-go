@@ -28,7 +28,7 @@ A score starts at **100** and decreases based on problems found (bad settings, c
 | `internal/` packages | `check`, `util`, `parser/eac` are not part of the public API; prevents accidental import by consumers |
 | `//go:embed` for `drives.json` + language JSONs | Single-binary distribution — no external data files needed at runtime |
 | `Logchecker` struct with `reset()` on `NewFile()` | Safe re-use of a single instance across multiple files without allocation overhead |
-| `account()` / `accountTrack()` centralize scoring | All score mutations go through one place; prevents duplicate detail messages |
+| `account()` / `accountTrack()` centralize scoring (with `accountDeduction`/`accountNotice`/`accountFatal` convenience wrappers in `scoring.go`) | All score mutations go through one place; prevents duplicate detail messages |
 | Ripper-specific parse entry points (`legacyParse`, `whipperParse`, `dbpowerampParse`) | EAC/XLD share legacy logic; whipper and dBpoweramp have divergent formats |
 | Fixture-driven tests (`tests/logs/*/details/*.json` + `html/*.log`) | Regression tests against real-world logs with known-good outputs |
 
@@ -151,14 +151,17 @@ logchecker-go/
 │   └── util/encoding.go          # DecodeEncoding() — UTF-16/Latin-1 → UTF-8
 ├── logchecker/
 │   ├── logchecker.go             # Public API: New(), NewFile(), Parse(), Get*()
-│   ├── scoring.go                # account(), accountTrack() — all score mutation
+│   ├── scoring.go                # account*/pointsStr/sortNumericStrings — score mutation + helpers
 │   ├── callbacks.go              # HTML annotation callbacks (one per log field)
-│   ├── regex_util.go             # Pure regex helpers: splitWithDelim, compareVersions
-│   ├── parser_legacy.go          # EAC + XLD parse logic
-│   ├── parser_whipper.go         # whipper parse logic
+│   ├── html_helpers.go           # spanClass/settingLine + shared account* helpers (xldErrorStat, drive/offset)
+│   ├── css_classes.go            # css* class-name constants (good/bad/log4/log5/…)
+│   ├── regex_util.go             # Pure regex helpers: splitWithDelim, splitWithCaptures, replaceCount*, compareVersions
+│   ├── parser_legacy.go          # EAC + XLD parse logic (legacyParse → legacyParseSession → legacyParseTracks)
+│   ├── parser_whipper.go         # whipper parse logic (YAML unmarshal + re-render)
 │   ├── parser_dbpoweramp.go      # dBpoweramp parse logic
-│   ├── drive.go                  # getDrives() — Levenshtein drive lookup
+│   ├── drive.go                  # getDrives()/validateDrive() — Levenshtein drive lookup
 │   └── resources/drives.json     # Embedded drive DB (~6000 entries)
+├── scripts/update_drives.go      # Maintenance: regenerate drives.json (not part of the library)
 ├── logchecker_test.go            # All tests — fixture-driven
 └── tests/logs/{eac,xld,whipper,dbpoweramp}/
     ├── originals/                # Input log files (source of truth)
@@ -186,13 +189,17 @@ Parse()
  │         │    ├── XLD signature present → split on `--- BEGIN/END XLD SIGNATURE ---`
  │         │    └── neither (checksumStatus=Missing) → split on `End of status report`
  │         │         └── strip CUETools DB Plugin segments
- │         ├── Per-section loop (each is one rip session for combined logs):
- │         │    ├── replaceCountCallback() over ~40 regex patterns
+ │         ├── Per-section loop → legacyParseSession(logIdx, rawLog) (one rip session each):
+ │         │    ├── version/ripper detection; [EAC] MP3-rip early-out
+ │         │    ├── settings: replaceCountCallback() over ~40 regex patterns
  │         │    │    Each callback: annotates log text with HTML spans
  │         │    │    AND calls account()/accountTrack() on problems found
  │         │    ├── Checksum validation (check.Validate()) if checksumStatus==OK
+ │         │    ├── legacyParseTracks(logIdx, rawLog, isEAC, isXLD):
+ │         │    │    split track listing (findTrackBoundary), annotate each track
+ │         │    │    (filename/CRC/AR/copy), then XLD all-track stats
  │         │    ├── checkTracks(logIdx) — sets score=0 if zero tracks found
- │         │    └── Reset per-session state (arTracks, arSummary, secureMode)
+ │         │    └── Reset per-session state (arTracks, secureMode)
  │         └── Merge per-session track scores into lc.details + lc.score
 ```
 
@@ -267,9 +274,11 @@ go test -v -run "TestHTMLOutput/whipper" ./...
 - Create a new file only for a genuinely new ripper parser (`parser_<name>.go`) or a new `internal/` utility package.
 
 ### Before writing any code
-1. Check `regex_util.go` for existing helpers (`splitWithDelim`, `replaceCount`, `compareVersions`) before implementing string/regex operations.
+1. Check `regex_util.go` for existing helpers (`splitWithDelim`, `splitWithCaptures`, `replaceCount`, `replaceCountCallback`, `compareVersions`) before implementing string/regex operations.
 2. Check `callbacks.go` for an existing callback pattern before writing a new HTML annotation.
-3. Check `internal/check/ripper.go` constants before referencing ripper names as string literals.
+3. Check `html_helpers.go` (`spanClass`, `settingLine`) and `css_classes.go` (`css*` constants) before emitting raw `<span class="...">` literals.
+4. Check `scoring.go` for the right account helper before calling the low-level `account()`: use `accountDeduction(msg, n)` for a normal penalty, `accountNotice(msg)` for an informational `[Notice]`, `accountFatal(msg, setScore)` to force a score, and `accountTrack(msg, n)` for per-track penalties.
+5. Check `internal/check/ripper.go` constants before referencing ripper names as string literals.
 
 ### Assumptions
 - Never assume a log file is valid UTF-8 — always route raw bytes through `util.DecodeEncoding()`.

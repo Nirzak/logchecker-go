@@ -9,6 +9,7 @@ import (
 
 	"github.com/Nirzak/logchecker-go/internal/check"
 	"github.com/Nirzak/logchecker-go/internal/parser/eac"
+	"github.com/Nirzak/logchecker-go/internal/toc"
 	"github.com/Nirzak/logchecker-go/internal/util"
 )
 
@@ -578,7 +579,32 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 	rawLog, _ = replaceCount(rawLog, win32InterfaceRe,
 		"\n$1<span class=\"log4\">Native Win32 interface$2</span>", 1)
 
-	// TOC
+	// TOC — extract data before annotation
+	if lc.cdToc == nil {
+		matches := tocRowRe.FindAllStringSubmatch(rawLog, -1)
+		if len(matches) > 0 {
+			offsets := make([]int, 0, len(matches))
+			lastEnd := 0
+			for _, m := range matches {
+				start, err1 := strconv.Atoi(strings.TrimSpace(m[13]))
+				end, err2 := strconv.Atoi(strings.TrimSpace(m[16]))
+				if err1 == nil && err2 == nil {
+					offsets = append(offsets, start)
+					lastEnd = end
+				}
+			}
+			if len(offsets) > 0 {
+				lc.cdToc = &toc.TOC{
+					FirstTrack: 1,
+					LastTrack:  len(offsets),
+					Offsets:    offsets,
+					Leadout:    lastEnd + 1,
+				}
+			}
+		}
+	}
+
+	// TOC annotation
 	rawLog = strings.ReplaceAll(rawLog, "TOC of the extracted CD",
 		`<span class="log4 log5">TOC of the extracted CD</span>`)
 	rawLog, _ = replaceCount(rawLog, tocHeaderRe,

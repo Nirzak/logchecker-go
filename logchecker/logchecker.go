@@ -10,6 +10,7 @@ import (
 
 	"github.com/Nirzak/logchecker-go/internal/check"
 	"github.com/Nirzak/logchecker-go/internal/parser/eac"
+	"github.com/Nirzak/logchecker-go/internal/toc"
 	"github.com/Nirzak/logchecker-go/internal/util"
 )
 
@@ -57,6 +58,7 @@ type Logchecker struct {
 	xldSecureRipper  bool
 	validateChecksum bool
 	fakeDrives       []string
+	cdToc            *toc.TOC
 }
 
 type trackData struct {
@@ -125,6 +127,7 @@ func (lc *Logchecker) reset() {
 	lc.rangeRip = false
 	lc.xldSecureRipper = false
 	lc.language = "en"
+	lc.cdToc = nil
 }
 
 // ValidateChecksum enables or disables external checksum validation.
@@ -150,6 +153,9 @@ func (lc *Logchecker) GetChecksumState() string { return lc.checksumStatus }
 
 // GetLanguage returns the detected log language code (e.g. "en", "ru").
 func (lc *Logchecker) GetLanguage() string { return lc.language }
+
+// GetTOC returns the parsed CD Table of Contents, or nil if not available.
+func (lc *Logchecker) GetTOC() *toc.TOC { return lc.cdToc }
 
 // IsCombinedLog returns true when the file contains multiple rip sessions.
 func (lc *Logchecker) IsCombinedLog() bool { return lc.combined > 0 }

@@ -150,6 +150,72 @@ func (t *TOC) CTDBLookupURL() string {
 	return fmt.Sprintf("https://db.cuetools.net/ui/cd/%s", id)
 }
 
+// AccurateRipDiscID1 computes the first AccurateRip disc identifier.
+// It is the sum of all 0-based LBA offsets (tracks + lead-out), masked to 32 bits.
+func (t *TOC) AccurateRipDiscID1() uint32 {
+	if t == nil || len(t.Offsets) == 0 {
+		return 0
+	}
+	var id1 uint32
+	for _, off := range t.Offsets {
+		id1 += uint32(off)
+	}
+	id1 += uint32(t.Leadout)
+	return id1
+}
+
+// AccurateRipDiscID2 computes the second AccurateRip disc identifier.
+// It is the sum of max(offset, 1) * (i+1) for each offset and lead-out, masked to 32 bits.
+func (t *TOC) AccurateRipDiscID2() uint32 {
+	if t == nil || len(t.Offsets) == 0 {
+		return 0
+	}
+	var id2 uint32
+	for i, off := range t.Offsets {
+		v := uint32(off)
+		if v == 0 {
+			v = 1
+		}
+		id2 += v * uint32(i+1)
+	}
+	// Lead-out is at position len(Offsets)+1
+	lo := uint32(t.Leadout)
+	if lo == 0 {
+		lo = 1
+	}
+	id2 += lo * uint32(len(t.Offsets)+1)
+	return id2
+}
+
+// AccurateRipID returns the full AccurateRip disc identifier string.
+// Format: "NNN-IIIIIIII-JJJJJJJJ-KKKKKKKK" where NNN is track count,
+// I is ID1 (hex), J is ID2 (hex), K is FreeDB/CDDB ID (hex).
+func (t *TOC) AccurateRipID() string {
+	if t == nil || len(t.Offsets) == 0 {
+		return ""
+	}
+	cddb := t.FreeDBDiscID()
+	if cddb == "" {
+		return ""
+	}
+	return fmt.Sprintf("%03d-%08x-%08x-%s",
+		t.LastTrack, t.AccurateRipDiscID1(), t.AccurateRipDiscID2(), cddb)
+}
+
+// AccurateRipURL returns the AccurateRip database lookup URL for this disc.
+// URL: http://www.accuraterip.com/accuraterip/X/Y/Z/dBAR-NNN-ID1-ID2-CDDB.bin
+// where X, Y, Z are derived from the hex representation of ID1.
+func (t *TOC) AccurateRipURL() string {
+	id := t.AccurateRipID()
+	if id == "" {
+		return ""
+	}
+	id1hex := fmt.Sprintf("%08x", t.AccurateRipDiscID1())
+	// Directory path uses last 3 hex chars of ID1 (positions 7, 6, 5)
+	return fmt.Sprintf("http://www.accuraterip.com/accuraterip/%c/%c/%c/dBAR-%s.bin",
+		id1hex[7], id1hex[6], id1hex[5], id)
+}
+
 // digitSum returns the sum of the decimal digits of n.
 func digitSum(n int) int {
 	sum := 0
@@ -159,3 +225,4 @@ func digitSum(n int) int {
 	}
 	return sum
 }
+

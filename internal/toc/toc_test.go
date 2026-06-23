@@ -83,6 +83,32 @@ func TestFreeDBDiscID_WhipperLog(t *testing.T) {
 	}
 }
 
+// TestFreeDBDiscID_GnuDBExample verifies the CDDB algorithm against gnudb's own
+//
+//	discid 13 150 15105 ... 171530 (nsecs 2358) => 9a09340d
+//
+// Frame offsets there are MSF (LBA+150); this package stores 0-based LBA, so
+// Offsets = frame-150 and Leadout = nsecs*75 + first-track-LBA.
+func TestFreeDBDiscID_GnuDBExample(t *testing.T) {
+	frames := []int{150, 15105, 26335, 40545, 48890, 66822, 92035, 104685, 114340, 130040, 146350, 165575, 171530}
+	offsets := make([]int, len(frames))
+	for i, f := range frames {
+		offsets[i] = f - 150
+	}
+	toc := &TOC{
+		FirstTrack: 1,
+		LastTrack:  len(frames),
+		Offsets:    offsets,
+		// total length nsecs=2358s; Leadout(MSF)=2358*75, so LBA = that-150.
+		Leadout: 2358*75 - 150,
+	}
+	got := toc.FreeDBDiscID()
+	want := "9a09340d"
+	if got != want {
+		t.Errorf("FreeDBDiscID() = %q, want %q", got, want)
+	}
+}
+
 // TestFreeDBLookupURL verifies the GnuDB URL format.
 func TestFreeDBLookupURL(t *testing.T) {
 	toc := &TOC{
@@ -93,7 +119,7 @@ func TestFreeDBLookupURL(t *testing.T) {
 	}
 
 	got := toc.FreeDBLookupURL()
-	want := "https://gnudb.com/cd/" + toc.FreeDBDiscID()
+	want := "https://gnudb.org/cd/" + toc.FreeDBDiscID()
 	if got != want {
 		t.Errorf("FreeDBLookupURL() = %q, want %q", got, want)
 	}
@@ -123,23 +149,27 @@ func TestMusicBrainzLookupURL(t *testing.T) {
 	}
 }
 
-// TestCTDBDiscID verifies CTDB disc ID is non-empty for valid TOC.
+// TestCTDBDiscID verifies the CTDB TOC ID against a known-good value from a
+// real EAC log (3G - A Killer Connection), whose CUETools DB Plugin section
+// embeds [CTDB TOCID: bbpsSDypNcxLiDUgMGjuiR4Qh34-].
 func TestCTDBDiscID(t *testing.T) {
 	toc := &TOC{
 		FirstTrack: 1,
 		LastTrack:  6,
-		Offsets:    []int{0, 15213, 32164, 46442, 63264, 80339},
-		Leadout:    95312,
+		Offsets:    []int{0, 21191, 46706, 73452, 95617, 121242},
+		Leadout:    131263, // last end sector 131262 + 1
 	}
 
 	got := toc.CTDBDiscID()
-	if got == "" {
-		t.Error("CTDBDiscID() returned empty for valid TOC")
+	want := "bbpsSDypNcxLiDUgMGjuiR4Qh34-"
+	if got != want {
+		t.Errorf("CTDBDiscID() = %q, want %q", got, want)
 	}
 
 	url := toc.CTDBLookupURL()
-	if !contains(url, "db.cuetools.net") {
-		t.Errorf("CTDB URL missing db.cuetools.net: %s", url)
+	wantURL := "https://db.cuetools.net/ui/?tocid=" + want
+	if url != wantURL {
+		t.Errorf("CTDBLookupURL() = %q, want %q", url, wantURL)
 	}
 }
 

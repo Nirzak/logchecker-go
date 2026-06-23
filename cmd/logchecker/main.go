@@ -15,7 +15,7 @@ import (
 
 func usage() {
 	fmt.Fprintf(os.Stderr, `Usage:
-  logchecker analyze  [--html] [--no_text] <file> [out_file] [details_json]
+  logchecker analyze  [--html] [--no_text] [--ids] <file> [out_file] [details_json]
   logchecker analyse  (alias of analyze)
   logchecker decode   <file>
   logchecker translate [-l lang] <file>
@@ -52,6 +52,7 @@ func cmdAnalyze(args []string) {
 	fs := flag.NewFlagSet("analyze", flag.ExitOnError)
 	htmlFlag := fs.Bool("html", false, "print the HTML version of the log")
 	noText := fs.Bool("no_text", false, "do not print log text to console")
+	idsFlag := fs.Bool("ids", false, "print disc IDs (AccurateRip, MusicBrainz, CTDB, FreeDB) and exit")
 	fs.Parse(args)
 
 	positional := fs.Args()
@@ -81,6 +82,12 @@ func cmdAnalyze(args []string) {
 		os.Exit(1)
 	}
 	lc.Parse()
+
+	// Print disc IDs and exit, if requested.
+	if *idsFlag {
+		printDiscIDs(lc)
+		return
+	}
 
 	// Write details JSON if requested.
 	if detailsFile != "" {
@@ -141,6 +148,35 @@ func cmdAnalyze(args []string) {
 		logText = htmlToConsole(logText)
 	}
 	fmt.Print(logText)
+}
+
+// printDiscIDs prints the computed disc identifiers and their lookup URLs.
+// AccurateRip prefers the log-embedded ID (dBpoweramp); the rest derive from
+// the parsed TOC. Lines are omitted when their source data is unavailable.
+func printDiscIDs(lc *logchecker.Logchecker) {
+	fmt.Println("Ripper  :", lc.GetRipper())
+
+	if ar := lc.GetAccurateRipID(); ar != "" {
+		fmt.Println("AccurateRip :", ar)
+	} else {
+		fmt.Println("AccurateRip : (unavailable)")
+	}
+
+	t := lc.GetTOC()
+	if t == nil {
+		fmt.Println("(no TOC in log — MusicBrainz/CTDB/FreeDB unavailable)")
+		return
+	}
+
+	if t.AccurateRipURL() != "" {
+		fmt.Println("  AR URL    :", t.AccurateRipURL())
+	}
+	fmt.Println("MusicBrainz :", t.MusicBrainzDiscID())
+	fmt.Println("  MB URL    :", t.MusicBrainzLookupURL())
+	fmt.Println("CTDB        :", t.CTDBDiscID())
+	fmt.Println("  CTDB URL  :", t.CTDBLookupURL())
+	fmt.Println("FreeDB/CDDB :", t.FreeDBDiscID())
+	fmt.Println("  FreeDB URL:", t.FreeDBLookupURL())
 }
 
 // htmlToConsole strips HTML span/strong tags (console output, no colors).

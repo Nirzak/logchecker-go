@@ -244,10 +244,11 @@ func TestTOCExtraction(t *testing.T) {
 			freedbDiscID: "c2058d11",
 		},
 		{
-			name:       "xld",
-			logPath:    "tests/logs/xld/originals/xld_perfect.log",
-			expectTOC:  true,
-			trackCount: 16,
+			name:        "xld",
+			logPath:     "tests/logs/xld/originals/xld_perfect.log",
+			expectTOC:   true,
+			trackCount:  16,
+			firstOffset: 35,
 		},
 		{
 			name:        "dbpoweramp",

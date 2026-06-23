@@ -218,6 +218,14 @@ func (lc *Logchecker) dbpowerampParse() {
 		}
 	}
 
+	// Extract embedded AccurateRip DiscID (authoritative when present).
+	// Log form: [DiscID: NNN-ID1-ID2-CDDB-tracknum]; strip trailing -tracknum.
+	if m := dbDiscIDRe.FindStringSubmatch(lc.log); m != nil {
+		if parts := strings.Split(strings.TrimSpace(m[2]), "-"); len(parts) >= 4 {
+			lc.accurateRipID = strings.Join(parts[:4], "-")
+		}
+	}
+
 	type formattedTrack struct {
 		number        string
 		text          string

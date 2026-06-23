@@ -319,3 +319,47 @@ func TestTOCExtraction(t *testing.T) {
 		})
 	}
 }
+
+// TestAccurateRipIDExtraction verifies GetAccurateRipID():
+//   - dBpoweramp: extracted from the embedded [DiscID: ...] field
+//   - whipper:    computed from the TOC (no embedded AR id)
+func TestAccurateRipIDExtraction(t *testing.T) {
+	cases := []struct {
+		name string
+		log  string
+		want string // exact match, or "" meaning "non-empty computed value"
+	}{
+		{
+			name: "dbpoweramp embedded",
+			log:  "tests/logs/dbpoweramp/originals/Standard Accurate Rip Ultra Disabled 2.log",
+			want: "009-000f105c-006e4f61-8a0a4209",
+		},
+		{
+			name: "whipper computed from TOC",
+			log:  "tests/logs/whipper/originals/1.log",
+			want: "", // computed; just assert non-empty + well-formed
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			lc := logchecker.New()
+			if err := lc.NewFile(tc.log); err != nil {
+				t.Fatalf("NewFile: %v", err)
+			}
+			lc.Parse()
+			got := lc.GetAccurateRipID()
+			if tc.want != "" {
+				if got != tc.want {
+					t.Errorf("GetAccurateRipID() = %q, want %q", got, tc.want)
+				}
+				return
+			}
+			if got == "" {
+				t.Fatal("GetAccurateRipID() empty, want computed value")
+			}
+			if parts := strings.Split(got, "-"); len(parts) != 4 {
+				t.Errorf("GetAccurateRipID() = %q, want 4 dash-parts", got)
+			}
+		})
+	}
+}

@@ -164,6 +164,79 @@ func TestNilTOC(t *testing.T) {
 	if toc.CTDBLookupURL() != "" {
 		t.Error("expected empty for nil TOC")
 	}
+	if toc.AccurateRipID() != "" {
+		t.Error("expected empty for nil TOC")
+	}
+	if toc.AccurateRipURL() != "" {
+		t.Error("expected empty for nil TOC")
+	}
+}
+
+// TestAccurateRipDiscID verifies ID1/ID2 against known-good vectors from the
+// Rust `cdtoc` crate's t_accuraterip test. Offsets here are 0-based LBA
+// (sector-150), matching this package's TOC convention; cdtoc subtracts 150
+// from raw sectors internally, so the arithmetic is identical.
+func TestAccurateRipDiscID(t *testing.T) {
+	cases := []struct {
+		name    string
+		toc     *TOC
+		wantID1 uint32
+		wantID2 uint32
+	}{
+		{
+			// cdtoc: 4+96+2D2B+6256+B327+D84A (sectors); -150 → LBA below.
+			name: "4 tracks",
+			toc: &TOC{
+				FirstTrack: 1, LastTrack: 4,
+				Offsets: []int{0, 0x2D2B - 150, 0x6256 - 150, 0xB327 - 150},
+				Leadout: 0xD84A - 150,
+			},
+			wantID1: 0x0002189a,
+			wantID2: 0x00087f33,
+		},
+		{
+			// cdtoc: 10(0x10=16)+B6+5352+62AC+99D6+E218+12AC0+135E7+142E9+
+			//        178B0+19D22+1B0D0+1E7FA+22882+247DB+27074+2A1BD+2C0FB
+			name: "16 tracks",
+			toc: &TOC{
+				FirstTrack: 1, LastTrack: 16,
+				Offsets: []int{
+					0xB6 - 150, 0x5352 - 150, 0x62AC - 150, 0x99D6 - 150,
+					0xE218 - 150, 0x12AC0 - 150, 0x135E7 - 150, 0x142E9 - 150,
+					0x178B0 - 150, 0x19D22 - 150, 0x1B0D0 - 150, 0x1E7FA - 150,
+					0x22882 - 150, 0x247DB - 150, 0x27074 - 150, 0x2A1BD - 150,
+				},
+				Leadout: 0x2C0FB - 150,
+			},
+			wantID1: 0x0018be61,
+			wantID2: 0x012232a8,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := tc.toc.AccurateRipDiscID1(); got != tc.wantID1 {
+				t.Errorf("AccurateRipDiscID1() = %08x, want %08x", got, tc.wantID1)
+			}
+			if got := tc.toc.AccurateRipDiscID2(); got != tc.wantID2 {
+				t.Errorf("AccurateRipDiscID2() = %08x, want %08x", got, tc.wantID2)
+			}
+		})
+	}
+}
+
+// TestAccurateRipURL verifies URL format + directory digits from ID1 hex.
+func TestAccurateRipURL(t *testing.T) {
+	toc := &TOC{
+		FirstTrack: 1, LastTrack: 4,
+		Offsets: []int{0, 0x2D2B - 150, 0x6256 - 150, 0xB327 - 150},
+		Leadout: 0xD84A - 150,
+	}
+	// ID1 = 0002189a → directory digits [7]=a [6]=9 [5]=8.
+	url := toc.AccurateRipURL()
+	want := "http://www.accuraterip.com/accuraterip/a/9/8/dBAR-" + toc.AccurateRipID() + ".bin"
+	if url != want {
+		t.Errorf("AccurateRipURL() = %q, want %q", url, want)
+	}
 }
 
 func contains(s, substr string) bool {

@@ -225,4 +225,3 @@ func digitSum(n int) int {
 	}
 	return sum
 }
-

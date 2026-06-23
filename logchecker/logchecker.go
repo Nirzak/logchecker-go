@@ -59,6 +59,7 @@ type Logchecker struct {
 	validateChecksum bool
 	fakeDrives       []string
 	cdToc            *toc.TOC
+	accurateRipID    string
 }
 
 type trackData struct {
@@ -128,6 +129,7 @@ func (lc *Logchecker) reset() {
 	lc.xldSecureRipper = false
 	lc.language = "en"
 	lc.cdToc = nil
+	lc.accurateRipID = ""
 }
 
 // ValidateChecksum enables or disables external checksum validation.
@@ -156,6 +158,19 @@ func (lc *Logchecker) GetLanguage() string { return lc.language }
 
 // GetTOC returns the parsed CD Table of Contents, or nil if not available.
 func (lc *Logchecker) GetTOC() *toc.TOC { return lc.cdToc }
+
+// GetAccurateRipID returns the AccurateRip disc ID (NNN-ID1-ID2-CDDB).
+// Prefers the value embedded in the log (dBpoweramp); otherwise computes it
+// from the TOC. Returns "" if neither is available. No network I/O.
+func (lc *Logchecker) GetAccurateRipID() string {
+	if lc.accurateRipID != "" {
+		return lc.accurateRipID
+	}
+	if lc.cdToc != nil {
+		return lc.cdToc.AccurateRipID()
+	}
+	return ""
+}
 
 // IsCombinedLog returns true when the file contains multiple rip sessions.
 func (lc *Logchecker) IsCombinedLog() bool { return lc.combined > 0 }

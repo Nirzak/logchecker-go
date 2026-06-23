@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Nirzak/logchecker-go/internal/check"
+	"github.com/Nirzak/logchecker-go/internal/toc"
 	"github.com/Nirzak/logchecker-go/internal/util"
 )
 
@@ -54,6 +55,7 @@ var (
 	dbSummWarnRe       = regexp.MustCompile(`(?i)^\d+\s+Secure\s*\(Warning\)$`)
 	dbSummSecureRe     = regexp.MustCompile(`(?i)^\d+\s+Secure$`)
 	dbSummInaccRe      = regexp.MustCompile(`(?i)^\d+\s+Inaccurate`)
+	dbLBAExtractRe     = regexp.MustCompile(`Ripped LBA\s+(\d+)\s+to\s+(\d+)`)
 )
 
 func (lc *Logchecker) dbpowerampParse() {
@@ -191,6 +193,37 @@ func (lc *Logchecker) dbpowerampParse() {
 	if len(trackHeaders) == 0 {
 		lc.accountFatal("No tracks found in log", 0)
 		return
+	}
+
+	// Extract TOC from LBA data before annotation
+	lbaMatches := dbLBAExtractRe.FindAllStringSubmatch(lc.log, -1)
+	if len(lbaMatches) > 0 {
+		offsets := make([]int, 0, len(lbaMatches))
+		lastEnd := 0
+		for _, m := range lbaMatches {
+			start, err1 := strconv.Atoi(m[1])
+			end, err2 := strconv.Atoi(m[2])
+			if err1 == nil && err2 == nil {
+				offsets = append(offsets, start)
+				lastEnd = end
+			}
+		}
+		if len(offsets) > 0 {
+			lc.cdToc = &toc.TOC{
+				FirstTrack: 1,
+				LastTrack:  len(offsets),
+				Offsets:    offsets,
+				Leadout:    lastEnd + 1,
+			}
+		}
+	}
+
+	// Extract embedded AccurateRip DiscID (authoritative when present).
+	// Log form: [DiscID: NNN-ID1-ID2-CDDB-tracknum]; strip trailing -tracknum.
+	if m := dbDiscIDRe.FindStringSubmatch(lc.log); m != nil {
+		if parts := strings.Split(strings.TrimSpace(m[2]), "-"); len(parts) >= 4 {
+			lc.accurateRipID = strings.Join(parts[:4], "-")
+		}
 	}
 
 	type formattedTrack struct {

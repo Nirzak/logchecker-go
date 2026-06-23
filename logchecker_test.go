@@ -212,3 +212,154 @@ func stringsEqual(a, b []string) bool {
 	}
 	return true
 }
+
+func TestTOCExtraction(t *testing.T) {
+	tests := []struct {
+		name         string
+		logPath      string
+		expectTOC    bool
+		trackCount   int
+		firstOffset  int
+		mbDiscID     string // expected MusicBrainz disc ID (empty = skip check)
+		freedbDiscID string // expected FreeDB disc ID (empty = skip check)
+	}{
+		{
+			name:       "eac with TOC",
+			logPath:    "tests/logs/eac/originals/en_5.log",
+			expectTOC:  true,
+			trackCount: 13,
+		},
+		{
+			name:      "eac without TOC",
+			logPath:   "tests/logs/eac/originals/en_1.log",
+			expectTOC: false,
+		},
+		{
+			name:         "whipper",
+			logPath:      "tests/logs/whipper/originals/1.log",
+			expectTOC:    true,
+			trackCount:   17,
+			firstOffset:  0,
+			mbDiscID:     "wXcMD4BGh8KcpBCxKY.mfAfc_EY-",
+			freedbDiscID: "c2058d11",
+		},
+		{
+			name:        "xld",
+			logPath:     "tests/logs/xld/originals/xld_perfect.log",
+			expectTOC:   true,
+			trackCount:  16,
+			firstOffset: 35,
+		},
+		{
+			name:        "dbpoweramp",
+			logPath:     "tests/logs/dbpoweramp/originals/Ultra Perfect Rip.log",
+			expectTOC:   true,
+			trackCount:  9,
+			firstOffset: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lc := logchecker.New()
+			if err := lc.NewFile(tt.logPath); err != nil {
+				t.Fatalf("NewFile error: %v", err)
+			}
+			lc.Parse()
+
+			toc := lc.GetTOC()
+			if tt.expectTOC {
+				if toc == nil {
+					t.Fatal("expected TOC but got nil")
+				}
+				if toc.LastTrack != tt.trackCount {
+					t.Errorf("track count: got %d, want %d", toc.LastTrack, tt.trackCount)
+				}
+				if tt.firstOffset >= 0 && len(toc.Offsets) > 0 && toc.Offsets[0] != tt.firstOffset {
+					t.Errorf("first offset: got %d, want %d", toc.Offsets[0], tt.firstOffset)
+				}
+				if toc.Leadout <= 0 {
+					t.Error("leadout should be > 0")
+				}
+
+				// Verify disc IDs are non-empty
+				if toc.MusicBrainzDiscID() == "" {
+					t.Error("MusicBrainzDiscID() returned empty")
+				}
+				if toc.FreeDBDiscID() == "" {
+					t.Error("FreeDBDiscID() returned empty")
+				}
+				if toc.CTDBDiscID() == "" {
+					t.Error("CTDBDiscID() returned empty")
+				}
+
+				// Verify URLs are non-empty
+				if toc.MusicBrainzLookupURL() == "" {
+					t.Error("MusicBrainzLookupURL() returned empty")
+				}
+				if toc.FreeDBLookupURL() == "" {
+					t.Error("FreeDBLookupURL() returned empty")
+				}
+				if toc.CTDBLookupURL() == "" {
+					t.Error("CTDBLookupURL() returned empty")
+				}
+
+				// Check specific expected values
+				if tt.mbDiscID != "" && toc.MusicBrainzDiscID() != tt.mbDiscID {
+					t.Errorf("MusicBrainzDiscID: got %q, want %q", toc.MusicBrainzDiscID(), tt.mbDiscID)
+				}
+				if tt.freedbDiscID != "" && toc.FreeDBDiscID() != tt.freedbDiscID {
+					t.Errorf("FreeDBDiscID: got %q, want %q", toc.FreeDBDiscID(), tt.freedbDiscID)
+				}
+			} else {
+				if toc != nil {
+					t.Errorf("expected nil TOC but got %+v", toc)
+				}
+			}
+		})
+	}
+}
+
+// TestAccurateRipIDExtraction verifies GetAccurateRipID():
+//   - dBpoweramp: extracted from the embedded [DiscID: ...] field
+//   - whipper:    computed from the TOC (no embedded AR id)
+func TestAccurateRipIDExtraction(t *testing.T) {
+	cases := []struct {
+		name string
+		log  string
+		want string // exact match, or "" meaning "non-empty computed value"
+	}{
+		{
+			name: "dbpoweramp embedded",
+			log:  "tests/logs/dbpoweramp/originals/Standard Accurate Rip Ultra Disabled 2.log",
+			want: "009-000f105c-006e4f61-8a0a4209",
+		},
+		{
+			name: "whipper computed from TOC",
+			log:  "tests/logs/whipper/originals/1.log",
+			want: "", // computed; just assert non-empty + well-formed
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			lc := logchecker.New()
+			if err := lc.NewFile(tc.log); err != nil {
+				t.Fatalf("NewFile: %v", err)
+			}
+			lc.Parse()
+			got := lc.GetAccurateRipID()
+			if tc.want != "" {
+				if got != tc.want {
+					t.Errorf("GetAccurateRipID() = %q, want %q", got, tc.want)
+				}
+				return
+			}
+			if got == "" {
+				t.Fatal("GetAccurateRipID() empty, want computed value")
+			}
+			if parts := strings.Split(got, "-"); len(parts) != 4 {
+				t.Errorf("GetAccurateRipID() = %q, want 4 dash-parts", got)
+			}
+		})
+	}
+}

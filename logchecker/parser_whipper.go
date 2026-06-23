@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Nirzak/logchecker-go/internal/check"
+	"github.com/Nirzak/logchecker-go/internal/toc"
 	"gopkg.in/yaml.v3"
 )
 
@@ -174,18 +175,46 @@ func (lc *Logchecker) whipperParse() {
 	}
 
 	// TOC
-	if toc, ok := parsed["TOC"].(map[string]interface{}); ok {
-		for k, trackRaw := range toc {
+	if tocMap, ok := parsed["TOC"].(map[string]interface{}); ok {
+		// Extract TOC data before annotation
+		keys := make([]string, 0, len(tocMap))
+		for k := range tocMap {
+			keys = append(keys, k)
+		}
+		sortNumericStrings(keys)
+		offsets := make([]int, 0, len(keys))
+		lastEnd := 0
+		for _, k := range keys {
+			if t, ok := tocMap[k].(map[string]interface{}); ok {
+				startSector := toInt(t["Start sector"])
+				endSector := toInt(t["End sector"])
+				if startSector >= 0 && endSector >= 0 {
+					offsets = append(offsets, startSector)
+					lastEnd = endSector
+				}
+			}
+		}
+		if len(offsets) > 0 {
+			lc.cdToc = &toc.TOC{
+				FirstTrack: 1,
+				LastTrack:  len(offsets),
+				Offsets:    offsets,
+				Leadout:    lastEnd + 1,
+			}
+		}
+
+		// Annotate TOC
+		for k, trackRaw := range tocMap {
 			if t, ok := trackRaw.(map[string]interface{}); ok {
 				for _, field := range []string{"Start", "Length", "Start sector", "End sector"} {
 					if v, ok := t[field]; ok {
 						t[field] = fmt.Sprintf("<span class='log1'>%v</span>", v)
 					}
 				}
-				toc[k] = t
+				tocMap[k] = t
 			}
 		}
-		parsed["TOC"] = toc
+		parsed["TOC"] = tocMap
 	}
 
 	// Tracks
@@ -501,4 +530,23 @@ func renderWhipperLog(parsed map[string]interface{}) string {
 	}
 
 	return sb.String()
+}
+
+// toInt extracts an integer from a YAML-parsed value that may be int, float64, or string.
+// Returns -1 if the value cannot be converted.
+func toInt(v interface{}) int {
+	switch val := v.(type) {
+	case int:
+		return val
+	case float64:
+		return int(val)
+	case string:
+		n, err := strconv.Atoi(val)
+		if err != nil {
+			return -1
+		}
+		return n
+	default:
+		return -1
+	}
 }

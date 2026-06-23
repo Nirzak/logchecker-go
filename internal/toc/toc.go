@@ -24,8 +24,8 @@ var mbBase64Encoding = base64.NewEncoding(
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._",
 ).WithPadding('-')
 
-// ctdbBase64Encoding is the URL-safe Base64 encoding used by CUETools.
-var ctdbBase64Encoding = base64.URLEncoding.WithPadding(base64.NoPadding)
+// ctdbReplacer applies CUETools' URL-safe Base64 substitutions: +→. /→_ =→-
+var ctdbReplacer = strings.NewReplacer("+", ".", "/", "_", "=", "-")
 
 // MusicBrainzDiscID computes the MusicBrainz Disc ID from the TOC.
 // See https://musicbrainz.org/doc/Disc_ID_Calculation
@@ -109,36 +109,39 @@ func (t *TOC) FreeDBLookupURL() string {
 	if id == "" {
 		return ""
 	}
-	return fmt.Sprintf("https://gnudb.com/cd/%s", id)
+	return fmt.Sprintf("https://gnudb.org/cd/%s", id)
 }
 
-// CTDBDiscID computes a best-effort CUETools Database TOC ID.
-// The algorithm hashes track lengths (in sectors) using SHA-1,
-// then encodes with URL-safe Base64 (no padding).
+// CTDBDiscID computes the CUETools Database TOC ID.
+//
+// Algorithm (from CUETools' CDImageLayout.TOCID):
+//   - for each audio track after the first, append (Start - Start[0]) as %08X
+//   - append the lead-out as (lastEnd+1 - Start[0]) = (Leadout - Start[0]) as %08X
+//   - zero-pad the string to 100 track slots: (100 - trackCount) * 8 zeros
+//   - SHA-1 the ASCII bytes, standard Base64, then +→. /→_ =→-
+//
+// Note: no +150 lead-in here (unlike MusicBrainz/FreeDB); offsets are relative
+// to the first track's start.
 func (t *TOC) CTDBDiscID() string {
 	if t == nil || len(t.Offsets) == 0 {
 		return ""
 	}
 
-	// Build string of track lengths separated by spaces.
+	first := t.Offsets[0]
 	var sb strings.Builder
-	for i := 0; i < len(t.Offsets); i++ {
-		if i > 0 {
-			sb.WriteByte(' ')
-		}
-		var length int
-		if i+1 < len(t.Offsets) {
-			length = t.Offsets[i+1] - t.Offsets[i]
-		} else {
-			length = t.Leadout - t.Offsets[i]
-		}
-		fmt.Fprintf(&sb, "%d", length)
+	for i := 1; i < len(t.Offsets); i++ {
+		fmt.Fprintf(&sb, "%08X", t.Offsets[i]-first)
+	}
+	fmt.Fprintf(&sb, "%08X", t.Leadout-first)
+	if pad := (100 - len(t.Offsets)) * 8; pad > 0 {
+		sb.WriteString(strings.Repeat("0", pad))
 	}
 
 	h := sha1.New()
 	h.Write([]byte(sb.String()))
 	digest := h.Sum(nil)
-	return ctdbBase64Encoding.EncodeToString(digest)
+	b64 := base64.StdEncoding.EncodeToString(digest)
+	return ctdbReplacer.Replace(b64)
 }
 
 // CTDBLookupURL returns the CUETools Database lookup URL.
@@ -147,7 +150,7 @@ func (t *TOC) CTDBLookupURL() string {
 	if id == "" {
 		return ""
 	}
-	return fmt.Sprintf("https://db.cuetools.net/ui/cd/%s", id)
+	return fmt.Sprintf("https://db.cuetools.net/ui/?tocid=%s", id)
 }
 
 // AccurateRipDiscID1 computes the first AccurateRip disc identifier.

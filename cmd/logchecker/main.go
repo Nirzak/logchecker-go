@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Nirzak/logchecker-go/gnudb"
 	"github.com/Nirzak/logchecker-go/internal/parser/eac"
 	"github.com/Nirzak/logchecker-go/internal/util"
 	"github.com/Nirzak/logchecker-go/logchecker"
@@ -176,7 +177,16 @@ func printDiscIDs(lc *logchecker.Logchecker) {
 	fmt.Println("CTDB        :", t.CTDBDiscID())
 	fmt.Println("  CTDB URL  :", t.CTDBLookupURL())
 	fmt.Println("FreeDB/CDDB :", t.FreeDBDiscID())
-	fmt.Println("  FreeDB URL:", t.FreeDBLookupURL())
+	if g, err := gnudb.Resolve(t); err != nil {
+		fmt.Println("  gnudb     : lookup failed:", err)
+		fmt.Println("  FreeDB URL:", t.FreeDBLookupURL())
+	} else if g.Matched {
+		fmt.Println("  gnudb     : matched", g.DiscID, "—", g.Title)
+		fmt.Println("  FreeDB URL:", g.URL)
+	} else {
+		fmt.Println("  gnudb     : no match; using calculated ID")
+		fmt.Println("  FreeDB URL:", g.URL)
+	}
 }
 
 // htmlToConsole strips HTML span/strong tags (console output, no colors).

@@ -70,17 +70,33 @@ FreeDB/CDDB) with their lookup URLs, then exits without dumping the log text.
 The AccurateRip ID is taken from the log when embedded (dBpoweramp); the rest
 are computed from the parsed TOC. Lines are omitted when the log has no TOC.
 
+For FreeDB/CDDB, the tool additionally queries the **gnudb** database online to
+resolve the disc to an authoritative entry (the calculated CDDB ID and the
+database's stored ID can differ in the track-count byte). On a match the gnudb
+ID is used for the URL; if the lookup fails — **no internet, timeout, or no
+match** — it falls back to the calculated ID. The fallback is automatic; the
+command never blocks beyond a 15-second network timeout and always prints a
+usable URL.
+
 ```text
 $ logchecker analyze --ids path/to/file.log
-Ripper  : whipper
-AccurateRip : 017-000dfdc8-00b4ca27-c2058d11
-  AR URL    : http://www.accuraterip.com/accuraterip/8/c/d/dBAR-017-000dfdc8-00b4ca27-c2058d11.bin
-MusicBrainz : wXcMD4BGh8KcpBCxKY.mfAfc_EY-
-  MB URL    : https://musicbrainz.org/cdtoc/attach?toc=...&tracks=17&id=...
-CTDB        : tbuVo3k57JgCiLhxX1jqNvn2hME
-  CTDB URL  : https://db.cuetools.net/ui/cd/tbuVo3k57JgCiLhxX1jqNvn2hME
-FreeDB/CDDB : c2058d11
-  FreeDB URL: https://gnudb.com/cd/c2058d11
+Ripper  : EAC
+AccurateRip : 011-00164217-00beabe7-9d0bf70b
+  AR URL    : http://www.accuraterip.com/accuraterip/7/1/2/dBAR-011-00164217-00beabe7-9d0bf70b.bin
+MusicBrainz : lXlcau748FItWbittqBtRd3VYPU-
+  MB URL    : https://musicbrainz.org/cdtoc/attach?toc=...&tracks=11&id=...
+CTDB        : ReQ9rI.mtYl1ofdDtzJxoEbiZUU-
+  CTDB URL  : https://db.cuetools.net/ui/?tocid=ReQ9rI.mtYl1ofdDtzJxoEbiZUU-
+FreeDB/CDDB : 9d0bf70b
+  gnudb     : matched 9d0bf789 — Various Artists / Aashiqui 2
+  FreeDB URL: https://gnudb.org/cd/9d0bf789
+```
+
+When offline or unmatched the last two lines instead read:
+
+```text
+  gnudb     : no match; using calculated ID
+  FreeDB URL: https://gnudb.org/cd/9d0bf70b
 ```
 
 ## Library Usage
@@ -182,6 +198,32 @@ case accuraterip.StatusNotFound: // disc absent from the database
 case accuraterip.StatusError:
 }
 ```
+
+### gnudb disc-ID resolution (`gnudb`)
+
+The locally-computed FreeDB/CDDB ID and gnudb's stored ID can differ in the
+track-count byte. The `gnudb` package resolves a TOC to gnudb's authoritative
+entry over its CDDB CGI protocol, falling back to the calculated ID on any
+failure (no internet, timeout, or no match). Like `accuraterip`, it performs
+network I/O and is kept out of the pure core — call it explicitly:
+
+```go
+import "github.com/Nirzak/logchecker-go/gnudb"
+
+res, err := gnudb.Resolve(lc.GetTOC())   // or ResolveWithContext(ctx, toc)
+if err != nil {
+    // offline / timeout / http error — res still holds the calculated fallback
+}
+res.DiscID  // gnudb ID if matched, else the calculated CDDB ID
+res.URL     // https://gnudb.org/cd/<DiscID>
+res.Matched // true if gnudb returned an entry
+res.Title   // "Artist / Album" from the match, if any
+```
+
+`Resolve` never blocks beyond a 15-second timeout, and `res` is always usable
+even on error. The CLI's `--ids` flag uses this internally.
+
+For the pure, offline calculated URL (no network), use `GetTOC().FreeDBLookupURL()`.
 
 
 ## Testing

@@ -31,6 +31,7 @@ A score starts at **100** and decreases based on problems found (bad settings, c
 | `account()` / `accountTrack()` centralize scoring (with `accountDeduction`/`accountNotice`/`accountFatal` convenience wrappers in `scoring.go`) | All score mutations go through one place; prevents duplicate detail messages |
 | Ripper-specific parse entry points (`legacyParse`, `whipperParse`, `dbpowerampParse`) | EAC/XLD share legacy logic; whipper and dBpoweramp have divergent formats |
 | Disc-ID calc in `internal/toc` (pure) vs DB lookup in public `accuraterip/` (HTTP) | Keeps `Parse()` and the core library pure CPU/memory; network I/O is opt-in by the consumer only |
+| Network HTTP confined to public `accuraterip/` and `gnudb/`, never in `logchecker/` or `internal/` | DB lookups need HTTP; isolating them in opt-in public packages keeps the core `Parse()` path and all `internal/` packages pure |
 | Fixture-driven tests (`tests/logs/*/details/*.json` + `html/*.log`) | Regression tests against real-world logs with known-good outputs |
 
 ---
@@ -145,6 +146,8 @@ logchecker-go/
 ├── cmd/logchecker/main.go        # CLI only — thin wrapper, no business logic
 ├── accuraterip/
 │   └── accuraterip.go            # PUBLIC pkg: AccurateRip DB lookup (HTTP) + .bin parse — opt-in network I/O
+├── gnudb/
+│   └── gnudb.go                  # PUBLIC pkg: gnudb CDDB lookup (HTTP) — resolves FreeDB ID to authoritative entry; opt-in
 ├── internal/
 │   ├── check/
 │   │   ├── ripper.go             # GetRipper() — detects ripper from raw text
@@ -220,7 +223,7 @@ Parse()
 | New language support | Add JSON file to `internal/parser/eac/languages/` + entry in `master.json`; `//go:embed` picks it up automatically |
 | Encoding edge case | `internal/util/encoding.go` only |
 | New disc-ID scheme (pure calc) | Add method on `TOC` in `internal/toc/toc.go`; surface via a `logchecker` getter if needed |
-| New external DB lookup (network) | New public package (like `accuraterip/`) — NEVER inside `logchecker/` or `internal/`; consume `lc.GetTOC()` |
+| New external DB lookup (network) | New **public** package consuming `lc.GetTOC()` (like `accuraterip/` or `gnudb/`). NEVER add HTTP to `logchecker/`, the parse path, or any `internal/` package |
 
 ---
 
@@ -236,7 +239,7 @@ Parse()
 
 5. **Never modify test fixtures (`tests/logs/*/details/*.json`, `html/*.log`) to make a failing test pass** — fix the code. Fixtures are the ground truth derived from the PHP reference implementation.
 
-6. **Never add external HTTP calls or filesystem side effects to `logchecker/` or `internal/`** — the core library is pure CPU/memory; `NewFile()` is its only I/O entry point. Network-dependent features (e.g. AccurateRip DB verification) go in a **separate public package** like `accuraterip/`, which the consumer opts into explicitly.
+6. **Never add external HTTP calls or filesystem side effects to `logchecker/` or any `internal/` package** — the core parse path (`Parse()` and everything it calls) and the `internal/` packages (`check`, `toc`, `util`, `parser/eac`) are pure CPU/memory; `NewFile()` is the only I/O entry point. Network-dependent features go in a dedicated **public** package the consumer opts into — `accuraterip/` (AccurateRip DB) and `gnudb/` (gnudb CDDB lookup) are the existing examples.
 
 7. **`LevenshteinDistance` is a package-level var for testing only** — do not increase it as a workaround for a failing drive lookup.
 

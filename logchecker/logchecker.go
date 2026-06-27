@@ -21,7 +21,7 @@ var drivesJSON []byte
 var LevenshteinDistance = 0
 
 // Version of the logchecker library.
-const Version = "1.14.8"
+const Version = "1.15.0"
 
 // driveEntry holds one drive from drives.json. Offset is normalized to a
 // string at load time so the lookup hot path needs no type assertions.

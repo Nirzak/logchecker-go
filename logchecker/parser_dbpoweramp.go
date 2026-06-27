@@ -213,7 +213,11 @@ func (lc *Logchecker) dbpowerampParse() {
 				FirstTrack: 1,
 				LastTrack:  len(offsets),
 				Offsets:    offsets,
-				Leadout:    lastEnd + 1,
+				// dBpoweramp's "Ripped LBA <start> to <end>" uses <end> as the
+				// exclusive end (== next track's start), so the last track's
+				// <end> is already the lead-out sector — no +1 (unlike EAC,
+				// whose TOC lists an inclusive End sector).
+				Leadout: lastEnd,
 			}
 		}
 	}

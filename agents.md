@@ -251,6 +251,8 @@ Parse()
 - All tests live in `logchecker_test.go` (package `logchecker_test`) — black-box testing of the public API only
 - `TestLogchecker`: validates `ripper`, `version`, `language`, `combined`, `score`, `checksum`, `details` against `tests/logs/*/details/*.json`
 - `TestHTMLOutput`: validates full annotated HTML output against `tests/logs/*/html/*.log`
+- `TestTOCExtraction`: validates TOC extraction from **every** test log by checking the expected AccurateRip disc ID (`GetAccurateRipID()`). AR ID = f(offsets, leadout, tracks), so a correct AR ID proves the entire TOC was extracted correctly; MusicBrainz/CTDB/FreeDB all derive from the same `TOC` struct and are implicitly covered. Logs without a TOC table are listed in a separate `noTOC` slice and verified to return `nil`. **No network calls** — pure CPU.
+- `TestAccurateRipIDExtraction`: spot-checks `GetAccurateRipID()` for dBpoweramp (embedded `[DiscID:]`) vs whipper (computed from TOC) to verify both code paths.
 
 
 
@@ -267,15 +269,21 @@ logchecker analyze tests/logs/eac/originals/new.log \
 # 3. Verify the fixture looks correct, then commit both files
 ```
 
+After generating fixtures, **also update `TestTOCExtraction`** in `logchecker_test.go`:
+- If the log contains a TOC table → add its path and expected AR ID to the `wantARID` map. Run `logchecker analyze --ids <log>` to obtain the AR ID.
+- If the log has no TOC → add its path to the `noTOC` slice.
+
 ### Running targeted tests
 ```bash
 go test -v -run "TestLogchecker/eac/combined_1.log" ./...
 go test -v -run "TestHTMLOutput/whipper" ./...
+go test -v -run "TestTOCExtraction" ./...
 ```
 
 ### Coverage expectations
 - Every new ripper rule (`account()` call) **must** have at least one fixture that exercises it
 - All code paths in `internal/` packages must be covered by the fixture suite or explicit unit tests
+- Every test log **must** have a corresponding entry in `TestTOCExtraction` (either `wantARID` or `noTOC`)
 - `checksum_invalid` fixtures may report `checksum_ok` in environments without the external validator — this is explicitly tolerated in the test harness; do not work around it differently
 
 ---

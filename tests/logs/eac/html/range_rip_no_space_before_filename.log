@@ -30,9 +30,9 @@ Exact Audio Copy <span class="log1">V1.6</span> from <span class="log1">23. Octo
 
 Track | Start | Length | Start sector | End sector
 <strong>---------------------------------------------------------</strong>
-1 | 0:00.37 | 4:58.00 | 37 | 22386
-2 | 4:58.37 | 4:46.00 | 22387 | 43836
-3 | 9:44.37 | 4:55.00 | 43837 | 65961
+<span class="log4">1</span> <strong>|</strong> <span class="log1">0:00.37</span> <strong>|</strong> <span class="log1">4:58.00</span> <strong>|</strong> <span class="log1">37</span> <strong>|</strong> <span class="log1">22386</span>
+<span class="log4">2</span> <strong>|</strong> <span class="log1">4:58.37</span> <strong>|</strong> <span class="log1">4:46.00</span> <strong>|</strong> <span class="log1">22387</span> <strong>|</strong> <span class="log1">43836</span>
+<span class="log4">3</span> <strong>|</strong> <span class="log1">9:44.37</span> <strong>|</strong> <span class="log1">4:55.00</span> <strong>|</strong> <span class="log1">43837</span> <strong>|</strong> <span class="log1">65961</span>
 
 
 <span class="bad">Range status and errors</span>

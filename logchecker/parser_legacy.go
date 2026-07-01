@@ -79,7 +79,7 @@ var (
 	win32InterfaceRe  = regexp.MustCompile(`(?i)\n( *)Native Win32 interface(.+)`)
 	tocHeaderRe       = regexp.MustCompile(`(?i)( +)Track( +)\|( +)Start( +)\|( +)Length( +)\|( +)Start sector( +)\|( +)End sector( ?)`)
 	tocDashRe         = regexp.MustCompile(`-{10,100}`)
-	tocRowRe          = regexp.MustCompile(`(?i)( +)([0-9]{1,3})( +)\|( +)(([0-9]{1,3}:)?[0-9]{2}[.:][0-9]{2})( +)\|( +)(([0-9]{1,3}:)?[0-9]{2}[.:][0-9]{2})( +)\|( +)([0-9]{1,10})( +)\|( +)([0-9]{1,10})( +)\n`)
+	tocRowRe          = regexp.MustCompile(`(?i)( *)([0-9]{1,3})( +)\|( +)(([0-9]{1,3}:)?[0-9]{2}[.:][0-9]{2})( +)\|( +)(([0-9]{1,3}:)?[0-9]{2}[.:][0-9]{2})( +)\|( +)([0-9]{1,10})( +)\|( +)([0-9]{1,10})( *)\n`)
 	noErrorsRe        = regexp.MustCompile(`(?i)No errors occurr?ed`)
 	thereWereErrorsRe = regexp.MustCompile(`(?i)(There were errors) ?\n`)
 	someInconsistRe   = regexp.MustCompile(`(?i)(Some inconsistencies found) ?\n`)

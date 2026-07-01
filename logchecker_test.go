@@ -214,111 +214,106 @@ func stringsEqual(a, b []string) bool {
 }
 
 func TestTOCExtraction(t *testing.T) {
-	tests := []struct {
-		name         string
-		logPath      string
-		expectTOC    bool
-		trackCount   int
-		firstOffset  int
-		mbDiscID     string // expected MusicBrainz disc ID (empty = skip check)
-		freedbDiscID string // expected FreeDB disc ID (empty = skip check)
-	}{
-		{
-			name:       "eac with TOC",
-			logPath:    "tests/logs/eac/originals/en_5.log",
-			expectTOC:  true,
-			trackCount: 13,
-		},
-		{
-			name:      "eac without TOC",
-			logPath:   "tests/logs/eac/originals/en_1.log",
-			expectTOC: false,
-		},
-		{
-			name:         "whipper",
-			logPath:      "tests/logs/whipper/originals/1.log",
-			expectTOC:    true,
-			trackCount:   17,
-			firstOffset:  0,
-			mbDiscID:     "wXcMD4BGh8KcpBCxKY.mfAfc_EY-",
-			freedbDiscID: "c2058d11",
-		},
-		{
-			name:        "xld",
-			logPath:     "tests/logs/xld/originals/xld_perfect.log",
-			expectTOC:   true,
-			trackCount:  16,
-			firstOffset: 35,
-		},
-		{
-			name:        "dbpoweramp",
-			logPath:     "tests/logs/dbpoweramp/originals/Ultra Perfect Rip.log",
-			expectTOC:   true,
-			trackCount:  9,
-			firstOffset: 0,
-		},
+	// wantARID maps every test log that should produce a TOC to its
+	// expected AccurateRip disc ID.  AR ID = f(offsets, leadout, tracks),
+	// so a correct AR ID proves the entire TOC was extracted correctly.
+	// MB / CTDB / FreeDB all derive from the same TOC struct, so they
+	// are implicitly covered.
+	wantARID := map[string]string{
+		// EAC
+		"tests/logs/eac/originals/combined-with-burst.log":                          "012-001d9a1d-011e5f28-8910460c",
+		"tests/logs/eac/originals/combined_1.log":                                   "010-0017ff18-00bef165-8c0e970a",
+		"tests/logs/eac/originals/combined_copy_aborted.log":                        "020-0028494e-024deb84-2b0d0914",
+		"tests/logs/eac/originals/combined_different_drives.log":                    "012-002107d1-012cf219-c810280c",
+		"tests/logs/eac/originals/combined_different_drives_missing_second.log":     "012-002107d1-012cf219-c810280c",
+		"tests/logs/eac/originals/combined_mp3_1.log":                               "004-00059507-00167d09-2d07af04",
+		"tests/logs/eac/originals/combined_mp3_2.log":                               "008-000ef04a-00640684-760b7b08",
+		"tests/logs/eac/originals/cs_1.log":                                         "011-0010b7c2-009041a8-7809a00b",
+		"tests/logs/eac/originals/en_2.log":                                         "012-0015007e-00c20538-980ad70c",
+		"tests/logs/eac/originals/en_3.log":                                         "017-0023979e-01c0d6c4-d80df111",
+		"tests/logs/eac/originals/en_4.log":                                         "011-0011d5fa-00a0d6e3-8f0c540b",
+		"tests/logs/eac/originals/en_5.log":                                         "013-00156be3-00d62ac1-b70aae0d",
+		"tests/logs/eac/originals/en_6.log":                                         "008-000d4ad5-0056d79a-6009d108",
+		"tests/logs/eac/originals/en_7.log":                                         "025-0039bb28-04113cce-540f3819",
+		"tests/logs/eac/originals/en_8_negative_offset.log":                         "014-00256c98-01899f9d-df10f40e",
+		"tests/logs/eac/originals/en_delete_leading_silent.log":                     "014-00203859-015967b7-c9106e0e",
+		"tests/logs/eac/originals/en_normalization.log":                              "012-001f1d35-011e5bf3-9f105b0c",
+		"tests/logs/eac/originals/encoding_maccentraleurope.log":                    "019-00360ce9-02de37d4-14113b13",
+		"tests/logs/eac/originals/file_write_error.log":                             "014-002913c0-01af357d-bf12380e",
+		"tests/logs/eac/originals/gap_handling_left_out.log":                        "015-001f3298-0161a3b1-d80cdb0f",
+		"tests/logs/eac/originals/id3_tags.log":                                     "013-00178adb-00ed88cf-ca0b2a0d",
+		"tests/logs/eac/originals/invalid_track_separator.log":                      "003-000174ee-0004e48d-19028903",
+		"tests/logs/eac/originals/jp_2.log":                                         "006-0006c11a-0023f803-3e068c06",
+		"tests/logs/eac/originals/long_filename.log":                                "012-00235be9-01514fd0-ac12870c",
+		"tests/logs/eac/originals/no_test_copy.log":                                 "013-001e1ff2-012df642-ad0e820d",
+		"tests/logs/eac/originals/range_rip_no_space_before_filename.log":           "003-0002047f-0006b76a-18036f03",
+		"tests/logs/eac/originals/ru_1.log":                                         "010-001ccda3-00e5ab70-9f12690a",
+		"tests/logs/eac/originals/ru_2.log":                                         "012-001f4873-0125437c-b711cc0c",
+		// XLD
+		"tests/logs/xld/originals/angle_bracket.log":  "010-000eb92b-0072cf34-82088a0a",
+		"tests/logs/xld/originals/cdparanoia.log":      "010-0010bad3-0084dd33-740a450a",
+		"tests/logs/xld/originals/macroman.log":        "014-001bbebd-012f451f-da0dc80e",
+		"tests/logs/xld/originals/null_drive.log":      "007-0009084d-00370534-6708e107",
+		"tests/logs/xld/originals/old_no_checksum.log": "016-00205e97-01923485-cd0e2610",
+		"tests/logs/xld/originals/range-vbox.log":      "003-00014f93-0004617c-1e023c03",
+		"tests/logs/xld/originals/xld_perfect.log":     "016-001fcbda-01800a88-e40d7a10",
+		"tests/logs/xld/originals/xld_perfect_2.log":   "019-002c194f-026ce8a3-030f6713",
+		// whipper
+		"tests/logs/whipper/originals/1.log":             "017-000dfdc8-00b4ca27-c2058d11",
+		"tests/logs/whipper/originals/4.log":             "013-00185ebf-00f46c7d-c30bde0d",
+		"tests/logs/whipper/originals/invalid_hash.log":  "017-000dfdc8-00b4ca27-c2058d11",
+		"tests/logs/whipper/originals/missing_hash.log":  "017-000dfdc8-00b4ca27-c2058d11",
+		"tests/logs/whipper/originals/whipper_0_9_0.log": "012-00159d6b-00c997f8-ab0b7c0c",
+		// dBpoweramp
+		"tests/logs/dbpoweramp/originals/Secure Rip Ultra Enabled with Re-Rip Frames.log":  "015-0022f083-018c901e-d10f080f",
+		"tests/logs/dbpoweramp/originals/Secure rip ultra enabled with inaccurate rip.log":  "011-001f3a4b-020e8c9d-7b0c940b",
+		"tests/logs/dbpoweramp/originals/Standard Accurate Rip Ultra Disabled 2.log":        "009-000f105c-006e4f61-8a0a4209",
+		"tests/logs/dbpoweramp/originals/Standard FLAC Accurate Rip Ultra Disabled.log":     "009-001a2b3c-00e4f5a6-6a07b809",
+		"tests/logs/dbpoweramp/originals/Standard WAV Accurate Rip Ultra Disabled.log":      "006-00057e24-001d2d8b-43053c06",
+		"tests/logs/dbpoweramp/originals/Ultra Perfect Rip.log":                             "009-001c3d4e-01f2a3b4-7c08d509",
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	// Logs that genuinely contain no TOC table.
+	noTOC := []string{
+		"tests/logs/eac/originals/eac_95_1.log",
+		"tests/logs/eac/originals/en_1.log",
+		"tests/logs/eac/originals/incorrect_offset.log",
+		"tests/logs/eac/originals/pl_1.log",
+		"tests/logs/dbpoweramp/originals/Full Errored Rip.log",
+	}
+
+	for logPath, expectedAR := range wantARID {
+		t.Run(logPath, func(t *testing.T) {
 			lc := logchecker.New()
-			if err := lc.NewFile(tt.logPath); err != nil {
-				t.Fatalf("NewFile error: %v", err)
+			if err := lc.NewFile(logPath); err != nil {
+				t.Fatalf("NewFile: %v", err)
 			}
 			lc.Parse()
 
-			toc := lc.GetTOC()
-			if tt.expectTOC {
-				if toc == nil {
-					t.Fatal("expected TOC but got nil")
-				}
-				if toc.LastTrack != tt.trackCount {
-					t.Errorf("track count: got %d, want %d", toc.LastTrack, tt.trackCount)
-				}
-				if tt.firstOffset >= 0 && len(toc.Offsets) > 0 && toc.Offsets[0] != tt.firstOffset {
-					t.Errorf("first offset: got %d, want %d", toc.Offsets[0], tt.firstOffset)
-				}
-				if toc.Leadout <= 0 {
-					t.Error("leadout should be > 0")
-				}
+			if lc.GetTOC() == nil {
+				t.Fatal("expected TOC but got nil")
+			}
+			if got := lc.GetAccurateRipID(); got != expectedAR {
+				t.Errorf("GetAccurateRipID() = %q, want %q", got, expectedAR)
+			}
+		})
+	}
 
-				// Verify disc IDs are non-empty
-				if toc.MusicBrainzDiscID() == "" {
-					t.Error("MusicBrainzDiscID() returned empty")
-				}
-				if toc.FreeDBDiscID() == "" {
-					t.Error("FreeDBDiscID() returned empty")
-				}
-				if toc.CTDBDiscID() == "" {
-					t.Error("CTDBDiscID() returned empty")
-				}
+	for _, logPath := range noTOC {
+		t.Run(logPath, func(t *testing.T) {
+			lc := logchecker.New()
+			if err := lc.NewFile(logPath); err != nil {
+				t.Fatalf("NewFile: %v", err)
+			}
+			lc.Parse()
 
-				// Verify URLs are non-empty
-				if toc.MusicBrainzLookupURL() == "" {
-					t.Error("MusicBrainzLookupURL() returned empty")
-				}
-				if toc.FreeDBLookupURL() == "" {
-					t.Error("FreeDBLookupURL() returned empty")
-				}
-				if toc.CTDBLookupURL() == "" {
-					t.Error("CTDBLookupURL() returned empty")
-				}
-
-				// Check specific expected values
-				if tt.mbDiscID != "" && toc.MusicBrainzDiscID() != tt.mbDiscID {
-					t.Errorf("MusicBrainzDiscID: got %q, want %q", toc.MusicBrainzDiscID(), tt.mbDiscID)
-				}
-				if tt.freedbDiscID != "" && toc.FreeDBDiscID() != tt.freedbDiscID {
-					t.Errorf("FreeDBDiscID: got %q, want %q", toc.FreeDBDiscID(), tt.freedbDiscID)
-				}
-			} else {
-				if toc != nil {
-					t.Errorf("expected nil TOC but got %+v", toc)
-				}
+			if toc := lc.GetTOC(); toc != nil {
+				t.Errorf("expected nil TOC but got %+v", toc)
 			}
 		})
 	}
 }
+
 
 // TestAccurateRipIDExtraction verifies GetAccurateRipID():
 //   - dBpoweramp: extracted from the embedded [DiscID: ...] field

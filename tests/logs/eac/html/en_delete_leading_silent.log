@@ -33,20 +33,20 @@ Exact Audio Copy <span class="log1">V1.3</span> from <span class="log1">2. Septe
 
 <strong>     Track |   Start  |  Length  | Start sector | End sector</strong>
     <strong>---------------------------------------------------------</strong>
-        1  |  0:00.00 |  4:22.24 |         0    |    19673
-        2  |  4:22.24 |  4:12.05 |     19674    |    38578
-        3  |  8:34.29 |  5:50.31 |     38579    |    64859
-        4  | 14:24.60 |  3:43.30 |     64860    |    81614
-        5  | 18:08.15 |  4:55.25 |     81615    |   103764
-        6  | 23:03.40 |  4:39.43 |    103765    |   124732
-        7  | 27:43.08 |  0:31.03 |    124733    |   127060
-        8  | 28:14.11 |  5:59.17 |    127061    |   154002
-        9  | 34:13.28 |  3:35.32 |    154003    |   170159
-       10  | 37:48.60 |  6:29.39 |    170160    |   199373
-       11  | 44:18.24 |  4:48.27 |    199374    |   221000
-       12  | 49:06.51 |  4:28.37 |    221001    |   241137
-       13  | 53:35.13 |  1:59.33 |    241138    |   250095
-       14  | 55:34.46 | 14:32.22 |    250096    |   315517
+        <span class="log4">1</span>  <strong>|</strong>  <span class="log1">0:00.00</span> <strong>|</strong>  <span class="log1">4:22.24</span> <strong>|</strong>         <span class="log1">0</span>    <strong>|</strong>    <span class="log1">19673</span>
+        <span class="log4">2</span>  <strong>|</strong>  <span class="log1">4:22.24</span> <strong>|</strong>  <span class="log1">4:12.05</span> <strong>|</strong>     <span class="log1">19674</span>    <strong>|</strong>    <span class="log1">38578</span>
+        <span class="log4">3</span>  <strong>|</strong>  <span class="log1">8:34.29</span> <strong>|</strong>  <span class="log1">5:50.31</span> <strong>|</strong>     <span class="log1">38579</span>    <strong>|</strong>    <span class="log1">64859</span>
+        <span class="log4">4</span>  <strong>|</strong> <span class="log1">14:24.60</span> <strong>|</strong>  <span class="log1">3:43.30</span> <strong>|</strong>     <span class="log1">64860</span>    <strong>|</strong>    <span class="log1">81614</span>
+        <span class="log4">5</span>  <strong>|</strong> <span class="log1">18:08.15</span> <strong>|</strong>  <span class="log1">4:55.25</span> <strong>|</strong>     <span class="log1">81615</span>    <strong>|</strong>   <span class="log1">103764</span>
+        <span class="log4">6</span>  <strong>|</strong> <span class="log1">23:03.40</span> <strong>|</strong>  <span class="log1">4:39.43</span> <strong>|</strong>    <span class="log1">103765</span>    <strong>|</strong>   <span class="log1">124732</span>
+        <span class="log4">7</span>  <strong>|</strong> <span class="log1">27:43.08</span> <strong>|</strong>  <span class="log1">0:31.03</span> <strong>|</strong>    <span class="log1">124733</span>    <strong>|</strong>   <span class="log1">127060</span>
+        <span class="log4">8</span>  <strong>|</strong> <span class="log1">28:14.11</span> <strong>|</strong>  <span class="log1">5:59.17</span> <strong>|</strong>    <span class="log1">127061</span>    <strong>|</strong>   <span class="log1">154002</span>
+        <span class="log4">9</span>  <strong>|</strong> <span class="log1">34:13.28</span> <strong>|</strong>  <span class="log1">3:35.32</span> <strong>|</strong>    <span class="log1">154003</span>    <strong>|</strong>   <span class="log1">170159</span>
+       <span class="log4">10</span>  <strong>|</strong> <span class="log1">37:48.60</span> <strong>|</strong>  <span class="log1">6:29.39</span> <strong>|</strong>    <span class="log1">170160</span>    <strong>|</strong>   <span class="log1">199373</span>
+       <span class="log4">11</span>  <strong>|</strong> <span class="log1">44:18.24</span> <strong>|</strong>  <span class="log1">4:48.27</span> <strong>|</strong>    <span class="log1">199374</span>    <strong>|</strong>   <span class="log1">221000</span>
+       <span class="log4">12</span>  <strong>|</strong> <span class="log1">49:06.51</span> <strong>|</strong>  <span class="log1">4:28.37</span> <strong>|</strong>    <span class="log1">221001</span>    <strong>|</strong>   <span class="log1">241137</span>
+       <span class="log4">13</span>  <strong>|</strong> <span class="log1">53:35.13</span> <strong>|</strong>  <span class="log1">1:59.33</span> <strong>|</strong>    <span class="log1">241138</span>    <strong>|</strong>   <span class="log1">250095</span>
+       <span class="log4">14</span>  <strong>|</strong> <span class="log1">55:34.46</span> <strong>|</strong> <span class="log1">14:32.22</span> <strong>|</strong>    <span class="log1">250096</span>    <strong>|</strong>   <span class="log1">315517</span>
 
 
 <span class="log5">Track</span>  <span class="log4 log1">1</span>

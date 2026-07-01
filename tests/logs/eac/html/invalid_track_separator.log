@@ -1,4 +1,3 @@
-
 Exact Audio Copy <span class="log1">V1.6</span> from <span class="log1">23. October 2020</span>
 
 <span class='good'>EAC extraction logfile from <span class='log5'>5. October 2023, 12:20</span></span>
@@ -33,9 +32,9 @@ Exact Audio Copy <span class="log1">V1.6</span> from <span class="log1">23. Octo
 
      user |   Start  |  Length  | Start sector | End sector
     <strong>---------------------------------------------------------</strong>
-        1  |  0:00.00 |  3:13.29 |         0    |    14503
-        2  |  3:13.29 |  3:56.16 |     14504    |    32219
-        3  |  7:09.45 |  3:40.26 |     32220    |    48745
+        <span class="log4">1</span>  <strong>|</strong>  <span class="log1">0:00.00</span> <strong>|</strong>  <span class="log1">3:13.29</span> <strong>|</strong>         <span class="log1">0</span>    <strong>|</strong>    <span class="log1">14503</span>
+        <span class="log4">2</span>  <strong>|</strong>  <span class="log1">3:13.29</span> <strong>|</strong>  <span class="log1">3:56.16</span> <strong>|</strong>     <span class="log1">14504</span>    <strong>|</strong>    <span class="log1">32219</span>
+        <span class="log4">3</span>  <strong>|</strong>  <span class="log1">7:09.45</span> <strong>|</strong>  <span class="log1">3:40.26</span> <strong>|</strong>     <span class="log1">32220</span>    <strong>|</strong>    <span class="log1">48745</span>
 
 
 user  1

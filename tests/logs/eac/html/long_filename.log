@@ -32,18 +32,18 @@ Exact Audio Copy <span class="log1">V1.0 beta 3</span> from <span class="log1">2
 
 <strong>     Track |   Start  |  Length  | Start sector | End sector</strong>
     <strong>---------------------------------------------------------</strong>
-        1  |  0:00.00 |  4:46.00 |         0    |    21449
-        2  |  4:46.00 |  5:12.07 |     21450    |    44856
-        3  |  9:58.07 |  6:05.33 |     44857    |    72264
-        4  | 16:03.40 |  3:11.10 |     72265    |    86599
-        5  | 19:14.50 | 10:32.32 |     86600    |   134031
-        6  | 29:47.07 |  7:49.20 |    134032    |   169226
-        7  | 37:36.27 | 15:14.08 |    169227    |   237784
-        8  | 52:50.35 |  6:08.25 |    237785    |   265409
-        9  | 58:58.60 |  2:47.45 |    265410    |   277979
-       10  | 61:46.30 |  5:06.27 |    277980    |   300956
-       11  | 66:52.57 |  8:35.02 |    300957    |   339583
-       12  | 77:59.59 |  1:03.33 |    350984    |   355741
+        <span class="log4">1</span>  <strong>|</strong>  <span class="log1">0:00.00</span> <strong>|</strong>  <span class="log1">4:46.00</span> <strong>|</strong>         <span class="log1">0</span>    <strong>|</strong>    <span class="log1">21449</span>
+        <span class="log4">2</span>  <strong>|</strong>  <span class="log1">4:46.00</span> <strong>|</strong>  <span class="log1">5:12.07</span> <strong>|</strong>     <span class="log1">21450</span>    <strong>|</strong>    <span class="log1">44856</span>
+        <span class="log4">3</span>  <strong>|</strong>  <span class="log1">9:58.07</span> <strong>|</strong>  <span class="log1">6:05.33</span> <strong>|</strong>     <span class="log1">44857</span>    <strong>|</strong>    <span class="log1">72264</span>
+        <span class="log4">4</span>  <strong>|</strong> <span class="log1">16:03.40</span> <strong>|</strong>  <span class="log1">3:11.10</span> <strong>|</strong>     <span class="log1">72265</span>    <strong>|</strong>    <span class="log1">86599</span>
+        <span class="log4">5</span>  <strong>|</strong> <span class="log1">19:14.50</span> <strong>|</strong> <span class="log1">10:32.32</span> <strong>|</strong>     <span class="log1">86600</span>    <strong>|</strong>   <span class="log1">134031</span>
+        <span class="log4">6</span>  <strong>|</strong> <span class="log1">29:47.07</span> <strong>|</strong>  <span class="log1">7:49.20</span> <strong>|</strong>    <span class="log1">134032</span>    <strong>|</strong>   <span class="log1">169226</span>
+        <span class="log4">7</span>  <strong>|</strong> <span class="log1">37:36.27</span> <strong>|</strong> <span class="log1">15:14.08</span> <strong>|</strong>    <span class="log1">169227</span>    <strong>|</strong>   <span class="log1">237784</span>
+        <span class="log4">8</span>  <strong>|</strong> <span class="log1">52:50.35</span> <strong>|</strong>  <span class="log1">6:08.25</span> <strong>|</strong>    <span class="log1">237785</span>    <strong>|</strong>   <span class="log1">265409</span>
+        <span class="log4">9</span>  <strong>|</strong> <span class="log1">58:58.60</span> <strong>|</strong>  <span class="log1">2:47.45</span> <strong>|</strong>    <span class="log1">265410</span>    <strong>|</strong>   <span class="log1">277979</span>
+       <span class="log4">10</span>  <strong>|</strong> <span class="log1">61:46.30</span> <strong>|</strong>  <span class="log1">5:06.27</span> <strong>|</strong>    <span class="log1">277980</span>    <strong>|</strong>   <span class="log1">300956</span>
+       <span class="log4">11</span>  <strong>|</strong> <span class="log1">66:52.57</span> <strong>|</strong>  <span class="log1">8:35.02</span> <strong>|</strong>    <span class="log1">300957</span>    <strong>|</strong>   <span class="log1">339583</span>
+       <span class="log4">12</span>  <strong>|</strong> <span class="log1">77:59.59</span> <strong>|</strong>  <span class="log1">1:03.33</span> <strong>|</strong>    <span class="log1">350984</span>    <strong>|</strong>   <span class="log1">355741</span>
 
 
 <span class="log5">Track</span>  <span class="log4 log1">1</span>

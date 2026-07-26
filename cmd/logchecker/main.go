@@ -16,7 +16,7 @@ import (
 
 func usage() {
 	fmt.Fprintf(os.Stderr, `Usage:
-  logchecker analyze  [--html] [--no_text] [--ids] <file> [out_file] [details_json]
+  logchecker analyze  [--html] [--no_text] [--no-checksum] [--ids] <file> [out_file] [details_json]
   logchecker analyse  (alias of analyze)
   logchecker decode   <file>
   logchecker translate [-l lang] <file>
@@ -53,6 +53,7 @@ func cmdAnalyze(args []string) {
 	fs := flag.NewFlagSet("analyze", flag.ExitOnError)
 	htmlFlag := fs.Bool("html", false, "print the HTML version of the log")
 	noText := fs.Bool("no_text", false, "do not print log text to console")
+	noChecksum := fs.Bool("no-checksum", false, "disable checksum validation")
 	idsFlag := fs.Bool("ids", false, "print disc IDs (AccurateRip, MusicBrainz, CTDB, FreeDB) and exit")
 	fs.Parse(args)
 
@@ -81,6 +82,9 @@ func cmdAnalyze(args []string) {
 	if err := lc.NewFile(file); err != nil {
 		fmt.Fprintln(os.Stderr, "Error reading file:", err)
 		os.Exit(1)
+	}
+	if *noChecksum {
+		lc.ValidateChecksum(false)
 	}
 	lc.Parse()
 

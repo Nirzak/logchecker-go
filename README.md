@@ -41,7 +41,7 @@ $ logchecker version
 Logchecker 1.14.4
 
 Usage:
-  logchecker analyze  [--html] [--no_text] [--ids] <file> [out_file] [details_json]
+  logchecker analyze  [--html] [--no_text] [--no-checksum] [--ids] <file> [out_file] [details_json]
   logchecker analyse  (alias of analyze)
   logchecker decode   <file>
   logchecker translate [-l lang] <file>
@@ -62,6 +62,9 @@ Details :
     Could not verify id3 tag setting (-1 point)
     Range rip detected (-30 points)
 ```
+
+Use `--no-checksum` to skip validation of the log checksum. The checksum
+section is still detected and reported, but its value is not verified.
 
 ### Disc IDs (`--ids`)
 

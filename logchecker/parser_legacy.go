@@ -325,7 +325,8 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 		lc.ripperVersion = strings.TrimLeft(m[1], "V")
 		vcheck := strings.Split(lc.ripperVersion, " ")[0]
 		if compareVersions(vcheck, "1.0") < 0 {
-			lc.checksumStatus = check.ChecksumMissing
+			// EAC added log checksums in version 1.0.
+			lc.checksumStatus = check.ChecksumNotApplicable
 			v, _ := strconv.ParseFloat(vcheck, 64)
 			if v <= 0.95 {
 				lc.account("EAC version older than 0.99", 30, -1, false, false)
@@ -334,7 +335,7 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 			lc.checksumStatus = check.ChecksumMissing
 		}
 	} else if eacOldRe.MatchString(rawLog) {
-		lc.checksumStatus = check.ChecksumMissing
+		lc.checksumStatus = check.ChecksumNotApplicable
 		lc.account("EAC version older than 0.99", 30, -1, false, false)
 	}
 
@@ -343,6 +344,9 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 		ver, _ := strconv.Atoi(lc.ripperVersion)
 		if ver >= 20121222 && !xldSigRe.MatchString(rawLog) {
 			lc.checksumStatus = check.ChecksumMissing
+		} else if ver < 20121222 {
+			// The XLD Log Checker plug-in, which appends signatures, was made available with this release.
+			lc.checksumStatus = check.ChecksumNotApplicable
 		}
 	}
 
@@ -387,7 +391,7 @@ func (lc *Logchecker) legacyParseSession(logIdx int, rawLog string) {
 
 	// Annotate checksum block
 	csClass := "good"
-	if lc.checksumStatus != check.ChecksumOK {
+	if lc.checksumStatus == check.ChecksumInvalid || lc.checksumStatus == check.ChecksumMissing {
 		csClass = "bad"
 	}
 	rawLog, eacCount := replaceCount(rawLog, checksumRe, "<span class='"+csClass+"'>$1</span>", 1)

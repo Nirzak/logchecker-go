@@ -124,6 +124,43 @@ func TestLogchecker(t *testing.T) {
 	}
 }
 
+func TestChecksumStateForApplicableButMissingEACChecksum(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "missing-checksum.log")
+	log := "Exact Audio Copy V1.0 from 1. January 2020\n\n" +
+		"EAC extraction logfile from 1. January 2020\n"
+	if err := os.WriteFile(path, []byte(log), 0o600); err != nil {
+		t.Fatalf("write log fixture: %v", err)
+	}
+
+	lc := logchecker.New()
+	if err := lc.NewFile(path); err != nil {
+		t.Fatalf("NewFile error: %v", err)
+	}
+	lc.Parse()
+
+	if got, want := lc.GetChecksumState(), "checksum_missing"; got != want {
+		t.Errorf("checksum: got %q, want %q", got, want)
+	}
+}
+
+func TestChecksumStateForApplicableButMissingXLDSignature(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "missing-signature.log")
+	log := "X Lossless Decoder version 20121222 (120.5)\n"
+	if err := os.WriteFile(path, []byte(log), 0o600); err != nil {
+		t.Fatalf("write log fixture: %v", err)
+	}
+
+	lc := logchecker.New()
+	if err := lc.NewFile(path); err != nil {
+		t.Fatalf("NewFile error: %v", err)
+	}
+	lc.Parse()
+
+	if got, want := lc.GetChecksumState(), "checksum_missing"; got != want {
+		t.Errorf("checksum: got %q, want %q", got, want)
+	}
+}
+
 func TestHTMLOutput(t *testing.T) {
 	rippers := []string{"eac", "xld", "whipper", "dbpoweramp"}
 

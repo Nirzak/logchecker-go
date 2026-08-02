@@ -59,7 +59,8 @@ var (
 )
 
 func (lc *Logchecker) dbpowerampParse() {
-	lc.checksumStatus = check.ChecksumMissing
+	// dBpoweramp extraction logs do not have a log-integrity checksum.
+	lc.checksumStatus = check.ChecksumNotApplicable
 	lc.log = util.NormalizeLineEndings(lc.log)
 
 	// Version

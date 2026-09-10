@@ -16,6 +16,8 @@ const (
 	ChecksumOK      = "checksum_ok"
 	ChecksumInvalid = "checksum_invalid"
 	ChecksumMissing = "checksum_missing"
+	// ChecksumNotApplicable means this ripper/log format does not provide a checksum to validate. It is informational, not an error.
+	ChecksumNotApplicable = "checksum_not_applicable"
 )
 
 var whipperHashRe = regexp.MustCompile(`(?i)SHA-256 hash: ([A-Z0-9]+)$`)
@@ -26,7 +28,7 @@ var whipperHashRe = regexp.MustCompile(`(?i)SHA-256 hash: ([A-Z0-9]+)$`)
 func Validate(logPath, ripper string) string {
 	switch ripper {
 	case DBpoweramp:
-		return ChecksumMissing
+		return ChecksumNotApplicable
 
 	case Whipper:
 		return validateWhipper(logPath)

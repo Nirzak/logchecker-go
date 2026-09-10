@@ -150,7 +150,7 @@ func (lc *Logchecker) GetScore() int { return lc.score }
 // GetDetails returns the list of detail messages accumulated during parse.
 func (lc *Logchecker) GetDetails() []string { return lc.details }
 
-// GetChecksumState returns one of check.Checksum* constants.
+// GetChecksumState returns one of check.Checksum* constants, including ChecksumNotApplicable when this log format has no checksum mechanism.
 func (lc *Logchecker) GetChecksumState() string { return lc.checksumStatus }
 
 // GetLanguage returns the detected log language code (e.g. "en", "ru").
